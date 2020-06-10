@@ -98,8 +98,6 @@ paths:
                   data:
                     type: object
                     properties:
-                      some:
-                        type: number
                       upload_id:
                         type: string
                   errorFlag:

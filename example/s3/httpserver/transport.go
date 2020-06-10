@@ -7,8 +7,8 @@ import (
 	"bytes"
 	"strconv"
 
-	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
 	"github.com/valyala/fasthttp"
+	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
 )
 
 var (

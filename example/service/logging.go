@@ -7,9 +7,9 @@ import (
 	"context"
 	"time"
 
-	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
 )
 
 // loggingMiddleware wraps Service and logs request information to the provided logger

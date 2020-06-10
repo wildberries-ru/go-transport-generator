@@ -98,11 +98,11 @@ go build -o ~/go/bin/gtg ./cmd/gtg
 Run gtg binary from root of your project repository.
 You should use `--in` flag to set service folder, by default it's `./pkg/service/`.
 ```
-./gtg --in ./example/service
+gtg --in ./example/
 ```
 Run walks all folders from `--in` and find all service interfaces. Very usefull for multiple domains. 
 ### Deploy
 Swagger generation
 ```
-./gtg --in="./example" --desc="service description" --title="some title for service" --version="v0.0.10" --servers="http://some.url = some url description\r\nhttp://another.url = another url description"
+gtg --in="./example" --desc="service description" --title="some title for service" --version="v0.0.10" --servers="http://some.url = some url description\r\nhttp://another.url = another url description"
 ```

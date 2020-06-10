@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
 	"github.com/go-kit/kit/metrics"
+	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
 )
 
 // instrumentingMiddleware wraps Service and enables request metrics

@@ -6,8 +6,8 @@ package httpclient
 import (
 	"context"
 
-	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
 	"github.com/stretchr/testify/mock"
+	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
 )
 
 // MockService ...

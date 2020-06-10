@@ -2,7 +2,6 @@ package v1
 
 // CreateMultipartUploadData ...
 type CreateMultipartUploadData struct {
-	Some     int    `json:"some"`
 	UploadID string `json:"upload_id"`
 }
 
