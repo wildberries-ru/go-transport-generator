@@ -47,7 +47,7 @@ func New(router *fasthttprouter.Router, svc service, decodeJSONErrorCreator erro
 	{{$isIntQueryPlaceholders := $ct.IsIntQueryPlaceholders}}
 	{{$responseContentType := $ct.ResponseContentType}}
 	{{$responseBody := $ct.ResponseBody}}{{low .Name}}Transport := New{{.Name}}Transport({{if eq $contentType "application/json"}}{{if lenMap $body}}decodeJSONErrorCreator, {{end}}{{end}}{{if eq $responseContentType "application/json"}}{{if lenMap $responseBody}}encodeJSONErrorCreator, {{end}}{{end}}{{if eq $isIntQueryPlaceholders true}}encodeQueryTypeIntErrorCreator{{end}})
-	router.Handle(httpMethod{{.Name}}, uriPath{{.Name}}, New{{.Name}}SwaggerInfo({{low .Name}}Transport, svc, errorProcessor))
+	router.Handle(httpMethod{{.Name}}, uriPath{{.Name}}, New{{.Name}}({{low .Name}}Transport, svc, errorProcessor))
 	{{end}}
 	router.Handle("GET", "/debug/pprof/", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Index))
 	router.Handle("GET", "/debug/pprof/profile", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Profile))

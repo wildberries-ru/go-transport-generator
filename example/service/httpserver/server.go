@@ -19,14 +19,14 @@ type service interface {
 	GetSomeElseDataUtf8(ctx context.Context) (cool v1.Detail, nothing v1.Namespace, id *string, err error)
 }
 
-type getWarehousesSwaggerInfo struct {
+type getWarehouses struct {
 	transport      GetWarehousesTransport
 	service        service
 	errorProcessor errorProcessor
 }
 
 // ServeHTTP implements http.Handler.
-func (s *getWarehousesSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
+func (s *getWarehouses) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
 		pets []v1.Detail
 		err  error
@@ -49,9 +49,9 @@ func (s *getWarehousesSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// NewGetWarehousesSwaggerInfo the server creator
-func NewGetWarehousesSwaggerInfo(transport GetWarehousesTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
-	ls := getWarehousesSwaggerInfo{
+// NewGetWarehouses the server creator
+func NewGetWarehouses(transport GetWarehousesTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
+	ls := getWarehouses{
 		transport:      transport,
 		service:        service,
 		errorProcessor: errorProcessor,
@@ -59,14 +59,14 @@ func NewGetWarehousesSwaggerInfo(transport GetWarehousesTransport, service servi
 	return ls.ServeHTTP
 }
 
-type getDetailsSwaggerInfo struct {
+type getDetails struct {
 	transport      GetDetailsTransport
 	service        service
 	errorProcessor errorProcessor
 }
 
 // ServeHTTP implements http.Handler.
-func (s *getDetailsSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
+func (s *getDetails) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
 		namespace string
 		detail    string
@@ -96,9 +96,9 @@ func (s *getDetailsSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// NewGetDetailsSwaggerInfo the server creator
-func NewGetDetailsSwaggerInfo(transport GetDetailsTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
-	ls := getDetailsSwaggerInfo{
+// NewGetDetails the server creator
+func NewGetDetails(transport GetDetailsTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
+	ls := getDetails{
 		transport:      transport,
 		service:        service,
 		errorProcessor: errorProcessor,
@@ -106,14 +106,14 @@ func NewGetDetailsSwaggerInfo(transport GetDetailsTransport, service service, er
 	return ls.ServeHTTP
 }
 
-type getDetailsEmbedStructSwaggerInfo struct {
+type getDetailsEmbedStruct struct {
 	transport      GetDetailsEmbedStructTransport
 	service        service
 	errorProcessor errorProcessor
 }
 
 // ServeHTTP implements http.Handler.
-func (s *getDetailsEmbedStructSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
+func (s *getDetailsEmbedStruct) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
 		namespace string
 		detail    string
@@ -138,9 +138,9 @@ func (s *getDetailsEmbedStructSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// NewGetDetailsEmbedStructSwaggerInfo the server creator
-func NewGetDetailsEmbedStructSwaggerInfo(transport GetDetailsEmbedStructTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
-	ls := getDetailsEmbedStructSwaggerInfo{
+// NewGetDetailsEmbedStruct the server creator
+func NewGetDetailsEmbedStruct(transport GetDetailsEmbedStructTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
+	ls := getDetailsEmbedStruct{
 		transport:      transport,
 		service:        service,
 		errorProcessor: errorProcessor,
@@ -148,14 +148,14 @@ func NewGetDetailsEmbedStructSwaggerInfo(transport GetDetailsEmbedStructTranspor
 	return ls.ServeHTTP
 }
 
-type getDetailsListEmbedStructSwaggerInfo struct {
+type getDetailsListEmbedStruct struct {
 	transport      GetDetailsListEmbedStructTransport
 	service        service
 	errorProcessor errorProcessor
 }
 
 // ServeHTTP implements http.Handler.
-func (s *getDetailsListEmbedStructSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
+func (s *getDetailsListEmbedStruct) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
 		namespace string
 		detail    string
@@ -180,9 +180,9 @@ func (s *getDetailsListEmbedStructSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCt
 	}
 }
 
-// NewGetDetailsListEmbedStructSwaggerInfo the server creator
-func NewGetDetailsListEmbedStructSwaggerInfo(transport GetDetailsListEmbedStructTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
-	ls := getDetailsListEmbedStructSwaggerInfo{
+// NewGetDetailsListEmbedStruct the server creator
+func NewGetDetailsListEmbedStruct(transport GetDetailsListEmbedStructTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
+	ls := getDetailsListEmbedStruct{
 		transport:      transport,
 		service:        service,
 		errorProcessor: errorProcessor,
@@ -190,14 +190,14 @@ func NewGetDetailsListEmbedStructSwaggerInfo(transport GetDetailsListEmbedStruct
 	return ls.ServeHTTP
 }
 
-type putDetailsSwaggerInfo struct {
+type putDetails struct {
 	transport      PutDetailsTransport
 	service        service
 	errorProcessor errorProcessor
 }
 
 // ServeHTTP implements http.Handler.
-func (s *putDetailsSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
+func (s *putDetails) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
 		namespace string
 		detail    string
@@ -229,9 +229,9 @@ func (s *putDetailsSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// NewPutDetailsSwaggerInfo the server creator
-func NewPutDetailsSwaggerInfo(transport PutDetailsTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
-	ls := putDetailsSwaggerInfo{
+// NewPutDetails the server creator
+func NewPutDetails(transport PutDetailsTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
+	ls := putDetails{
 		transport:      transport,
 		service:        service,
 		errorProcessor: errorProcessor,
@@ -239,14 +239,14 @@ func NewPutDetailsSwaggerInfo(transport PutDetailsTransport, service service, er
 	return ls.ServeHTTP
 }
 
-type getSomeElseDataUtf8SwaggerInfo struct {
+type getSomeElseDataUtf8 struct {
 	transport      GetSomeElseDataUtf8Transport
 	service        service
 	errorProcessor errorProcessor
 }
 
 // ServeHTTP implements http.Handler.
-func (s *getSomeElseDataUtf8SwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
+func (s *getSomeElseDataUtf8) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
 		cool    v1.Detail
 		nothing v1.Namespace
@@ -271,9 +271,9 @@ func (s *getSomeElseDataUtf8SwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// NewGetSomeElseDataUtf8SwaggerInfo the server creator
-func NewGetSomeElseDataUtf8SwaggerInfo(transport GetSomeElseDataUtf8Transport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
-	ls := getSomeElseDataUtf8SwaggerInfo{
+// NewGetSomeElseDataUtf8 the server creator
+func NewGetSomeElseDataUtf8(transport GetSomeElseDataUtf8Transport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
+	ls := getSomeElseDataUtf8{
 		transport:      transport,
 		service:        service,
 		errorProcessor: errorProcessor,
