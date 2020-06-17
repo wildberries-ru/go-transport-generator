@@ -37,22 +37,22 @@ type errorCreator func(err error) error
 func New(router *fasthttprouter.Router, svc service, decodeJSONErrorCreator errorCreator, encodeJSONErrorCreator errorCreator, encodeQueryTypeIntErrorCreator errorCreator, errorProcessor errorProcessor) {
 
 	getWarehousesTransport := NewGetWarehousesTransport(encodeJSONErrorCreator)
-	router.Handle(httpMethodGetWarehouses, uriPathGetWarehouses, NewGetWarehousesSwaggerInfo(getWarehousesTransport, svc, errorProcessor))
+	router.Handle(httpMethodGetWarehouses, uriPathGetWarehouses, NewGetWarehouses(getWarehousesTransport, svc, errorProcessor))
 
 	getDetailsTransport := NewGetDetailsTransport(encodeJSONErrorCreator, encodeQueryTypeIntErrorCreator)
-	router.Handle(httpMethodGetDetails, uriPathGetDetails, NewGetDetailsSwaggerInfo(getDetailsTransport, svc, errorProcessor))
+	router.Handle(httpMethodGetDetails, uriPathGetDetails, NewGetDetails(getDetailsTransport, svc, errorProcessor))
 
 	getDetailsEmbedStructTransport := NewGetDetailsEmbedStructTransport(encodeJSONErrorCreator)
-	router.Handle(httpMethodGetDetailsEmbedStruct, uriPathGetDetailsEmbedStruct, NewGetDetailsEmbedStructSwaggerInfo(getDetailsEmbedStructTransport, svc, errorProcessor))
+	router.Handle(httpMethodGetDetailsEmbedStruct, uriPathGetDetailsEmbedStruct, NewGetDetailsEmbedStruct(getDetailsEmbedStructTransport, svc, errorProcessor))
 
 	getDetailsListEmbedStructTransport := NewGetDetailsListEmbedStructTransport(encodeJSONErrorCreator)
-	router.Handle(httpMethodGetDetailsListEmbedStruct, uriPathGetDetailsListEmbedStruct, NewGetDetailsListEmbedStructSwaggerInfo(getDetailsListEmbedStructTransport, svc, errorProcessor))
+	router.Handle(httpMethodGetDetailsListEmbedStruct, uriPathGetDetailsListEmbedStruct, NewGetDetailsListEmbedStruct(getDetailsListEmbedStructTransport, svc, errorProcessor))
 
 	putDetailsTransport := NewPutDetailsTransport(decodeJSONErrorCreator, encodeJSONErrorCreator)
-	router.Handle(httpMethodPutDetails, uriPathPutDetails, NewPutDetailsSwaggerInfo(putDetailsTransport, svc, errorProcessor))
+	router.Handle(httpMethodPutDetails, uriPathPutDetails, NewPutDetails(putDetailsTransport, svc, errorProcessor))
 
 	getSomeElseDataUtf8Transport := NewGetSomeElseDataUtf8Transport(encodeJSONErrorCreator)
-	router.Handle(httpMethodGetSomeElseDataUtf8, uriPathGetSomeElseDataUtf8, NewGetSomeElseDataUtf8SwaggerInfo(getSomeElseDataUtf8Transport, svc, errorProcessor))
+	router.Handle(httpMethodGetSomeElseDataUtf8, uriPathGetSomeElseDataUtf8, NewGetSomeElseDataUtf8(getSomeElseDataUtf8Transport, svc, errorProcessor))
 
 	router.Handle("GET", "/debug/pprof/", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Index))
 	router.Handle("GET", "/debug/pprof/profile", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Profile))

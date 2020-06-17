@@ -35,19 +35,19 @@ type errorCreator func(err error) error
 func New(router *fasthttprouter.Router, svc service, decodeJSONErrorCreator errorCreator, encodeJSONErrorCreator errorCreator, encodeQueryTypeIntErrorCreator errorCreator, errorProcessor errorProcessor) {
 
 	createMultipartUploadTransport := NewCreateMultipartUploadTransport(encodeJSONErrorCreator)
-	router.Handle(httpMethodCreateMultipartUpload, uriPathCreateMultipartUpload, NewCreateMultipartUploadSwaggerInfo(createMultipartUploadTransport, svc, errorProcessor))
+	router.Handle(httpMethodCreateMultipartUpload, uriPathCreateMultipartUpload, NewCreateMultipartUpload(createMultipartUploadTransport, svc, errorProcessor))
 
 	uploadPartDocumentTransport := NewUploadPartDocumentTransport()
-	router.Handle(httpMethodUploadPartDocument, uriPathUploadPartDocument, NewUploadPartDocumentSwaggerInfo(uploadPartDocumentTransport, svc, errorProcessor))
+	router.Handle(httpMethodUploadPartDocument, uriPathUploadPartDocument, NewUploadPartDocument(uploadPartDocumentTransport, svc, errorProcessor))
 
 	completeUploadTransport := NewCompleteUploadTransport()
-	router.Handle(httpMethodCompleteUpload, uriPathCompleteUpload, NewCompleteUploadSwaggerInfo(completeUploadTransport, svc, errorProcessor))
+	router.Handle(httpMethodCompleteUpload, uriPathCompleteUpload, NewCompleteUpload(completeUploadTransport, svc, errorProcessor))
 
 	uploadDocumentTransport := NewUploadDocumentTransport()
-	router.Handle(httpMethodUploadDocument, uriPathUploadDocument, NewUploadDocumentSwaggerInfo(uploadDocumentTransport, svc, errorProcessor))
+	router.Handle(httpMethodUploadDocument, uriPathUploadDocument, NewUploadDocument(uploadDocumentTransport, svc, errorProcessor))
 
 	downloadDocumentTransport := NewDownloadDocumentTransport(encodeJSONErrorCreator)
-	router.Handle(httpMethodDownloadDocument, uriPathDownloadDocument, NewDownloadDocumentSwaggerInfo(downloadDocumentTransport, svc, errorProcessor))
+	router.Handle(httpMethodDownloadDocument, uriPathDownloadDocument, NewDownloadDocument(downloadDocumentTransport, svc, errorProcessor))
 
 	router.Handle("GET", "/debug/pprof/", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Index))
 	router.Handle("GET", "/debug/pprof/profile", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Profile))

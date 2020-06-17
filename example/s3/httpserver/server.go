@@ -18,14 +18,14 @@ type service interface {
 	DownloadDocument(ctx context.Context, bucket string, key string) (document []byte, err error)
 }
 
-type createMultipartUploadSwaggerInfo struct {
+type createMultipartUpload struct {
 	transport      CreateMultipartUploadTransport
 	service        service
 	errorProcessor errorProcessor
 }
 
 // ServeHTTP implements http.Handler.
-func (s *createMultipartUploadSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
+func (s *createMultipartUpload) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
 		bucket           string
 		key              string
@@ -53,9 +53,9 @@ func (s *createMultipartUploadSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// NewCreateMultipartUploadSwaggerInfo the server creator
-func NewCreateMultipartUploadSwaggerInfo(transport CreateMultipartUploadTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
-	ls := createMultipartUploadSwaggerInfo{
+// NewCreateMultipartUpload the server creator
+func NewCreateMultipartUpload(transport CreateMultipartUploadTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
+	ls := createMultipartUpload{
 		transport:      transport,
 		service:        service,
 		errorProcessor: errorProcessor,
@@ -63,14 +63,14 @@ func NewCreateMultipartUploadSwaggerInfo(transport CreateMultipartUploadTranspor
 	return ls.ServeHTTP
 }
 
-type uploadPartDocumentSwaggerInfo struct {
+type uploadPartDocument struct {
 	transport      UploadPartDocumentTransport
 	service        service
 	errorProcessor errorProcessor
 }
 
 // ServeHTTP implements http.Handler.
-func (s *uploadPartDocumentSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
+func (s *uploadPartDocument) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
 		bucket     string
 		key        string
@@ -97,9 +97,9 @@ func (s *uploadPartDocumentSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// NewUploadPartDocumentSwaggerInfo the server creator
-func NewUploadPartDocumentSwaggerInfo(transport UploadPartDocumentTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
-	ls := uploadPartDocumentSwaggerInfo{
+// NewUploadPartDocument the server creator
+func NewUploadPartDocument(transport UploadPartDocumentTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
+	ls := uploadPartDocument{
 		transport:      transport,
 		service:        service,
 		errorProcessor: errorProcessor,
@@ -107,14 +107,14 @@ func NewUploadPartDocumentSwaggerInfo(transport UploadPartDocumentTransport, ser
 	return ls.ServeHTTP
 }
 
-type completeUploadSwaggerInfo struct {
+type completeUpload struct {
 	transport      CompleteUploadTransport
 	service        service
 	errorProcessor errorProcessor
 }
 
 // ServeHTTP implements http.Handler.
-func (s *completeUploadSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
+func (s *completeUpload) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
 		bucket   string
 		key      string
@@ -139,9 +139,9 @@ func (s *completeUploadSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// NewCompleteUploadSwaggerInfo the server creator
-func NewCompleteUploadSwaggerInfo(transport CompleteUploadTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
-	ls := completeUploadSwaggerInfo{
+// NewCompleteUpload the server creator
+func NewCompleteUpload(transport CompleteUploadTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
+	ls := completeUpload{
 		transport:      transport,
 		service:        service,
 		errorProcessor: errorProcessor,
@@ -149,14 +149,14 @@ func NewCompleteUploadSwaggerInfo(transport CompleteUploadTransport, service ser
 	return ls.ServeHTTP
 }
 
-type uploadDocumentSwaggerInfo struct {
+type uploadDocument struct {
 	transport      UploadDocumentTransport
 	service        service
 	errorProcessor errorProcessor
 }
 
 // ServeHTTP implements http.Handler.
-func (s *uploadDocumentSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
+func (s *uploadDocument) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
 		bucket   string
 		key      string
@@ -181,9 +181,9 @@ func (s *uploadDocumentSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// NewUploadDocumentSwaggerInfo the server creator
-func NewUploadDocumentSwaggerInfo(transport UploadDocumentTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
-	ls := uploadDocumentSwaggerInfo{
+// NewUploadDocument the server creator
+func NewUploadDocument(transport UploadDocumentTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
+	ls := uploadDocument{
 		transport:      transport,
 		service:        service,
 		errorProcessor: errorProcessor,
@@ -191,14 +191,14 @@ func NewUploadDocumentSwaggerInfo(transport UploadDocumentTransport, service ser
 	return ls.ServeHTTP
 }
 
-type downloadDocumentSwaggerInfo struct {
+type downloadDocument struct {
 	transport      DownloadDocumentTransport
 	service        service
 	errorProcessor errorProcessor
 }
 
 // ServeHTTP implements http.Handler.
-func (s *downloadDocumentSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
+func (s *downloadDocument) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
 		bucket   string
 		key      string
@@ -223,9 +223,9 @@ func (s *downloadDocumentSwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// NewDownloadDocumentSwaggerInfo the server creator
-func NewDownloadDocumentSwaggerInfo(transport DownloadDocumentTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
-	ls := downloadDocumentSwaggerInfo{
+// NewDownloadDocument the server creator
+func NewDownloadDocument(transport DownloadDocumentTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
+	ls := downloadDocument{
 		transport:      transport,
 		service:        service,
 		errorProcessor: errorProcessor,

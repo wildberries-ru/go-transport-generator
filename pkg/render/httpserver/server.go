@@ -26,14 +26,14 @@ type service interface {
 }
 
 {{range .Iface.Methods}}
-type {{low .Name}}SwaggerInfo struct {
+type {{low .Name}} struct {
 	transport      {{.Name}}Transport
 	service        service
 	errorProcessor errorProcessor
 }
 
 // ServeHTTP implements http.Handler.
-func (s *{{low .Name}}SwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
+func (s *{{low .Name}}) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
 		{{$args := popFirst .Args}}{{range $i, $arg := $args}}{{$arg.String}}
 		{{end}}{{$args := popLast .Results}}{{range $i, $arg := $args}}{{$arg.String}}
@@ -57,9 +57,9 @@ func (s *{{low .Name}}SwaggerInfo) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// New{{.Name}}SwaggerInfo the server creator
-func New{{.Name}}SwaggerInfo(transport {{.Name}}Transport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
-	ls := {{low .Name}}SwaggerInfo{
+// New{{.Name}} the server creator
+func New{{.Name}}(transport {{.Name}}Transport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
+	ls := {{low .Name}}{
 		transport:      transport,
 		service:        service,
 		errorProcessor: errorProcessor,
@@ -72,7 +72,7 @@ type imports interface {
 	GoImports(path string) (err error)
 }
 
-// SwaggerInfo ...
+// Server ...
 type Server struct {
 	*template.Template
 	packageName string
