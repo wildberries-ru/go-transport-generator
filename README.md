@@ -33,7 +33,6 @@ Interface definition requirements:
 
 [NOTE]
 * URI path parameters should be strings
-* Query parameters should be pointers on string
 * Headers parameter should be pointers on string
 
 #### Service interface Tags
