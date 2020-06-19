@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 )
 
+// Swagger ...
 type Swagger struct {
 	OpenAPI    string           `json:"openapi" yaml:"openapi"`
 	Info       Info             `json:"info,omitempty" yaml:"info,omitempty"`
@@ -96,6 +97,7 @@ type Response struct {
 	Headers     map[string]Header `json:"headers,omitempty" yaml:"headers,omitempty"`
 }
 
+// Header ...
 type Header struct {
 	Description string `json:"description,omitempty" yaml:"description,omitempty"`
 	Schema      Schema `json:"schema,omitempty" yaml:"schema,omitempty"`
@@ -150,7 +152,7 @@ type Server struct {
 	Variables   map[string]Variable `json:"variables,omitempty" yaml:"variables,omitempty"`
 }
 
-// Info ...
+// Schemas ...
 type Schemas map[string]Schema
 
 // Components ...

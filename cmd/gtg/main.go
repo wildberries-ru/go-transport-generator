@@ -26,6 +26,7 @@ import (
 	"github.com/wildberries-ru/go-transport-generator/pkg/render/service"
 )
 
+// Generator ...
 type Generator interface {
 	Generate(path string, info api.GenerationInfo) (err error)
 }

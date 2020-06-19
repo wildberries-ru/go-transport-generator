@@ -65,6 +65,7 @@ type Client struct {
 	imports     imports
 }
 
+// Generate ...
 func (s *Client) Generate(info api.Interface) (err error) {
 	info.PkgName = s.packageName
 	info.AbsOutputPath = strings.Join(append(strings.Split(info.AbsOutputPath, "/"), s.filePath...), "/")

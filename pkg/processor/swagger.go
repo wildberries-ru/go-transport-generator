@@ -44,6 +44,7 @@ type swagger struct {
 	goGeneratedAutomaticallyPrefix []byte
 }
 
+// Process ...
 func (s *swagger) Process(info *api.GenerationInfo, iface *api.Interface) (err error) {
 	var (
 		ok          bool

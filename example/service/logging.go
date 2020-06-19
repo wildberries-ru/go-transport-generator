@@ -18,6 +18,7 @@ type loggingMiddleware struct {
 	svc    SomeService
 }
 
+// GetWarehouses ...
 func (s *loggingMiddleware) GetWarehouses(ctx context.Context) (pets []v1.Detail, err error) {
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(
@@ -29,6 +30,8 @@ func (s *loggingMiddleware) GetWarehouses(ctx context.Context) (pets []v1.Detail
 	}(time.Now())
 	return s.svc.GetWarehouses(ctx)
 }
+
+// GetDetails ...
 func (s *loggingMiddleware) GetDetails(ctx context.Context, namespace string, detail string, fileID uint32, someID *uint64, token *string) (det v1.Detail, ns v1.Namespace, id *string, err error) {
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(
@@ -47,6 +50,8 @@ func (s *loggingMiddleware) GetDetails(ctx context.Context, namespace string, de
 	}(time.Now())
 	return s.svc.GetDetails(ctx, namespace, detail, fileID, someID, token)
 }
+
+// GetDetailsEmbedStruct ...
 func (s *loggingMiddleware) GetDetailsEmbedStruct(ctx context.Context, namespace string, detail string) (response v1.GetDetailsEmbedStructResponse, err error) {
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(
@@ -60,6 +65,8 @@ func (s *loggingMiddleware) GetDetailsEmbedStruct(ctx context.Context, namespace
 	}(time.Now())
 	return s.svc.GetDetailsEmbedStruct(ctx, namespace, detail)
 }
+
+// GetDetailsListEmbedStruct ...
 func (s *loggingMiddleware) GetDetailsListEmbedStruct(ctx context.Context, namespace string, detail string) (details []v1.Detail, err error) {
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(
@@ -73,6 +80,8 @@ func (s *loggingMiddleware) GetDetailsListEmbedStruct(ctx context.Context, names
 	}(time.Now())
 	return s.svc.GetDetailsListEmbedStruct(ctx, namespace, detail)
 }
+
+// PutDetails ...
 func (s *loggingMiddleware) PutDetails(ctx context.Context, namespace string, detail string, testID string, blaID *string, token *string, pretty v1.Detail, yang v1.Namespace) (cool v1.Detail, nothing v1.Namespace, id *string, err error) {
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(
@@ -93,6 +102,8 @@ func (s *loggingMiddleware) PutDetails(ctx context.Context, namespace string, de
 	}(time.Now())
 	return s.svc.PutDetails(ctx, namespace, detail, testID, blaID, token, pretty, yang)
 }
+
+// GetSomeElseDataUtf8 ...
 func (s *loggingMiddleware) GetSomeElseDataUtf8(ctx context.Context) (cool v1.Detail, nothing v1.Namespace, id *string, err error) {
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(

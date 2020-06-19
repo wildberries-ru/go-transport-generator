@@ -28,7 +28,7 @@ func (t *description) Parse(info *api.SwaggerInfo, firstTag string, tags ...stri
 	return t.next.Parse(info, firstTag, tags...)
 }
 
-// newDescription ...
+// NewDescription ...
 func NewDescription(prefix string, suffix string, next Parser) Parser {
 	return &description{
 		prefix: prefix,

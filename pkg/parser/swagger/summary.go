@@ -17,6 +17,7 @@ type summary struct {
 	next   Parser
 }
 
+// Parse ...
 func (t *summary) Parse(info *api.SwaggerInfo, firstTag string, tags ...string) (err error) {
 	if strings.HasPrefix(firstTag, t.prefix) && strings.HasSuffix(firstTag, t.suffix) {
 		if len(tags) == 1 {
@@ -28,7 +29,7 @@ func (t *summary) Parse(info *api.SwaggerInfo, firstTag string, tags ...string) 
 	return t.next.Parse(info, firstTag, tags...)
 }
 
-// newSummary ...
+// NewSummary ...
 func NewSummary(prefix string, suffix string, next Parser) Parser {
 	return &summary{
 		prefix: prefix,

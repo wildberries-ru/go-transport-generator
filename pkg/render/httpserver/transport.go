@@ -161,6 +161,7 @@ type Transport struct {
 	imports     imports
 }
 
+// Generate ...
 func (s *Transport) Generate(info api.Interface) (err error) {
 	info.PkgName = s.packageName
 	info.AbsOutputPath = strings.Join(append(strings.Split(info.AbsOutputPath, "/"), s.filePath...), "/")

@@ -25,10 +25,13 @@ type MockService struct {
 	mock.Mock
 }
 
-{{range .Iface.Methods}}// {{.Name}} ...
+{{range .Iface.Methods -}}
+// {{.Name}} ...
 func (s *MockService) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFullVariables .Results ","}}) {
-	args := s.Called(context.Background(), {{$args := popFirst .Args}}{{joinVariableNames $args ","}})
-	return {{$res := popLast .Results}}{{range $i, $a := $res}}args.Get({{$i}}).({{$a.Type}}), {{end}}args.Error({{lenVariables $res}})
+	{{$args := popFirst .Args -}}
+	{{$res := popLast .Results -}}
+	args := s.Called(context.Background(), {{joinVariableNames $args ","}})
+	return {{range $i, $a := $res}}args.Get({{$i}}).({{$a.Type}}), {{end}}args.Error({{lenVariables $res}})
 }
 {{end}}
 `
@@ -41,6 +44,7 @@ type Mock struct {
 	imports     imports
 }
 
+// Generate ...
 func (s *Mock) Generate(info api.Interface) (err error) {
 	info.PkgName = s.packageName
 	info.AbsOutputPath = strings.Join(append(strings.Split(info.AbsOutputPath, "/"), s.filePath...), "/")

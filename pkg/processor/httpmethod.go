@@ -14,6 +14,7 @@ const (
 	errHTTPMthodGETCouldNotHaveRequestBody = "http method GET could not have request body in %s interface %s method %s"
 )
 
+// HTTPMethod ...
 type HTTPMethod interface {
 	Process(httpInfoMethod *api.HTTPMethod, iface *api.Interface, method *types.Function) (err error)
 }
@@ -23,6 +24,7 @@ type httpMethod struct {
 	tagsParser httpServerTagsParser
 }
 
+// Process ...
 func (s *httpMethod) Process(httpMethod *api.HTTPMethod, iface *api.Interface, method *types.Function) (err error) {
 	var (
 		from, to      string

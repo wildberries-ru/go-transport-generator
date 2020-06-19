@@ -16,11 +16,12 @@ const (
 	yamlExt = ".yaml"
 )
 
-// SwaggerInfo ...
+// Swagger ...
 type Swagger struct {
 	fileName string
 }
 
+// Generate ...
 func (s *Swagger) Generate(info api.GenerationInfo) (err error) {
 	var data []byte
 	err = os.MkdirAll(info.SwaggerAbsOutputPath, 0750)

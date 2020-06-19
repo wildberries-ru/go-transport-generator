@@ -35,11 +35,18 @@ type {{low .Name}} struct {
 // ServeHTTP implements http.Handler.
 func (s *{{low .Name}}) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
-		{{$args := popFirst .Args}}{{range $i, $arg := $args}}{{$arg.String}}
-		{{end}}{{$args := popLast .Results}}{{range $i, $arg := $args}}{{$arg.String}}
-		{{end}}err error
+		{{$args := popFirst .Args -}}
+		{{range $i, $arg := $args -}}
+			{{$arg.String}}
+		{{end -}}
+		{{$args := popLast .Results -}}
+		{{range $i, $arg := $args -}}
+			{{$arg.String}}
+		{{end -}}
+		err error
 	)
-	{{$args := popFirst .Args}}{{joinVariableNames $args "," "err"}} = s.transport.DecodeRequest(ctx, &ctx.Request)
+	{{$args := popFirst .Args -}}
+	{{joinVariableNames $args "," "err"}} = s.transport.DecodeRequest(ctx, &ctx.Request)
 	if err != nil {
 		s.errorProcessor.Encode(ctx, &ctx.Response, err)
 		return
@@ -51,7 +58,8 @@ func (s *{{low .Name}}) ServeHTTP(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.EncodeResponse(ctx, &ctx.Response, {{ $args := popLast .Results}}{{joinVariableNames $args ","}}); err != nil {
+	{{ $args := popLast .Results -}}
+	if err = s.transport.EncodeResponse(ctx, &ctx.Response, {{joinVariableNames $args ","}}); err != nil {
 		s.errorProcessor.Encode(ctx, &ctx.Response, err)
 		return
 	}
@@ -80,6 +88,7 @@ type Server struct {
 	imports     imports
 }
 
+// Generate ...
 func (s *Server) Generate(info api.Interface) (err error) {
 	info.PkgName = s.packageName
 	info.AbsOutputPath = strings.Join(append(strings.Split(info.AbsOutputPath, "/"), s.filePath...), "/")
