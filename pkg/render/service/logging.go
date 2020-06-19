@@ -27,19 +27,29 @@ type loggingMiddleware struct {
 	logger log.Logger
 	svc    {{ .Iface.Name }}
 }
-{{range .Iface.Methods}}func (s *loggingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFullVariables .Results ","}}) {
+
+{{range .Iface.Methods -}}
+// {{.Name}} ...
+func (s *loggingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFullVariables .Results ","}}) {
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(
 			"method", "{{.Name}}",
-			{{$args := popFirst .Args}}{{range $arg := $args}}"{{$arg.Name}}", {{$arg.Name}}, 
-			{{end}}{{$args := popLast .Results}}{{range $arg := $args}}"{{$arg.Name}}", {{$arg.Name}}, 
-			{{end}}"err", err,
+			{{$args := popFirst .Args -}}
+			{{range $arg := $args -}}
+				"{{$arg.Name}}", {{$arg.Name}}, 
+			{{end -}}
+			{{$args := popLast .Results -}}
+			{{range $arg := $args -}}
+				"{{$arg.Name}}", {{$arg.Name}}, 
+			{{end -}}
+			"err", err,
 			"elapsed", time.Since(begin),
 		)
 	}(time.Now())
 	return s.svc.{{.Name}}({{joinVariableNames .Args ","}})
 }
 {{end}}
+
 func (s *loggingMiddleware) wrap(err error) log.Logger {
 	lvl := level.Debug
 	if err != nil {
@@ -64,6 +74,7 @@ type Logging struct {
 	imports  imports
 }
 
+// Generate ...
 func (s *Logging) Generate(info api.Interface) (err error) {
 	info.PkgName = path.Base(info.AbsOutputPath)
 	info.AbsOutputPath = strings.Join(append(strings.Split(info.AbsOutputPath, "/"), s.filePath...), "/")

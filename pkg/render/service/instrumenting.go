@@ -28,12 +28,15 @@ type instrumentingMiddleware struct {
 	reqDuration metrics.Histogram
 	svc         {{ .Iface.Name }}
 }
-{{range .Iface.Methods}}
+
+{{range .Iface.Methods -}}
+// {{.Name}} ...
 func (s *instrumentingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFullVariables .Results ","}}) {
 	defer s.recordMetrics("{{.Name}}", time.Now(), err)
 	return s.svc.{{.Name}}({{joinVariableNames .Args ","}})
 }
 {{end}}
+
 func (s *instrumentingMiddleware) recordMetrics(method string, startTime time.Time, err error) {
 	labels := []string{
 		"method", method,
@@ -57,13 +60,14 @@ type imports interface {
 	GoImports(path string) (err error)
 }
 
-// Logging ...
+// Instrumenting ...
 type Instrumenting struct {
 	*template.Template
 	filePath []string
 	imports  imports
 }
 
+// Generate ...
 func (s *Instrumenting) Generate(info api.Interface) (err error) {
 	info.PkgName = path.Base(info.AbsOutputPath)
 	info.AbsOutputPath = strings.Join(append(strings.Split(info.AbsOutputPath, "/"), s.filePath...), "/")

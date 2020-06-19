@@ -19,31 +19,37 @@ type instrumentingMiddleware struct {
 	svc         SomeService
 }
 
+// GetWarehouses ...
 func (s *instrumentingMiddleware) GetWarehouses(ctx context.Context) (pets []v1.Detail, err error) {
 	defer s.recordMetrics("GetWarehouses", time.Now(), err)
 	return s.svc.GetWarehouses(ctx)
 }
 
+// GetDetails ...
 func (s *instrumentingMiddleware) GetDetails(ctx context.Context, namespace string, detail string, fileID uint32, someID *uint64, token *string) (det v1.Detail, ns v1.Namespace, id *string, err error) {
 	defer s.recordMetrics("GetDetails", time.Now(), err)
 	return s.svc.GetDetails(ctx, namespace, detail, fileID, someID, token)
 }
 
+// GetDetailsEmbedStruct ...
 func (s *instrumentingMiddleware) GetDetailsEmbedStruct(ctx context.Context, namespace string, detail string) (response v1.GetDetailsEmbedStructResponse, err error) {
 	defer s.recordMetrics("GetDetailsEmbedStruct", time.Now(), err)
 	return s.svc.GetDetailsEmbedStruct(ctx, namespace, detail)
 }
 
+// GetDetailsListEmbedStruct ...
 func (s *instrumentingMiddleware) GetDetailsListEmbedStruct(ctx context.Context, namespace string, detail string) (details []v1.Detail, err error) {
 	defer s.recordMetrics("GetDetailsListEmbedStruct", time.Now(), err)
 	return s.svc.GetDetailsListEmbedStruct(ctx, namespace, detail)
 }
 
+// PutDetails ...
 func (s *instrumentingMiddleware) PutDetails(ctx context.Context, namespace string, detail string, testID string, blaID *string, token *string, pretty v1.Detail, yang v1.Namespace) (cool v1.Detail, nothing v1.Namespace, id *string, err error) {
 	defer s.recordMetrics("PutDetails", time.Now(), err)
 	return s.svc.PutDetails(ctx, namespace, detail, testID, blaID, token, pretty, yang)
 }
 
+// GetSomeElseDataUtf8 ...
 func (s *instrumentingMiddleware) GetSomeElseDataUtf8(ctx context.Context) (cool v1.Detail, nothing v1.Namespace, id *string, err error) {
 	defer s.recordMetrics("GetSomeElseDataUtf8", time.Now(), err)
 	return s.svc.GetSomeElseDataUtf8(ctx)
