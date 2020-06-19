@@ -27,7 +27,13 @@ type errorProcessor interface {
 }
 
 // New ...
-func New(serverURL string, serverHost string, maxConns int, errorProcessor errorProcessor, options map[interface{}]Option) SomeService {
+func New(
+	serverURL string,
+	serverHost string,
+	maxConns int,
+	errorProcessor errorProcessor,
+	options map[interface{}]Option,
+) SomeService {
 	transportGetWarehouses := NewGetWarehousesTransport(
 		errorProcessor,
 		serverURL+uriPathClientGetWarehouses,

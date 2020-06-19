@@ -37,7 +37,13 @@ type errorProcessor interface {
 }
 
 // New ...
-func New(serverURL string, serverHost string, maxConns int, errorProcessor errorProcessor, options map[interface{}]Option) {{ .Iface.Name }} {
+func New(
+	serverURL string, 
+	serverHost string, 
+	maxConns int, 
+	errorProcessor errorProcessor, 
+	options map[interface{}]Option,
+) {{ .Iface.Name }} {
 	{{range .Iface.Methods}}transport{{.Name}} := New{{.Name}}Transport(
 		errorProcessor,
 		serverURL+uriPathClient{{.Name}},
@@ -64,6 +70,7 @@ type Builder struct {
 	imports     imports
 }
 
+// Generate ...
 func (s *Builder) Generate(info api.Interface) (err error) {
 	info.PkgName = s.packageName
 	info.AbsOutputPath = strings.Join(append(strings.Split(info.AbsOutputPath, "/"), s.filePath...), "/")
