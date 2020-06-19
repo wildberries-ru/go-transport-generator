@@ -14,16 +14,17 @@ type Service interface {
 	// @gtg http-server-response-header X-Auth-ID {id}
 	// @gtg http-server-response-status http.StatusOK
 	// @gtg http-server-response-content-type application/json
-	GetDetails(ctx context.Context, namespace string, detail string, fileID *string, someID *string, token string, pet v1.Detail, net v1.Namespace) (det v1.Detail, ns v1.Namespace, id string, err error)
+	GetDetails(ctx context.Context, namespace string, detail string, fileID uint32, someID *uint64, token *string) (det v1.Detail, ns v1.Namespace, id *string, err error)
 	// @gtg http-server-method PUT
 	// @gtg http-server-uri-path /api/v1/namespaces/{namespace}/details/{detail}
 	// @gtg http-server-query test={testID}&bla={blaID}
 	// @gtg http-server-header X-Auth-Token {token}
+	// @gtg http-server-json-tag pretty ThePretty
 	// @gtg http-server-content-type application/json
 	// @gtg http-server-response-header X-Auth-ID {id}
 	// @gtg http-server-response-status http.StatusOK
 	// @gtg http-server-response-content-type application/json
-	PutDetails(ctx context.Context, namespace string, detail string, testID *string, blaID *string, token string, pretty v1.Detail, yang v1.Namespace) (cool v1.Detail, nothing v1.Namespace, id string, err error)
+	PutDetails(ctx context.Context, namespace string, detail string, testID string, blaID *string, token *string, pretty v1.Detail, yang v1.Namespace) (cool v1.Detail, nothing v1.Namespace, id *string, err error)
 }
 ```
 Interface definition requirements:
@@ -33,7 +34,6 @@ Interface definition requirements:
 
 [NOTE]
 * URI path parameters should be strings
-* Query parameters should be pointers on string
 * Headers parameter should be pointers on string
 
 #### Service interface Tags
@@ -62,7 +62,7 @@ fill from URI path to variables `namespace` and `detail` (should be strings)
 
 for example `file={fileID}&some={someID}`
 
-fill from query string to variables `fileID` and `someID` (should be pointers to string)
+fill from query string to variables `fileID` and `someID`
 
 **http-server-header** Header string with placeholders
 
