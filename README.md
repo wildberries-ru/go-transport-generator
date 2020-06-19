@@ -62,7 +62,7 @@ fill from URI path to variables `namespace` and `detail` (should be strings)
 
 for example `file={fileID}&some={someID}`
 
-fill from query string to variables `fileID` and `someID` (should be pointers to string)
+fill from query string to variables `fileID` and `someID`
 
 **http-server-header** Header string with placeholders
 
