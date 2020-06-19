@@ -31,6 +31,7 @@ type Service struct {
 	swaggerRender                  swaggerRender
 }
 
+// Process ...
 func (s *Service) Process(serviceDirectory, outPath string, info *api.GenerationInfo) (err error) {
 	var (
 		filePath   string

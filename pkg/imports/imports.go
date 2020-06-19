@@ -8,6 +8,7 @@ import (
 type Imports struct {
 }
 
+// GoImports ...
 func (fw *Imports) GoImports(path string) (err error) {
 	var execPath string
 	if execPath, err = exec.LookPath("goimports"); err != nil {

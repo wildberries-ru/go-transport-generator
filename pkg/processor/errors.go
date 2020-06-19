@@ -6,12 +6,14 @@ import (
 	"github.com/wildberries-ru/go-transport-generator/pkg/api"
 )
 
+// Errors ...
 type Errors struct {
 	tagMark            string
 	uiErrorsRender     serviceRender
 	clientErrorsRender serviceRender
 }
 
+// Process ...
 func (s *Errors) Process(_ *api.GenerationInfo, iface *api.Interface) (err error) {
 	err = s.uiErrorsRender.Generate(*iface)
 	if err != nil {

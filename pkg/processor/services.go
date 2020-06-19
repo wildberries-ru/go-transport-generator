@@ -10,11 +10,13 @@ import (
 	"github.com/wildberries-ru/go-transport-generator/pkg/api"
 )
 
+// Services ...
 type Services struct {
 	tagMark    string
 	processors map[string]Processor
 }
 
+// Process ...
 func (s *Services) Process(info *api.GenerationInfo, astra *types.File, outPath string) (err error) {
 	for _, i := range astra.Interfaces {
 		for _, doc := range i.Docs {

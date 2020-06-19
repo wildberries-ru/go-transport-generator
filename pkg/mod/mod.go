@@ -13,10 +13,11 @@ import (
 	"golang.org/x/mod/modfile"
 )
 
-// mod ...
+// Mod ...
 type Mod struct {
 }
 
+// PkgModPath ...
 func (m *Mod) PkgModPath(pkgName string) string {
 	modPath, _ := m.goModPath(".")
 	module, require := m.parseMod(modPath)

@@ -3,10 +3,10 @@ package api
 import (
 	"github.com/vetcher/go-astra/types"
 
-	"github.com/wildberries-ru/go-transport-generator/example/api/v1"
+	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
 )
 
-// GenerationInfo ...
+// GenerationInfo present generation info
 type GenerationInfo struct {
 	Interfaces []*Interface
 
@@ -17,7 +17,7 @@ type GenerationInfo struct {
 	SwaggerAbsOutputPath string
 }
 
-// GenerationInfo present generation info
+// Interface ...
 type Interface struct {
 	PkgName       string
 	AbsOutputPath string

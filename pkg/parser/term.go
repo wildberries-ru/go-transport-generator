@@ -8,6 +8,7 @@ import (
 type Term struct {
 }
 
+// Parse ...
 func (t *Term) Parse(info *api.HTTPMethod, firstTag string, tags ...string) (err error) {
 	return
 }
