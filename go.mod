@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/VividCortex/gohistogram v1.0.0 // indirect
+	github.com/aws/aws-sdk-go v1.32.6
 	github.com/buaazp/fasthttprouter v0.1.1
 	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/go-kit/kit v0.8.0

@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
@@ -38,27 +39,32 @@ type errorProcessor interface {
 
 // New ...
 func New(
-	serverURL string, 
-	serverHost string, 
+	serverURL string,
 	maxConns int, 
 	errorProcessor errorProcessor, 
 	options map[interface{}]Option,
-) {{ .Iface.Name }} {
+) (client {{ .Iface.Name }}, err error) {
+	parsedServerURL, err := url.Parse(serverURL)
+	if err != nil {
+		err = fmt.Errorf("failed to parse apiserver url", err)
+		return
+	}
 	{{range .Iface.Methods}}transport{{.Name}} := New{{.Name}}Transport(
 		errorProcessor,
-		serverURL+uriPathClient{{.Name}},
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClient{{.Name}},
 		httpMethod{{.Name}},
 	)
 	{{end}}
-	return NewClient(
+	client = NewClient(
 		&fasthttp.HostClient{
-			Addr:     serverHost,
+			Addr:     parsedServerURL.Host,
 			MaxConns: maxConns,
 			{{if .IsTLSClient}}IsTLS:    true,{{end}}
 		},
 		{{range .Iface.Methods}}transport{{.Name}},
 		{{end}}options,
 	)
+	return
 }
 `
 

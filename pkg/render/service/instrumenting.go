@@ -33,7 +33,7 @@ type instrumentingMiddleware struct {
 // {{.Name}} ...
 func (s *instrumentingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFullVariables .Results ","}}) {
 	defer s.recordMetrics("{{.Name}}", time.Now(), err)
-	return s.svc.{{.Name}}({{joinVariableNames .Args ","}})
+	return s.svc.{{.Name}}({{joinVariableNamesWithEllipsis .Args ","}})
 }
 {{end}}
 
