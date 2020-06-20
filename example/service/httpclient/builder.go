@@ -4,6 +4,9 @@
 package httpclient
 
 import (
+	"fmt"
+	"net/url"
+
 	"github.com/valyala/fasthttp"
 )
 
@@ -29,45 +32,49 @@ type errorProcessor interface {
 // New ...
 func New(
 	serverURL string,
-	serverHost string,
 	maxConns int,
 	errorProcessor errorProcessor,
 	options map[interface{}]Option,
-) SomeService {
+) (client SomeService, err error) {
+	parsedServerURL, err := url.Parse(serverURL)
+	if err != nil {
+		err = fmt.Errorf("failed to parse apiserver url", err)
+		return
+	}
 	transportGetWarehouses := NewGetWarehousesTransport(
 		errorProcessor,
-		serverURL+uriPathClientGetWarehouses,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetWarehouses,
 		httpMethodGetWarehouses,
 	)
 	transportGetDetails := NewGetDetailsTransport(
 		errorProcessor,
-		serverURL+uriPathClientGetDetails,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetDetails,
 		httpMethodGetDetails,
 	)
 	transportGetDetailsEmbedStruct := NewGetDetailsEmbedStructTransport(
 		errorProcessor,
-		serverURL+uriPathClientGetDetailsEmbedStruct,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetDetailsEmbedStruct,
 		httpMethodGetDetailsEmbedStruct,
 	)
 	transportGetDetailsListEmbedStruct := NewGetDetailsListEmbedStructTransport(
 		errorProcessor,
-		serverURL+uriPathClientGetDetailsListEmbedStruct,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetDetailsListEmbedStruct,
 		httpMethodGetDetailsListEmbedStruct,
 	)
 	transportPutDetails := NewPutDetailsTransport(
 		errorProcessor,
-		serverURL+uriPathClientPutDetails,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientPutDetails,
 		httpMethodPutDetails,
 	)
 	transportGetSomeElseDataUtf8 := NewGetSomeElseDataUtf8Transport(
 		errorProcessor,
-		serverURL+uriPathClientGetSomeElseDataUtf8,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetSomeElseDataUtf8,
 		httpMethodGetSomeElseDataUtf8,
 	)
 
-	return NewClient(
+	client = NewClient(
 		&fasthttp.HostClient{
-			Addr:     serverHost,
+			Addr:     parsedServerURL.Host,
 			MaxConns: maxConns,
 		},
 		transportGetWarehouses,
@@ -78,4 +85,5 @@ func New(
 		transportGetSomeElseDataUtf8,
 		options,
 	)
+	return
 }
