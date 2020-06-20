@@ -170,6 +170,21 @@ func main() {
 		}
 		return strings.Join(t, c)
 	}})
+	t.Funcs(template.FuncMap{"joinVariableNamesWithEllipsis": func(s []types.Variable, c string, any ...string) string {
+		t := make([]string, len(s))
+		for i, m := range s {
+			switch m.Type.(type) {
+			case types.TEllipsis:
+				t[i] = m.Name + "..."
+			default:
+				t[i] = m.Name
+			}
+		}
+		if len(any) > 0 {
+			t = append(t, any...)
+		}
+		return strings.Join(t, c)
+	}})
 	t.Funcs(template.FuncMap{"low": func(s string) string {
 		a := []rune(s)
 		a[0] = unicode.ToLower(a[0])

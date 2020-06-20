@@ -46,7 +46,7 @@ func (s *loggingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFu
 			"elapsed", time.Since(begin),
 		)
 	}(time.Now())
-	return s.svc.{{.Name}}({{joinVariableNames .Args ","}})
+	return s.svc.{{.Name}}({{joinVariableNamesWithEllipsis .Args ","}})
 }
 {{end}}
 
