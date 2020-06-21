@@ -38,9 +38,8 @@ type HTTPMethod struct {
 	ClientURIPath           string
 	ErrorProcessor          string
 	URIPathPlaceholders     []string
-	RawQueryPlaceholders    map[string]*Placeholder
+	QueryPlaceholders       map[string]*Placeholder
 	IsIntQueryPlaceholders  bool
-	IsIntQuery              bool
 	HeaderPlaceholders      map[string]string
 	ContentType             string
 	JsonTags                map[string]string

@@ -30,8 +30,7 @@ import (
 {{$ct := getValueMap $methods .Name}}
 {{$method := $ct.Method}}
 {{$uriPlaceholders := $ct.URIPathPlaceholders}}
-{{$queryPlaceholders := $ct.RawQueryPlaceholders}}
-{{$isIntQueryPlaceholders := $ct.IsIntQueryPlaceholders}}
+{{$queryPlaceholders := $ct.QueryPlaceholders}}
 {{$headerPlaceholders := $ct.HeaderPlaceholders}}
 {{$body := $ct.Body}}
 {{$contentType := $ct.ContentType}}

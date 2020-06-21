@@ -33,7 +33,7 @@ var (
 
 {{$ct := getValueMap $methods .Name}}
 {{$uriPlaceholders := $ct.URIPathPlaceholders}}
-{{$queryPlaceholders := $ct.RawQueryPlaceholders}}
+{{$queryPlaceholders := $ct.QueryPlaceholders}}
 {{$isIntQueryPlaceholders := $ct.IsIntQueryPlaceholders}}
 {{$headerPlaceholders := $ct.HeaderPlaceholders}}
 {{$body := $ct.Body}}
