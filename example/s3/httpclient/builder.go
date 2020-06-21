@@ -4,6 +4,9 @@
 package httpclient
 
 import (
+	"fmt"
+	"net/url"
+
 	"github.com/valyala/fasthttp"
 )
 
@@ -25,36 +28,46 @@ type errorProcessor interface {
 }
 
 // New ...
-func New(serverURL string, serverHost string, maxConns int, errorProcessor errorProcessor, options map[interface{}]Option) Service {
+func New(
+	serverURL string,
+	maxConns int,
+	errorProcessor errorProcessor,
+	options map[interface{}]Option,
+) (client Service, err error) {
+	parsedServerURL, err := url.Parse(serverURL)
+	if err != nil {
+		err = fmt.Errorf("failed to parse apiserver url", err)
+		return
+	}
 	transportCreateMultipartUpload := NewCreateMultipartUploadTransport(
 		errorProcessor,
-		serverURL+uriPathClientCreateMultipartUpload,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientCreateMultipartUpload,
 		httpMethodCreateMultipartUpload,
 	)
 	transportUploadPartDocument := NewUploadPartDocumentTransport(
 		errorProcessor,
-		serverURL+uriPathClientUploadPartDocument,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientUploadPartDocument,
 		httpMethodUploadPartDocument,
 	)
 	transportCompleteUpload := NewCompleteUploadTransport(
 		errorProcessor,
-		serverURL+uriPathClientCompleteUpload,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientCompleteUpload,
 		httpMethodCompleteUpload,
 	)
 	transportUploadDocument := NewUploadDocumentTransport(
 		errorProcessor,
-		serverURL+uriPathClientUploadDocument,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientUploadDocument,
 		httpMethodUploadDocument,
 	)
 	transportDownloadDocument := NewDownloadDocumentTransport(
 		errorProcessor,
-		serverURL+uriPathClientDownloadDocument,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientDownloadDocument,
 		httpMethodDownloadDocument,
 	)
 
-	return NewClient(
+	client = NewClient(
 		&fasthttp.HostClient{
-			Addr:     serverHost,
+			Addr:     parsedServerURL.Host,
 			MaxConns: maxConns,
 		},
 		transportCreateMultipartUpload,
@@ -64,4 +77,5 @@ func New(serverURL string, serverHost string, maxConns int, errorProcessor error
 		transportDownloadDocument,
 		options,
 	)
+	return
 }

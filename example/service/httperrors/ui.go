@@ -27,44 +27,42 @@ func (e *httpError) StatusCode() int {
 	return e.Code
 }
 
-type responseWithError struct {
+type errorResponse struct {
 	Error            bool              `json:"error"`
 	ErrorText        string            `json:"errorText"`
-	Data             *bool             `json:"data"`
 	AdditionalErrors map[string]string `json:"additionalErrors"`
+	Data             *struct{}         `json:"data"`
 }
 
-// UIErrorProcessor ...
-type UIErrorProcessor struct {
-	defaultCode    int
-	defaultMessage string
-	errors         map[string]string
-	errDefault     string
+// ErrorProcessor ...
+type ErrorProcessor struct {
+	errors map[string]string
 }
 
-// Encode writes a svc error to the given http.ResponseWriter.
-func (e *UIErrorProcessor) Encode(ctx context.Context, r *fasthttp.Response, err error) {
-	numberOfError := err.Error()[:strings.Index(err.Error(), ":")]
-	errorText, ok := e.errors[numberOfError]
-	if !ok {
-		errorText = e.errDefault
+//Encode writes a svc error to the given http.ResponseWriter.
+func (e *ErrorProcessor) Encode(ctx context.Context, r *fasthttp.Response, err error) {
+	errorText := err.Error()
+	if idx := strings.Index(err.Error(), ":"); idx != -1 {
+		numberOfError := err.Error()[:idx]
+		if text, ok := e.errors[numberOfError]; ok {
+			errorText = text
+		}
 	}
-	res := responseWithError{
+	res := errorResponse{
 		Error:     true,
 		ErrorText: errorText,
 	}
-	r.SetStatusCode(http.StatusOK)
+	r.SetStatusCode(200)
 	r.Header.Set("Content-Type", "application/json")
 	body, err := json.Marshal(res)
 	if err != nil {
 		return
 	}
 	r.SetBody(body)
-	return
 }
 
 // Decode reads a Service error from the given *http.Response.
-func (e *UIErrorProcessor) Decode(r *fasthttp.Response) error {
+func (e *ErrorProcessor) Decode(r *fasthttp.Response) error {
 	msgBytes := r.Body()
 	msg := strings.TrimSpace(string(msgBytes))
 	if msg == "" {
@@ -76,12 +74,9 @@ func (e *UIErrorProcessor) Decode(r *fasthttp.Response) error {
 	}
 }
 
-// NewUIErrorProcessor ...
-func NewUIErrorProcessor(defaultCode int, defaultMessage string, errors map[string]string, errDefault string) *UIErrorProcessor {
-	return &UIErrorProcessor{
-		defaultCode:    defaultCode,
-		defaultMessage: defaultMessage,
-		errors:         errors,
-		errDefault:     errDefault,
+// NewErrorProcessor ...
+func NewErrorProcessor(errors map[string]string) *ErrorProcessor {
+	return &ErrorProcessor{
+		errors: errors,
 	}
 }

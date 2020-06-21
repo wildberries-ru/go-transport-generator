@@ -18,6 +18,7 @@ type loggingMiddleware struct {
 	svc    Service
 }
 
+// CreateMultipartUpload ...
 func (s *loggingMiddleware) CreateMultipartUpload(ctx context.Context, bucket string, key string) (data v1.CreateMultipartUploadData, errorFlag bool, errorText string, additionalErrors *v1.AdditionalErrors, err error) {
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(
@@ -34,6 +35,8 @@ func (s *loggingMiddleware) CreateMultipartUpload(ctx context.Context, bucket st
 	}(time.Now())
 	return s.svc.CreateMultipartUpload(ctx, bucket, key)
 }
+
+// UploadPartDocument ...
 func (s *loggingMiddleware) UploadPartDocument(ctx context.Context, bucket string, key string, uploadID string, partNumber int64, document []byte) (err error) {
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(
@@ -49,6 +52,8 @@ func (s *loggingMiddleware) UploadPartDocument(ctx context.Context, bucket strin
 	}(time.Now())
 	return s.svc.UploadPartDocument(ctx, bucket, key, uploadID, partNumber, document)
 }
+
+// CompleteUpload ...
 func (s *loggingMiddleware) CompleteUpload(ctx context.Context, bucket string, key string, uploadID string) (err error) {
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(
@@ -62,6 +67,8 @@ func (s *loggingMiddleware) CompleteUpload(ctx context.Context, bucket string, k
 	}(time.Now())
 	return s.svc.CompleteUpload(ctx, bucket, key, uploadID)
 }
+
+// UploadDocument ...
 func (s *loggingMiddleware) UploadDocument(ctx context.Context, bucket string, key string, document []byte) (err error) {
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(
@@ -75,6 +82,8 @@ func (s *loggingMiddleware) UploadDocument(ctx context.Context, bucket string, k
 	}(time.Now())
 	return s.svc.UploadDocument(ctx, bucket, key, document)
 }
+
+// DownloadDocument ...
 func (s *loggingMiddleware) DownloadDocument(ctx context.Context, bucket string, key string) (document []byte, err error) {
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(
