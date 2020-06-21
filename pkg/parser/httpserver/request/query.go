@@ -22,13 +22,13 @@ func (t *query) Parse(info *api.HTTPMethod, firstTag string, tags ...string) (er
 		if len(tags) == 1 {
 			qs := strings.Split(tags[0], "&")
 			if len(qs) > 0 {
-				info.RawQueryPlaceholders = make(map[string]*api.Placeholder, len(qs))
+				info.QueryPlaceholders = make(map[string]*api.Placeholder, len(qs))
 				for _, q := range qs {
 					qq := strings.Split(q, "=")
 					if len(qq) != 2 {
 						continue
 					}
-					info.RawQueryPlaceholders[qq[0]] = &api.Placeholder{
+					info.QueryPlaceholders[qq[0]] = &api.Placeholder{
 						Name: strings.TrimRight(strings.TrimLeft(qq[1], "{"), "}"),
 					}
 				}

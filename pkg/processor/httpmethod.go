@@ -50,7 +50,7 @@ func (s *httpMethod) Process(httpMethod *api.HTTPMethod, iface *api.Interface, m
 	for _, arg = range args {
 		diff[arg.Name] = arg.Type.String()
 	}
-	for from, toPlaceholder = range httpMethod.RawQueryPlaceholders {
+	for from, toPlaceholder = range httpMethod.QueryPlaceholders {
 		delete(diff, toPlaceholder.Name)
 		for _, arg = range args {
 			if arg.Name == toPlaceholder.Name {
@@ -84,15 +84,15 @@ func (s *httpMethod) cast(from string, arg types.Variable, argType types.Type, h
 	switch tp := argType.(type) {
 	case types.TName:
 		if s.isInt(tp) {
-			httpMethod.RawQueryPlaceholders[from].IsInt = true
+			httpMethod.QueryPlaceholders[from].IsInt = true
 			httpMethod.IsIntQueryPlaceholders = true
 		} else if s.isString(tp) {
-			httpMethod.RawQueryPlaceholders[from].IsString = true
+			httpMethod.QueryPlaceholders[from].IsString = true
 		}
-		httpMethod.RawQueryPlaceholders[from].Type = tp.String()
+		httpMethod.QueryPlaceholders[from].Type = tp.String()
 		return
 	case types.TPointer:
-		httpMethod.RawQueryPlaceholders[from].IsPointer = true
+		httpMethod.QueryPlaceholders[from].IsPointer = true
 		s.cast(from, arg, tp.Next, httpMethod)
 		return
 	}

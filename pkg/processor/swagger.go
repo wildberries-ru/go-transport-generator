@@ -89,13 +89,13 @@ func (s *swagger) Process(info *api.GenerationInfo, iface *api.Interface) (err e
 			swaggerPath = &v1.Path{}
 			info.Swagger.Paths[httpMethod.RawURIPath] = swaggerPath
 		}
-		httpMethodRawQueryPlaceholders := make(map[string]string, len(httpMethod.RawQueryPlaceholders))
-		for k, v := range httpMethod.RawQueryPlaceholders {
-			httpMethodRawQueryPlaceholders[k] = v.Name
+		httpMethodQueryPlaceholders := make(map[string]string, len(httpMethod.QueryPlaceholders))
+		for k, v := range httpMethod.QueryPlaceholders {
+			httpMethodQueryPlaceholders[k] = v.Name
 		}
 		params := s.fillParamsFromSlice(iface.RelOutputPath, method.Args, httpMethod.URIPathPlaceholders, inPath, true)
 		params = append(params, s.fillParamsFromMap(iface.RelOutputPath, method.Args, httpMethod.HeaderPlaceholders, inHeader, false)...)
-		params = append(params, s.fillParamsFromMap(iface.RelOutputPath, method.Args, httpMethodRawQueryPlaceholders, inQuery, false)...)
+		params = append(params, s.fillParamsFromMap(iface.RelOutputPath, method.Args, httpMethodQueryPlaceholders, inQuery, false)...)
 
 		var req *v1.RequestBody
 		if len(httpMethod.Body) > 0 {
