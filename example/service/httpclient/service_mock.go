@@ -5,6 +5,7 @@ package httpclient
 
 import (
 	"context"
+	"mime/multipart"
 
 	"github.com/stretchr/testify/mock"
 	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
@@ -15,10 +16,16 @@ type MockService struct {
 	mock.Mock
 }
 
+// UploadDocument ...
+func (s *MockService) UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data multipart.File) (err error) {
+	args := s.Called(context.Background(), token, name, extension, categoryID, supplierID, contractID, data)
+	return args.Error(0)
+}
+
 // GetWarehouses ...
-func (s *MockService) GetWarehouses(ctx context.Context) (pets []v1.Detail, err error) {
+func (s *MockService) GetWarehouses(ctx context.Context) (pets map[string]v1.Detail, err error) {
 	args := s.Called(context.Background())
-	return args.Get(0).([]v1.Detail), args.Error(1)
+	return args.Get(0).(map[string]v1.Detail), args.Error(1)
 }
 
 // GetDetails ...

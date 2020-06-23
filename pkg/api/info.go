@@ -43,7 +43,11 @@ type HTTPMethod struct {
 	HeaderPlaceholders      map[string]string
 	ContentType             string
 	JsonTags                map[string]string
+	MultipartValueTags      map[string]string
+	MultipartFileTags       map[string]string
 	Body                    map[string]string
+	BodyPlaceholders        map[string]*Placeholder
+	IsIntBodyPlaceholders   bool
 	ResponseHeaders         map[string]string
 	ResponseStatus          string
 	ResponseContentType     string

@@ -54,7 +54,7 @@ func (s *httpMethod) Process(httpMethod *api.HTTPMethod, iface *api.Interface, m
 		delete(diff, toPlaceholder.Name)
 		for _, arg = range args {
 			if arg.Name == toPlaceholder.Name {
-				s.cast(from, arg, arg.Type, httpMethod)
+				s.castQueryPlaceholder(from, arg, arg.Type, httpMethod)
 			}
 		}
 	}
@@ -68,6 +68,17 @@ func (s *httpMethod) Process(httpMethod *api.HTTPMethod, iface *api.Interface, m
 		return fmt.Errorf(errHTTPMthodGETCouldNotHaveRequestBody, iface.RelOutputPath, iface.Iface.Name, method.Name)
 	}
 	httpMethod.Body = diff
+	if len(diff) > 0 {
+		httpMethod.BodyPlaceholders = make(map[string]*api.Placeholder, len(diff))
+		for _, arg = range args {
+			if _, ok := diff[arg.Name]; ok {
+				httpMethod.BodyPlaceholders[arg.Name] = &api.Placeholder{
+					Name: arg.Name,
+				}
+				s.castBodyPlaceholder(arg.Name, arg, arg.Type, httpMethod)
+			}
+		}
+	}
 	results = method.Results[:len(method.Results)-1]
 	diff = make(map[string]string, len(results))
 	for _, res = range results {
@@ -80,7 +91,7 @@ func (s *httpMethod) Process(httpMethod *api.HTTPMethod, iface *api.Interface, m
 	return
 }
 
-func (s *httpMethod) cast(from string, arg types.Variable, argType types.Type, httpMethod *api.HTTPMethod) {
+func (s *httpMethod) castQueryPlaceholder(from string, arg types.Variable, argType types.Type, httpMethod *api.HTTPMethod) {
 	switch tp := argType.(type) {
 	case types.TName:
 		if s.isInt(tp) {
@@ -93,7 +104,27 @@ func (s *httpMethod) cast(from string, arg types.Variable, argType types.Type, h
 		return
 	case types.TPointer:
 		httpMethod.QueryPlaceholders[from].IsPointer = true
-		s.cast(from, arg, tp.Next, httpMethod)
+		s.castQueryPlaceholder(from, arg, tp.Next, httpMethod)
+		return
+	}
+}
+
+func (s *httpMethod) castBodyPlaceholder(to string, arg types.Variable, argType types.Type, httpMethod *api.HTTPMethod) {
+	switch tp := argType.(type) {
+	case types.TName:
+		if s.isInt(tp) {
+			httpMethod.BodyPlaceholders[to].IsInt = true
+			if httpMethod.ContentType == "multipart/form-data" {
+				httpMethod.IsIntBodyPlaceholders = true
+			}
+		} else if s.isString(tp) {
+			httpMethod.BodyPlaceholders[to].IsString = true
+		}
+		httpMethod.BodyPlaceholders[to].Type = tp.String()
+		return
+	case types.TPointer:
+		httpMethod.BodyPlaceholders[to].IsPointer = true
+		s.castBodyPlaceholder(to, arg, tp.Next, httpMethod)
 		return
 	}
 }

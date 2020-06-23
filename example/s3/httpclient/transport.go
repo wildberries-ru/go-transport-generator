@@ -35,6 +35,7 @@ type createMultipartUploadTransport struct {
 func (t *createMultipartUploadTransport) EncodeRequest(ctx context.Context, r *fasthttp.Request, bucket string, key string) (err error) {
 	r.Header.SetMethod(t.method)
 	r.SetRequestURI(fmt.Sprintf(t.pathTemplate, bucket, key))
+
 	return
 }
 
@@ -44,15 +45,20 @@ func (t *createMultipartUploadTransport) DecodeResponse(ctx context.Context, r *
 		err = t.errorProcessor.Decode(r)
 		return
 	}
+
 	var theResponse createMultipartUploadResponse
 	if err = theResponse.UnmarshalJSON(r.Body()); err != nil {
 		return
 	}
 
 	additionalErrors = theResponse.AdditionalErrors
+
 	data = theResponse.Data
+
 	errorFlag = theResponse.ErrorFlag
+
 	errorText = theResponse.ErrorText
+
 	return
 }
 
@@ -91,6 +97,7 @@ type uploadPartDocumentTransport struct {
 func (t *uploadPartDocumentTransport) EncodeRequest(ctx context.Context, r *fasthttp.Request, bucket string, key string, uploadID string, partNumber int64, document []byte) (err error) {
 	r.Header.SetMethod(t.method)
 	r.SetRequestURI(fmt.Sprintf(t.pathTemplate, bucket, key))
+
 	return
 }
 
@@ -100,6 +107,7 @@ func (t *uploadPartDocumentTransport) DecodeResponse(ctx context.Context, r *fas
 		err = t.errorProcessor.Decode(r)
 		return
 	}
+
 	return
 }
 
@@ -136,6 +144,7 @@ type completeUploadTransport struct {
 func (t *completeUploadTransport) EncodeRequest(ctx context.Context, r *fasthttp.Request, bucket string, key string, uploadID string) (err error) {
 	r.Header.SetMethod(t.method)
 	r.SetRequestURI(fmt.Sprintf(t.pathTemplate, bucket, key))
+
 	return
 }
 
@@ -145,6 +154,7 @@ func (t *completeUploadTransport) DecodeResponse(ctx context.Context, r *fasthtt
 		err = t.errorProcessor.Decode(r)
 		return
 	}
+
 	return
 }
 
@@ -181,6 +191,7 @@ type uploadDocumentTransport struct {
 func (t *uploadDocumentTransport) EncodeRequest(ctx context.Context, r *fasthttp.Request, bucket string, key string, document []byte) (err error) {
 	r.Header.SetMethod(t.method)
 	r.SetRequestURI(fmt.Sprintf(t.pathTemplate, bucket, key))
+
 	return
 }
 
@@ -190,6 +201,7 @@ func (t *uploadDocumentTransport) DecodeResponse(ctx context.Context, r *fasthtt
 		err = t.errorProcessor.Decode(r)
 		return
 	}
+
 	return
 }
 
@@ -227,6 +239,7 @@ type downloadDocumentTransport struct {
 func (t *downloadDocumentTransport) EncodeRequest(ctx context.Context, r *fasthttp.Request, bucket string, key string) (err error) {
 	r.Header.SetMethod(t.method)
 	r.SetRequestURI(fmt.Sprintf(t.pathTemplate, bucket, key))
+
 	return
 }
 
@@ -236,12 +249,14 @@ func (t *downloadDocumentTransport) DecodeResponse(ctx context.Context, r *fasth
 		err = t.errorProcessor.Decode(r)
 		return
 	}
+
 	var theResponse downloadDocumentResponse
 	if err = theResponse.UnmarshalJSON(r.Body()); err != nil {
 		return
 	}
 
 	document = theResponse.Document
+
 	return
 }
 

@@ -41,25 +41,27 @@ const (
 	mockService          = "mock"
 	swagger              = "swagger"
 
-	requestAPIPathSuffix          = "api-path"
-	requestContentTypeSuffix      = "content-type"
-	requestJsonTagSuffix          = "json-tag"
-	requestHeaderSuffix           = "header"
-	requestMethodSuffix           = "method"
-	requestQuerySuffix            = "query"
-	requestURIPathSuffix          = "uri-path"
-	requestErrorsSuffix           = "errors"
-	responseContentTypeSuffix     = "response-content-type"
-	responseContentEncodingSuffix = "response-content-encoding"
-	responseJsonTagSuffix         = "response-json-tag"
-	responseBodySuffix            = "response-body"
-	responseHeaderSuffix          = "response-header"
-	responseStatusSuffix          = "response-status"
-	swaggerDescriptionSuffix      = "description"
-	swaggerServersSuffix          = "servers"
-	swaggerSummarySuffix          = "summary"
-	swaggerTitleSuffix            = "title"
-	swaggerVersionSuffix          = "version"
+	requestAPIPathSuffix           = "api-path"
+	requestContentTypeSuffix       = "content-type"
+	requestMultipartValueTagSuffix = "value-tag"
+	requestMultipartFileTagSuffix  = "file-tag"
+	requestJsonTagSuffix           = "json-tag"
+	requestHeaderSuffix            = "header"
+	requestMethodSuffix            = "method"
+	requestQuerySuffix             = "query"
+	requestURIPathSuffix           = "uri-path"
+	requestErrorsSuffix            = "errors"
+	responseContentTypeSuffix      = "response-content-type"
+	responseContentEncodingSuffix  = "response-content-encoding"
+	responseJsonTagSuffix          = "response-json-tag"
+	responseBodySuffix             = "response-body"
+	responseHeaderSuffix           = "response-header"
+	responseStatusSuffix           = "response-status"
+	swaggerDescriptionSuffix       = "description"
+	swaggerServersSuffix           = "servers"
+	swaggerSummarySuffix           = "summary"
+	swaggerTitleSuffix             = "title"
+	swaggerVersionSuffix           = "version"
 
 	httpServerPkgName = "httpserver"
 	httpClientPkgName = "httpclient"
@@ -133,8 +135,10 @@ func main() {
 										request.NewMethod(httpServer, requestMethodSuffix,
 											request.NewHeader(httpServer, requestHeaderSuffix,
 												request.NewContentType(httpServer, requestContentTypeSuffix,
-													request.NewJsonTag(httpServer, requestJsonTagSuffix,
-														request.NewAPIPath(httpServer, requestAPIPathSuffix, &request2.Term{}))))))))))))))
+													request.NewMultipartFileTag(httpServer, requestMultipartFileTagSuffix,
+														request.NewMultipartValueTag(httpServer, requestMultipartValueTagSuffix,
+															request.NewJsonTag(httpServer, requestJsonTagSuffix,
+																request.NewAPIPath(httpServer, requestAPIPathSuffix, &request2.Term{}))))))))))))))))
 
 	swaggerMethodTagParser := swagger2.NewVersion(swagger, swaggerVersionSuffix,
 		swagger2.NewTitle(swagger, swaggerTitleSuffix,
@@ -200,6 +204,9 @@ func main() {
 		return ""
 	}})
 	t.Funcs(template.FuncMap{"up": func(s string) string {
+		if s == "id" {
+			return "ID"
+		}
 		a := []rune(s)
 		a[0] = unicode.ToUpper(a[0])
 		return string(a)
@@ -209,7 +216,10 @@ func main() {
 		return parts[len(parts)-1]
 	}})
 	t.Funcs(template.FuncMap{"isSliceType": func(s string) bool {
-		return len(s) > 0 && s[0] == '['
+		return len(s) > 2 && s[0] == '['
+	}})
+	t.Funcs(template.FuncMap{"isMapType": func(s string) bool {
+		return len(s) > 3 && s[0] == 'm' && s[1] == 'a' && s[2] == 'p'
 	}})
 
 	imp := imports.NewImports()
