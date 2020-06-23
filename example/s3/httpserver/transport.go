@@ -35,32 +35,47 @@ type createMultipartUploadTransport struct {
 
 // DecodeRequest method for decoding requests on server side
 func (t *createMultipartUploadTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (bucket string, key string, err error) {
+
 	bucket = ctx.UserValue("bucket").(string)
+
 	key = ctx.UserValue("key").(string)
+
 	return
 }
 
 // EncodeResponse method for encoding response on server side
 func (t *createMultipartUploadTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, data v1.CreateMultipartUploadData, errorFlag bool, errorText string, additionalErrors *v1.AdditionalErrors) (err error) {
+
 	r.Header.Set("Content-Type", "application/json")
 	var theResponse createMultipartUploadResponse
+
 	theResponse.AdditionalErrors = additionalErrors
+
 	theResponse.Data = data
+
 	theResponse.ErrorFlag = errorFlag
+
 	theResponse.ErrorText = errorText
+
 	body, err := theResponse.MarshalJSON()
 	if err != nil {
 		err = t.encodeJSONErrorCreator(err)
 		return
 	}
 	r.SetBody(body)
+
 	r.Header.SetStatusCode(201)
 	return
 }
 
 // NewCreateMultipartUploadTransport the transport creator for http requests
-func NewCreateMultipartUploadTransport(encodeJSONErrorCreator errorCreator) CreateMultipartUploadTransport {
+func NewCreateMultipartUploadTransport(
+
+	encodeJSONErrorCreator errorCreator,
+
+) CreateMultipartUploadTransport {
 	return &createMultipartUploadTransport{
+
 		encodeJSONErrorCreator: encodeJSONErrorCreator,
 	}
 }
@@ -82,14 +97,19 @@ type uploadPartDocumentTransport struct {
 
 // DecodeRequest method for decoding requests on server side
 func (t *uploadPartDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (bucket string, key string, uploadID string, partNumber int64, document []byte, err error) {
+
 	bucket = ctx.UserValue("bucket").(string)
+
 	key = ctx.UserValue("key").(string)
+
 	return
 }
 
 // EncodeResponse method for encoding response on server side
 func (t *uploadPartDocumentTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response) (err error) {
+
 	r.Header.Set("Content-Type", "application/json")
+
 	r.Header.SetStatusCode(200)
 	return
 }
@@ -114,14 +134,19 @@ type completeUploadTransport struct {
 
 // DecodeRequest method for decoding requests on server side
 func (t *completeUploadTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (bucket string, key string, uploadID string, err error) {
+
 	bucket = ctx.UserValue("bucket").(string)
+
 	key = ctx.UserValue("key").(string)
+
 	return
 }
 
 // EncodeResponse method for encoding response on server side
 func (t *completeUploadTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response) (err error) {
+
 	r.Header.Set("Content-Type", "application/json")
+
 	r.Header.SetStatusCode(200)
 	return
 }
@@ -146,14 +171,19 @@ type uploadDocumentTransport struct {
 
 // DecodeRequest method for decoding requests on server side
 func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (bucket string, key string, document []byte, err error) {
+
 	bucket = ctx.UserValue("bucket").(string)
+
 	key = ctx.UserValue("key").(string)
+
 	return
 }
 
 // EncodeResponse method for encoding response on server side
 func (t *uploadDocumentTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response) (err error) {
+
 	r.Header.Set("Content-Type", "application/json")
+
 	r.Header.SetStatusCode(201)
 	return
 }
@@ -180,34 +210,49 @@ type downloadDocumentTransport struct {
 
 // DecodeRequest method for decoding requests on server side
 func (t *downloadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (bucket string, key string, err error) {
+
 	bucket = ctx.UserValue("bucket").(string)
+
 	key = ctx.UserValue("key").(string)
+
 	return
 }
 
 // EncodeResponse method for encoding response on server side
 func (t *downloadDocumentTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, document []byte) (err error) {
+
 	r.Header.Set("Content-Type", "application/json")
 	var theResponse downloadDocumentResponse
+
 	theResponse.Document = document
+
 	body, err := theResponse.MarshalJSON()
 	if err != nil {
 		err = t.encodeJSONErrorCreator(err)
 		return
 	}
 	r.SetBody(body)
+
 	r.Header.SetStatusCode(200)
 	return
 }
 
 // NewDownloadDocumentTransport the transport creator for http requests
-func NewDownloadDocumentTransport(encodeJSONErrorCreator errorCreator) DownloadDocumentTransport {
+func NewDownloadDocumentTransport(
+
+	encodeJSONErrorCreator errorCreator,
+
+) DownloadDocumentTransport {
 	return &downloadDocumentTransport{
+
 		encodeJSONErrorCreator: encodeJSONErrorCreator,
 	}
 }
 
 func ptr(in []byte) *string {
+	if bytes.Equal(in, emptyBytes) {
+		return nil
+	}
 	i := string(in)
 	return &i
 }
@@ -230,4 +275,18 @@ func atoi(in []byte) (out int, err error) {
 		return
 	}
 	return strconv.Atoi(string(in))
+}
+
+func atoi64ptr(in []byte) (out *int64, err error) {
+	var (
+		o int
+		i = string(in)
+	)
+	if i != "" {
+		if o, err = strconv.Atoi(i); err == nil {
+			b := int64(o)
+			out = &b
+		}
+	}
+	return
 }

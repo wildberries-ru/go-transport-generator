@@ -2,19 +2,34 @@ package service
 
 import (
 	"context"
+	"mime/multipart"
 
 	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
 )
 
 // SomeService ...
-// @gtg http-server log metrics http-client mock http-errors
+// @gtg http-server log metrics mock http-errors
 type SomeService interface {
+	// @gtg http-server-method POST
+	// @gtg http-server-uri-path /api/v1/document
+	// @gtg http-server-content-type multipart/form-data
+	// @gtg http-server-header Authorization {token}
+	// @gtg http-server-value-tag name name
+	// @gtg http-server-value-tag extension extension
+	// @gtg http-server-value-tag categoryID categoryID
+	// @gtg http-server-value-tag contractID contractID
+	// @gtg http-server-value-tag supplierID supplierID
+	// @gtg http-server-file-tag data document
+	// @gtg http-server-response-content-type application/json
+	// @gtg http-server-response-status 201
+	UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data multipart.File) (err error)
 	// @gtg http-server-method GET
 	// @gtg http-server-uri-path /api/v1/getWarehouses
 	// @gtg http-server-content-type application/json
 	// @gtg http-server-response-status http.StatusOK
 	// @gtg http-server-response-content-type application/json
-	GetWarehouses(ctx context.Context) (pets []v1.Detail, err error)
+	// @gtg http-server-response-body pets
+	GetWarehouses(ctx context.Context) (pets map[string]v1.Detail, err error)
 	// @gtg http-server-method GET
 	// @gtg http-server-uri-path /api/v1/namespaces/{namespace}/details/{detail}
 	// @gtg http-server-query file={fileID}&some={someID}

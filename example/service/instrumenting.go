@@ -5,6 +5,7 @@ package service
 
 import (
 	"context"
+	"mime/multipart"
 	"strconv"
 	"time"
 
@@ -19,8 +20,14 @@ type instrumentingMiddleware struct {
 	svc         SomeService
 }
 
+// UploadDocument ...
+func (s *instrumentingMiddleware) UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data multipart.File) (err error) {
+	defer s.recordMetrics("UploadDocument", time.Now(), err)
+	return s.svc.UploadDocument(ctx, token, name, extension, categoryID, supplierID, contractID, data)
+}
+
 // GetWarehouses ...
-func (s *instrumentingMiddleware) GetWarehouses(ctx context.Context) (pets []v1.Detail, err error) {
+func (s *instrumentingMiddleware) GetWarehouses(ctx context.Context) (pets map[string]v1.Detail, err error) {
 	defer s.recordMetrics("GetWarehouses", time.Now(), err)
 	return s.svc.GetWarehouses(ctx)
 }

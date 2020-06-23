@@ -5,6 +5,7 @@ package service
 
 import (
 	"context"
+	"mime/multipart"
 	"time"
 
 	"github.com/go-kit/kit/log"
@@ -18,8 +19,27 @@ type loggingMiddleware struct {
 	svc    SomeService
 }
 
+// UploadDocument ...
+func (s *loggingMiddleware) UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data multipart.File) (err error) {
+	defer func(begin time.Time) {
+		_ = s.wrap(err).Log(
+			"method", "UploadDocument",
+			"token", token,
+			"name", name,
+			"extension", extension,
+			"categoryID", categoryID,
+			"supplierID", supplierID,
+			"contractID", contractID,
+			"data", data,
+			"err", err,
+			"elapsed", time.Since(begin),
+		)
+	}(time.Now())
+	return s.svc.UploadDocument(ctx, token, name, extension, categoryID, supplierID, contractID, data)
+}
+
 // GetWarehouses ...
-func (s *loggingMiddleware) GetWarehouses(ctx context.Context) (pets []v1.Detail, err error) {
+func (s *loggingMiddleware) GetWarehouses(ctx context.Context) (pets map[string]v1.Detail, err error) {
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(
 			"method", "GetWarehouses",

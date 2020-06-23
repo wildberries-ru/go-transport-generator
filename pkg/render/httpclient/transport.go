@@ -27,102 +27,125 @@ import (
  
 {{range .Iface.Methods}}
 
-{{$ct := getValueMap $methods .Name}}
-{{$method := $ct.Method}}
-{{$uriPlaceholders := $ct.URIPathPlaceholders}}
-{{$queryPlaceholders := $ct.QueryPlaceholders}}
-{{$headerPlaceholders := $ct.HeaderPlaceholders}}
-{{$body := $ct.Body}}
-{{$contentType := $ct.ContentType}}
-{{$jsonTags := $ct.JsonTags}}
-{{$responseJsonTags := $ct.ResponseJsonTags}}
-{{$responseHeaderPlaceholders := $ct.ResponseHeaders}}
-{{$responseStatus := $ct.ResponseStatus}}
-{{$responseContentType := $ct.ResponseContentType}}
-{{$responseBody := $ct.ResponseBody}}
-{{$responseBodyField := $ct.ResponseBodyField}}
-{{$responseBodyType := index $responseBody $ct.ResponseBodyField}}
-{{$responseBodyTypeIsSlice := isSliceType $responseBodyType}}
+	{{$ct := getValueMap $methods .Name}}
+	{{$method := $ct.Method}}
+	{{$uriPlaceholders := $ct.URIPathPlaceholders}}
+	{{$queryPlaceholders := $ct.QueryPlaceholders}}
+	{{$headerPlaceholders := $ct.HeaderPlaceholders}}
+	{{$body := $ct.Body}}
+	{{$contentType := $ct.ContentType}}
+	{{$jsonTags := $ct.JsonTags}}
+	{{$responseJsonTags := $ct.ResponseJsonTags}}
+	{{$responseHeaderPlaceholders := $ct.ResponseHeaders}}
+	{{$responseStatus := $ct.ResponseStatus}}
+	{{$responseContentType := $ct.ResponseContentType}}
+	{{$responseBody := $ct.ResponseBody}}
+	{{$responseBodyField := $ct.ResponseBodyField}}
+	{{$responseBodyType := index $responseBody $ct.ResponseBodyField}}
+	{{$responseBodyTypeIsSlice := isSliceType $responseBodyType}}
+	{{$responseBodyTypeIsMap := isMapType $responseBodyType}}
 
-{{if lenMap $body}}type {{low .Name}}Request struct {
-{{range $name, $tp := $body}}{{up $name}} {{$tp}}{{$tag := index $jsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
+
+	{{if lenMap $body}}type {{low .Name}}Request struct {
+		{{range $name, $tp := $body}}{{up $name}} {{$tp}}{{$tag := index $jsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
+		{{end}}
+	}{{end}}
+
+	{{if lenMap $responseBody}}//easyjson:json
+		type {{low .Name}}Response {{if or $responseBodyTypeIsSlice $responseBodyTypeIsMap}}{{$responseBodyType}}{{else}} struct {
+  			{{if $responseBodyType}}
+    			{{$responseBodyType}}
+  			{{else}}
+    			{{range $name, $tp := $responseBody}}{{up $name}} {{$tp}}{{$tag := index $responseJsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
+    			{{end}}
+  			{{end}}
+		}{{end}}
+	{{end}}
+
+	// {{.Name}}Transport transport interface
+	type {{.Name}}Transport interface {
+		EncodeRequest(ctx context.Context, r *fasthttp.Request, {{$args := popFirst .Args}}{{joinFullVariables $args ","}}) (err error)
+		DecodeResponse(ctx context.Context, r *fasthttp.Response) ({{$args := popLast .Results}}{{joinFullVariables $args "," "err error"}})
+	}
+
+	type {{low .Name}}Transport struct {
+		errorProcessor errorProcessor
+		pathTemplate   string
+		method         string
+	}
+
+	// EncodeRequest method for decoding requests on server side
+	func (t *{{low .Name}}Transport) EncodeRequest(ctx context.Context, r *fasthttp.Request, {{$args := popFirst .Args}}{{joinFullVariables $args ","}}) (err error) {
+		r.Header.SetMethod(t.method)
+		{{if len $uriPlaceholders}}r.SetRequestURI(fmt.Sprintf(t.pathTemplate, {{join $uriPlaceholders ","}})){{else}}r.SetRequestURI(t.pathTemplate){{end}}
+		{{range $from, $to := $queryPlaceholders}}
+			{{if eq $to.IsString true}}
+				{{if eq $to.IsPointer true}}if {{$to.Name}} != nil { {{end}}
+				r.URI().QueryArgs().Set("{{$from}}", {{if eq $to.IsPointer true}}*{{end}}{{$to.Name}})
+				{{if eq $to.IsPointer true}} } {{end}}
+			{{else if eq $to.IsInt true}}
+				{{if eq $to.IsPointer true}}if {{$to.Name}} != nil { {{end}}
+				r.URI().QueryArgs().Set("{{$from}}", strconv.Itoa({{if ne $to.Type "int"}}int({{if eq $to.IsPointer true}}*{{end}}{{$to.Name}}){{else}}{{if eq $to.IsPointer true}}*{{end}}{{$to.Name}}{{end}}))
+				{{if eq $to.IsPointer true}} } {{end}}
+			{{end}}
+		{{end}}
+		{{range $from, $to := $headerPlaceholders}}
+			r.Header.Set("{{$from}}", *{{$to}})
+		{{end}}
+		{{if eq $contentType "application/json"}}r.Header.Set("Content-Type", "application/json")
+			{{if lenMap $body}}var request {{low .Name}}Request
+				{{range $name, $tp := $body}}
+					request.{{up $name}} = {{$name}}
+				{{end}}
+				body, err := request.MarshalJSON()
+				if err != nil {
+					return
+				}
+				r.SetBody(body)
+			{{end}}
+		{{end}}
+		return
+	}
+
+	// DecodeResponse method for encoding response on server side
+	func (t *{{low .Name}}Transport) DecodeResponse(ctx context.Context, r *fasthttp.Response) ({{$args := popLast .Results}}{{joinFullVariables $args "," "err error"}}) {
+		if r.StatusCode() != {{$responseStatus}} {
+			err = t.errorProcessor.Decode(r)
+			return
+		}
+		{{if eq $responseContentType "application/json"}}
+			{{if lenMap $responseBody}}var theResponse {{low .Name}}Response
+				if err = theResponse.UnmarshalJSON(r.Body()); err != nil {
+					return
+				}
+				{{if $responseBodyType }}
+					{{$responseBodyField}} = theResponse{{if or $responseBodyTypeIsSlice $responseBodyTypeIsMap}}{{else}}.{{stripType $responseBodyType}}{{end}}
+				{{else}}
+					{{range $name, $tp := $responseBody}}
+						{{$name}} = theResponse.{{up $name}}
+					{{end}}
+				{{end}}
+			{{end}}
+		{{end}}
+		{{range $to, $from := $responseHeaderPlaceholders}}
+			{{$from}} = ptr(r.Header.Peek("{{$to}}"))
+		{{end}}
+		return
+	}
+
+	// New{{.Name}}Transport the transport creator for http requests
+	func New{{.Name}}Transport(
+		errorProcessor errorProcessor,
+		pathTemplate string,
+		method string,
+	) {{.Name}}Transport {
+		return &{{low .Name}}Transport{
+			errorProcessor: errorProcessor,
+			pathTemplate:   pathTemplate,
+			method:         method,
+		}
+	}
 {{end}}
-}{{end}}
-
-{{if lenMap $responseBody}}//easyjson:json
-type {{low .Name}}Response {{if $responseBodyTypeIsSlice}}{{$responseBodyType}}{{else}} struct {
-  {{if $responseBodyType}}
-    {{$responseBodyType}}
-  {{else}}
-    {{range $name, $tp := $responseBody}}{{up $name}} {{$tp}}{{$tag := index $responseJsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
-    {{end}}
-  {{end}}
-}{{end}}
-{{end}}
-
-// {{.Name}}Transport transport interface
-type {{.Name}}Transport interface {
-	EncodeRequest(ctx context.Context, r *fasthttp.Request, {{$args := popFirst .Args}}{{joinFullVariables $args ","}}) (err error)
-	DecodeResponse(ctx context.Context, r *fasthttp.Response) ({{$args := popLast .Results}}{{joinFullVariables $args "," "err error"}})
-}
-
-type {{low .Name}}Transport struct {
-	errorProcessor errorProcessor
-	pathTemplate   string
-	method         string
-}
-
-// EncodeRequest method for decoding requests on server side
-func (t *{{low .Name}}Transport) EncodeRequest(ctx context.Context, r *fasthttp.Request, {{$args := popFirst .Args}}{{joinFullVariables $args ","}}) (err error) {
-	r.Header.SetMethod(t.method)
-	{{if len $uriPlaceholders}}r.SetRequestURI(fmt.Sprintf(t.pathTemplate, {{join $uriPlaceholders ","}})){{else}}r.SetRequestURI(t.pathTemplate){{end}}
-	{{range $from, $to := $queryPlaceholders}}{{if eq $to.IsString true}}{{if eq $to.IsPointer true}}if {{$to.Name}} != nil { {{end}}
-		r.URI().QueryArgs().Set("{{$from}}", {{if eq $to.IsPointer true}}*{{end}}{{$to.Name}})
-	{{if eq $to.IsPointer true}} } {{end}}
-	{{else if eq $to.IsInt true}}{{if eq $to.IsPointer true}}if {{$to.Name}} != nil { {{end}}
-		r.URI().QueryArgs().Set("{{$from}}", strconv.Itoa({{if ne $to.Type "int"}}int({{if eq $to.IsPointer true}}*{{end}}{{$to.Name}}){{else}}{{if eq $to.IsPointer true}}*{{end}}{{$to.Name}}{{end}}))
-	{{if eq $to.IsPointer true}} } {{end}}
-	{{end}}{{end}}{{range $from, $to := $headerPlaceholders}}r.Header.Set("{{$from}}", *{{$to}})
-	{{end}}{{if eq $contentType "application/json"}}r.Header.Set("Content-Type", "application/json")
-	{{if lenMap $body}}var request {{low .Name}}Request
-	{{range $name, $tp := $body}}request.{{up $name}} = {{$name}}
-	{{end}}body, err := request.MarshalJSON()
-	if err != nil {
-		return
-	}
-	r.SetBody(body)
-	{{end}}{{end}}return
-}
-
-// DecodeResponse method for encoding response on server side
-func (t *{{low .Name}}Transport) DecodeResponse(ctx context.Context, r *fasthttp.Response) ({{$args := popLast .Results}}{{joinFullVariables $args "," "err error"}}) {
-	if r.StatusCode() != {{$responseStatus}} {
-		err = t.errorProcessor.Decode(r)
-		return
-	}
-	{{if eq $responseContentType "application/json"}}{{if lenMap $responseBody}}var theResponse {{low .Name}}Response
-	if err = theResponse.UnmarshalJSON(r.Body()); err != nil {
-		return
-	}
-	
-	{{if $responseBodyType }}{{$responseBodyField}} = theResponse{{if not $responseBodyTypeIsSlice}}.{{stripType $responseBodyType}}{{end}}
-	{{else}}{{range $name, $tp := $responseBody}}{{$name}} = theResponse.{{up $name}}
-	{{end}}{{end}}{{end}}{{end}}{{range $to, $from := $responseHeaderPlaceholders}}{{$from}} = ptr(r.Header.Peek("{{$to}}"))
-	{{end}}return
-}
-
-// New{{.Name}}Transport the transport creator for http requests
-func New{{.Name}}Transport(
-	errorProcessor errorProcessor,
-	pathTemplate string,
-	method string,
-) {{.Name}}Transport {
-	return &{{low .Name}}Transport{
-		errorProcessor: errorProcessor,
-		pathTemplate:   pathTemplate,
-		method:         method,
-	}
-}{{end}}
 
 func ptr(in []byte) *string {
 	i := string(in)
