@@ -55,7 +55,7 @@ func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fas
 		_ContractID := _contractID[0]
 		if _ContractID != "" {
 			var i int
-			i, err = strconv.Atoi(string(_ContractID))
+			i, err = strconv.Atoi(_ContractID)
 			if err != nil {
 				err = t.decodeTypeIntErrorCreator(err)
 				return
@@ -93,7 +93,7 @@ func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fas
 		_SupplierID := _supplierID[0]
 		if _SupplierID != "" {
 			var i int
-			i, err = strconv.Atoi(string(_SupplierID))
+			i, err = strconv.Atoi(_SupplierID)
 			if err != nil {
 				err = t.decodeTypeIntErrorCreator(err)
 				return

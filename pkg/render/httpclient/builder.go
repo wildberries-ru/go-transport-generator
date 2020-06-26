@@ -29,7 +29,7 @@ import (
 
 const (
 	{{range .Iface.Methods}}
-	{{$ct := getValueMap $methods .Name}}httpMethod{{.Name}} = "{{$ct.Method}}" 
+	{{$ct := index $methods .Name}}httpMethod{{.Name}} = "{{$ct.Method}}" 
 	uriPathClient{{.Name}} = "{{$ct.ClientURIPath}}"{{end}}
 )
 

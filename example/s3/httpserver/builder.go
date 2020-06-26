@@ -32,9 +32,12 @@ type errorProcessor interface {
 type errorCreator func(err error) error
 
 // New ...
-func New(router *fasthttprouter.Router, svc service, decodeJSONErrorCreator errorCreator, encodeJSONErrorCreator errorCreator, encodeQueryTypeIntErrorCreator errorCreator, errorProcessor errorProcessor) {
+func New(router *fasthttprouter.Router, svc service, decodeJSONErrorCreator errorCreator, encodeJSONErrorCreator errorCreator, decodeTypeIntErrorCreator errorCreator, errorProcessor errorProcessor) {
 
-	createMultipartUploadTransport := NewCreateMultipartUploadTransport(encodeJSONErrorCreator)
+	createMultipartUploadTransport := NewCreateMultipartUploadTransport(
+
+		encodeJSONErrorCreator,
+	)
 	router.Handle(httpMethodCreateMultipartUpload, uriPathCreateMultipartUpload, NewCreateMultipartUpload(createMultipartUploadTransport, svc, errorProcessor))
 
 	uploadPartDocumentTransport := NewUploadPartDocumentTransport()
@@ -46,7 +49,10 @@ func New(router *fasthttprouter.Router, svc service, decodeJSONErrorCreator erro
 	uploadDocumentTransport := NewUploadDocumentTransport()
 	router.Handle(httpMethodUploadDocument, uriPathUploadDocument, NewUploadDocument(uploadDocumentTransport, svc, errorProcessor))
 
-	downloadDocumentTransport := NewDownloadDocumentTransport(encodeJSONErrorCreator)
+	downloadDocumentTransport := NewDownloadDocumentTransport(
+
+		encodeJSONErrorCreator,
+	)
 	router.Handle(httpMethodDownloadDocument, uriPathDownloadDocument, NewDownloadDocument(downloadDocumentTransport, svc, errorProcessor))
 
 	router.Handle("GET", "/debug/pprof/", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Index))

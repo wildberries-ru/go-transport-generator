@@ -27,27 +27,28 @@ type loggingMiddleware struct {
 	logger log.Logger
 	svc    {{ .Iface.Name }}
 }
-
+{{$methods := .HTTPMethods}}
 {{range .Iface.Methods -}}
-// {{.Name}} ...
-func (s *loggingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFullVariables .Results ","}}) {
-	defer func(begin time.Time) {
-		_ = s.wrap(err).Log(
-			"method", "{{.Name}}",
-			{{$args := popFirst .Args -}}
-			{{range $arg := $args -}}
-				"{{$arg.Name}}", {{$arg.Name}}, 
-			{{end -}}
-			{{$args := popLast .Results -}}
-			{{range $arg := $args -}}
-				"{{$arg.Name}}", {{$arg.Name}}, 
-			{{end -}}
-			"err", err,
-			"elapsed", time.Since(begin),
-		)
-	}(time.Now())
-	return s.svc.{{.Name}}({{joinVariableNamesWithEllipsis .Args ","}})
-}
+	{{$method := index $methods .Name}}
+	// {{.Name}} ...
+	func (s *loggingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFullVariables .Results ","}}) {
+		defer func(begin time.Time) {
+			_ = s.wrap(err).Log(
+				"method", "{{.Name}}",
+				{{$args := popFirst .Args -}}
+				{{range $arg := $args -}}
+					{{if notin $method.LogIgnores $arg.Name}}"{{$arg.Name}}", {{$arg.Name}},{{end}} 
+				{{end -}}
+				{{$args := popLast .Results -}}
+				{{range $arg := $args -}}
+					{{if notin $method.LogIgnores $arg.Name}}"{{$arg.Name}}", {{$arg.Name}},{{end}}
+				{{end -}}
+				"err", err,
+				"elapsed", time.Since(begin),
+			)
+		}(time.Now())
+		return s.svc.{{.Name}}({{joinVariableNamesWithEllipsis .Args ","}})
+	}
 {{end}}
 
 func (s *loggingMiddleware) wrap(err error) log.Logger {
