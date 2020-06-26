@@ -15,6 +15,7 @@ import (
 	"github.com/wildberries-ru/go-transport-generator/pkg/imports"
 	"github.com/wildberries-ru/go-transport-generator/pkg/mod"
 	request2 "github.com/wildberries-ru/go-transport-generator/pkg/parser"
+	"github.com/wildberries-ru/go-transport-generator/pkg/parser/httpserver/log"
 	"github.com/wildberries-ru/go-transport-generator/pkg/parser/httpserver/request"
 	"github.com/wildberries-ru/go-transport-generator/pkg/parser/httpserver/response"
 	swagger2 "github.com/wildberries-ru/go-transport-generator/pkg/parser/swagger"
@@ -25,11 +26,6 @@ import (
 	"github.com/wildberries-ru/go-transport-generator/pkg/render/httpserver"
 	"github.com/wildberries-ru/go-transport-generator/pkg/render/service"
 )
-
-// Generator ...
-type Generator interface {
-	Generate(path string, info api.GenerationInfo) (err error)
-}
 
 const (
 	httpServer           = "http-server"
@@ -62,6 +58,7 @@ const (
 	swaggerSummarySuffix           = "summary"
 	swaggerTitleSuffix             = "title"
 	swaggerVersionSuffix           = "version"
+	ignoreSuffix                   = "ignore"
 
 	httpServerPkgName = "httpserver"
 	httpClientPkgName = "httpclient"
@@ -87,6 +84,8 @@ var (
 
 	goGeneratedAutomaticallyPrefix = []byte("// CODE GENERATED AUTOMATICALLY")
 	yaml                           = true
+
+	version = "v0.1.0"
 )
 
 func main() {
@@ -103,7 +102,13 @@ func main() {
 	info.SwaggerInfo.Title = flag.String("title", "", "swagger title")
 	info.SwaggerInfo.Version = flag.String("version", "", "swagger version")
 	servers := flag.String("servers", "", `swagger servers in format: http://some.url = some url description\r\nhttp://another.url = another url description`)
+
+	printVersion := flag.Bool("v", false, "print version and exit")
 	flag.Parse()
+	if *printVersion {
+		fmt.Println(version)
+		os.Exit(0)
+	}
 
 	if *servers != "" {
 		for _, srv := range strings.Split(*servers, `\r\n`) {
@@ -123,23 +128,23 @@ func main() {
 		info.SwaggerToYaml = &yaml
 	}
 
-	tagsParser := response.NewStatus(httpServer, responseStatusSuffix,
+	tagsParser := request.NewErrorProcessor(httpServer, requestErrorsSuffix,
+		request.NewURIPath(httpServer, requestURIPathSuffix,
+			request.NewQuery(httpServer, requestQuerySuffix,
+				request.NewMethod(httpServer, requestMethodSuffix,
+					request.NewHeader(httpServer, requestHeaderSuffix,
+						request.NewContentType(httpServer, requestContentTypeSuffix,
+							request.NewMultipartFileTag(httpServer, requestMultipartFileTagSuffix,
+								request.NewMultipartValueTag(httpServer, requestMultipartValueTagSuffix,
+									request.NewJsonTag(httpServer, requestJsonTagSuffix,
+										request.NewAPIPath(httpServer, requestAPIPathSuffix, &request2.Term{}))))))))))
+	tagsParser = response.NewStatus(httpServer, responseStatusSuffix,
 		response.NewHeader(httpServer, responseHeaderSuffix,
 			response.NewContentType(httpServer, responseContentTypeSuffix,
 				response.NewEncodingType(httpServer, responseContentEncodingSuffix,
 					response.NewJsonTag(httpServer, responseJsonTagSuffix,
-						response.NewBody(httpServer, responseBodySuffix,
-							request.NewErrorProcessor(httpServer, requestErrorsSuffix,
-								request.NewURIPath(httpServer, requestURIPathSuffix,
-									request.NewQuery(httpServer, requestQuerySuffix,
-										request.NewMethod(httpServer, requestMethodSuffix,
-											request.NewHeader(httpServer, requestHeaderSuffix,
-												request.NewContentType(httpServer, requestContentTypeSuffix,
-													request.NewMultipartFileTag(httpServer, requestMultipartFileTagSuffix,
-														request.NewMultipartValueTag(httpServer, requestMultipartValueTagSuffix,
-															request.NewJsonTag(httpServer, requestJsonTagSuffix,
-																request.NewAPIPath(httpServer, requestAPIPathSuffix, &request2.Term{}))))))))))))))))
-
+						response.NewBody(httpServer, responseBodySuffix, tagsParser))))))
+	tagsParser = log.NewLogIgnore(logService, ignoreSuffix, tagsParser)
 	swaggerMethodTagParser := swagger2.NewVersion(swagger, swaggerVersionSuffix,
 		swagger2.NewTitle(swagger, swaggerTitleSuffix,
 			swagger2.NewSummary(swagger, swaggerSummarySuffix,
@@ -194,9 +199,6 @@ func main() {
 		a[0] = unicode.ToLower(a[0])
 		return string(a)
 	}})
-	t.Funcs(template.FuncMap{"getValueMap": func(s map[string]api.HTTPMethod, name string) api.HTTPMethod {
-		return s[name]
-	}})
 	t.Funcs(template.FuncMap{"join": func(s []string, c string) string {
 		if len(s) > 0 {
 			return strings.Join(s, c)
@@ -221,6 +223,14 @@ func main() {
 	t.Funcs(template.FuncMap{"isMapType": func(s string) bool {
 		return len(s) > 3 && s[0] == 'm' && s[1] == 'a' && s[2] == 'p'
 	}})
+	t.Funcs(template.FuncMap{"notin": func(s []string, f string) bool {
+		for _, v := range s {
+			if v == f {
+				return false
+			}
+		}
+		return true
+	}})
 
 	imp := imports.NewImports()
 
@@ -243,21 +253,18 @@ func main() {
 			httpServerRender,
 			httpServerTransportRender,
 			httpServerBuilderRender,
-			httpMethodProcessor,
 		),
 		httpClient: processor.NewHTTPClient(
 			false,
 			httpClientRender,
 			httpClientTransportRender,
 			httpClientBuilderRender,
-			httpMethodProcessor,
 		),
 		httpsClient: processor.NewHTTPClient(
 			true,
 			httpClientRender,
 			httpClientTransportRender,
 			httpClientBuilderRender,
-			httpMethodProcessor,
 		),
 		httpErrors:           processor.NewErrors(tagMark, httpUIErrorsRender, httpClientErrorsRender),
 		instrumentingService: processor.NewInstrumenting(instrumentingRender),
@@ -266,7 +273,7 @@ func main() {
 		swagger:              processor.NewSwagger(tagMark, httpMethodProcessor, swaggerMethodTagParser, mod.NewMod(), goGeneratedAutomaticallyPrefix),
 	}
 
-	servicesProcessor := processor.NewServices(tagMark, processors)
+	servicesProcessor := processor.NewServices(tagMark, processors, httpMethodProcessor)
 	servicePreProcessor := preprocessor.NewService(servicesProcessor, goGeneratedAutomaticallyPrefix, swaggerRender)
 
 	info.SwaggerAbsOutputPath = *swaggerFile

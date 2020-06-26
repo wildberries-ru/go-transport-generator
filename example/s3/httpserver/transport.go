@@ -5,7 +5,6 @@ package httpserver
 
 import (
 	"bytes"
-	"strconv"
 
 	"github.com/valyala/fasthttp"
 	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
@@ -17,10 +16,13 @@ var (
 
 //easyjson:json
 type createMultipartUploadResponse struct {
-	AdditionalErrors *v1.AdditionalErrors         `json:"additionalErrors"`
-	Data             v1.CreateMultipartUploadData `json:"data"`
-	ErrorFlag        bool                         `json:"error"`
-	ErrorText        string                       `json:"errorText"`
+	AdditionalErrors *v1.AdditionalErrors `json:"additionalErrors"`
+
+	Data v1.CreateMultipartUploadData `json:"data"`
+
+	ErrorFlag bool `json:"error"`
+
+	ErrorText string `json:"errorText"`
 }
 
 // CreateMultipartUploadTransport transport interface
@@ -80,12 +82,6 @@ func NewCreateMultipartUploadTransport(
 	}
 }
 
-type uploadPartDocumentRequest struct {
-	Document   []byte
-	PartNumber int64
-	UploadID   string
-}
-
 // UploadPartDocumentTransport transport interface
 type UploadPartDocumentTransport interface {
 	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (bucket string, key string, uploadID string, partNumber int64, document []byte, err error)
@@ -119,10 +115,6 @@ func NewUploadPartDocumentTransport() UploadPartDocumentTransport {
 	return &uploadPartDocumentTransport{}
 }
 
-type completeUploadRequest struct {
-	UploadID string
-}
-
 // CompleteUploadTransport transport interface
 type CompleteUploadTransport interface {
 	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (bucket string, key string, uploadID string, err error)
@@ -154,10 +146,6 @@ func (t *completeUploadTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fa
 // NewCompleteUploadTransport the transport creator for http requests
 func NewCompleteUploadTransport() CompleteUploadTransport {
 	return &completeUploadTransport{}
-}
-
-type uploadDocumentRequest struct {
-	Document []byte
 }
 
 // UploadDocumentTransport transport interface
@@ -255,38 +243,4 @@ func ptr(in []byte) *string {
 	}
 	i := string(in)
 	return &i
-}
-
-func atoiptr(in []byte) (out *int, err error) {
-	var (
-		o int
-		i = string(in)
-	)
-	if i != "" {
-		if o, err = strconv.Atoi(i); err == nil {
-			out = &o
-		}
-	}
-	return
-}
-
-func atoi(in []byte) (out int, err error) {
-	if bytes.Equal(in, emptyBytes) {
-		return
-	}
-	return strconv.Atoi(string(in))
-}
-
-func atoi64ptr(in []byte) (out *int64, err error) {
-	var (
-		o int
-		i = string(in)
-	)
-	if i != "" {
-		if o, err = strconv.Atoi(i); err == nil {
-			b := int64(o)
-			out = &b
-		}
-	}
-	return
 }

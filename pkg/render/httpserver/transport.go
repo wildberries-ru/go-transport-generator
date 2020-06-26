@@ -31,7 +31,7 @@ var (
 )
  
 {{range .Iface.Methods}}
-	{{$ct := getValueMap $methods .Name}}
+	{{$ct := index $methods .Name}}
 	{{$uriPlaceholders := $ct.URIPathPlaceholders}}
 	{{$queryPlaceholders := $ct.QueryPlaceholders}}
 	{{$isIntQueryPlaceholders := $ct.IsIntQueryPlaceholders}}

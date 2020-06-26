@@ -12,8 +12,9 @@ import (
 
 // Services ...
 type Services struct {
-	tagMark    string
-	processors map[string]Processor
+	tagMark             string
+	processors          map[string]Processor
+	httpMethodProcessor HTTPMethod
 }
 
 // Process ...
@@ -27,16 +28,27 @@ func (s *Services) Process(info *api.GenerationInfo, astra *types.File, outPath 
 				}
 				iface.RelOutputPath = outPath
 				if iface.AbsOutputPath, err = filepath.Abs(outPath); err != nil {
-					err = errors.Wrap(err, "filepath.Abs error")
+					err = errors.Wrap(err, "[processor].filepath.Abs error")
 					return
 				}
 				info.Interfaces = append(info.Interfaces, &iface)
+				// init methods
+				iface.HTTPMethods = make(map[string]api.HTTPMethod)
+				for _, method := range iface.Iface.Methods {
+					httpMethod := api.HTTPMethod{}
+					err = s.httpMethodProcessor.Process(&httpMethod, &iface, method)
+					if err != nil {
+						err = errors.Wrap(err, "[processor]s.httpMethodProcessor.Process error")
+						return
+					}
+					iface.HTTPMethods[method.Name] = httpMethod
+				}
 				words := strings.Split(strings.TrimSpace(doc[len(s.tagMark):]), " ")
 				for _, word := range words {
 					if processor, ok := s.processors[word]; ok {
 						err = processor.Process(info, &iface)
 						if err != nil {
-							err = errors.Wrap(err, "processor.Process error")
+							err = errors.Wrap(err, "[processor].Process error")
 							return
 						}
 					}
@@ -48,9 +60,10 @@ func (s *Services) Process(info *api.GenerationInfo, astra *types.File, outPath 
 }
 
 // NewServices ...
-func NewServices(tagMark string, processors map[string]Processor) *Services {
+func NewServices(tagMark string, processors map[string]Processor, httpMethodProcessor HTTPMethod) *Services {
 	return &Services{
-		tagMark:    tagMark,
-		processors: processors,
+		tagMark:             tagMark,
+		processors:          processors,
+		httpMethodProcessor: httpMethodProcessor,
 	}
 }

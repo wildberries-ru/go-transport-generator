@@ -25,7 +25,7 @@ func (s *loggingMiddleware) UploadDocument(ctx context.Context, token *string, n
 		_ = s.wrap(err).Log(
 			"method", "UploadDocument",
 			"token", token,
-			"name", name,
+
 			"extension", extension,
 			"categoryID", categoryID,
 			"supplierID", supplierID,
@@ -43,7 +43,7 @@ func (s *loggingMiddleware) GetWarehouses(ctx context.Context) (pets map[string]
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(
 			"method", "GetWarehouses",
-			"pets", pets,
+
 			"err", err,
 			"elapsed", time.Since(begin),
 		)
@@ -56,8 +56,7 @@ func (s *loggingMiddleware) GetDetails(ctx context.Context, namespace string, de
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(
 			"method", "GetDetails",
-			"namespace", namespace,
-			"detail", detail,
+
 			"fileID", fileID,
 			"someID", someID,
 			"token", token,

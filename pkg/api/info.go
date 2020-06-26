@@ -55,6 +55,7 @@ type HTTPMethod struct {
 	ResponseJsonTags        map[string]string
 	ResponseBody            map[string]string
 	ResponseBodyField       string
+	LogIgnores              []string
 
 	SwaggerInfo
 }

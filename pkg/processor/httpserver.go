@@ -20,23 +20,12 @@ type Processor interface {
 }
 
 type httpServer struct {
-	serverRender        httpRender
-	transportRender     httpRender
-	builderRender       httpRender
-	httpMethodProcessor HTTPMethod
+	serverRender    httpRender
+	transportRender httpRender
+	builderRender   httpRender
 }
 
 func (s *httpServer) Process(_ *api.GenerationInfo, iface *api.Interface) (err error) {
-	iface.HTTPMethods = make(map[string]api.HTTPMethod)
-	for _, method := range iface.Iface.Methods {
-		httpMethod := api.HTTPMethod{}
-		err = s.httpMethodProcessor.Process(&httpMethod, iface, method)
-		if err != nil {
-			err = errors.Wrap(err, "[httpServer]s.httpMethodProcessor.Process error")
-			return
-		}
-		iface.HTTPMethods[method.Name] = httpMethod
-	}
 	err = s.builderRender.Generate(*iface)
 	if err != nil {
 		err = errors.Wrap(err, "[httpServer]s.builderRender.Generate error")
@@ -56,11 +45,10 @@ func (s *httpServer) Process(_ *api.GenerationInfo, iface *api.Interface) (err e
 }
 
 // NewHTTPServer ...
-func NewHTTPServer(serverRender httpRender, transportRender httpRender, builderRender httpRender, httpMethodProcessor HTTPMethod) Processor {
+func NewHTTPServer(serverRender httpRender, transportRender httpRender, builderRender httpRender) Processor {
 	return &httpServer{
-		serverRender:        serverRender,
-		transportRender:     transportRender,
-		builderRender:       builderRender,
-		httpMethodProcessor: httpMethodProcessor,
+		serverRender:    serverRender,
+		transportRender: transportRender,
+		builderRender:   builderRender,
 	}
 }
