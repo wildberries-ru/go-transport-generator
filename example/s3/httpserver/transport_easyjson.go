@@ -77,92 +77,7 @@ func (v *uploadPartDocumentTransport) UnmarshalJSON(data []byte) error {
 func (v *uploadPartDocumentTransport) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver(l, v)
 }
-func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver1(in *jlexer.Lexer, out *uploadPartDocumentRequest) {
-	isTopLevel := in.IsStart()
-	if in.IsNull() {
-		if isTopLevel {
-			in.Consumed()
-		}
-		in.Skip()
-		return
-	}
-	in.Delim('{')
-	for !in.IsDelim('}') {
-		key := in.UnsafeString()
-		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
-		switch key {
-		case "Document":
-			if in.IsNull() {
-				in.Skip()
-				out.Document = nil
-			} else {
-				out.Document = in.Bytes()
-			}
-		case "PartNumber":
-			out.PartNumber = int64(in.Int64())
-		case "UploadID":
-			out.UploadID = string(in.String())
-		default:
-			in.SkipRecursive()
-		}
-		in.WantComma()
-	}
-	in.Delim('}')
-	if isTopLevel {
-		in.Consumed()
-	}
-}
-func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver1(out *jwriter.Writer, in uploadPartDocumentRequest) {
-	out.RawByte('{')
-	first := true
-	_ = first
-	{
-		const prefix string = ",\"Document\":"
-		out.RawString(prefix[1:])
-		out.Base64Bytes(in.Document)
-	}
-	{
-		const prefix string = ",\"PartNumber\":"
-		out.RawString(prefix)
-		out.Int64(int64(in.PartNumber))
-	}
-	{
-		const prefix string = ",\"UploadID\":"
-		out.RawString(prefix)
-		out.String(string(in.UploadID))
-	}
-	out.RawByte('}')
-}
-
-// MarshalJSON supports json.Marshaler interface
-func (v uploadPartDocumentRequest) MarshalJSON() ([]byte, error) {
-	w := jwriter.Writer{}
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver1(&w, v)
-	return w.Buffer.BuildBytes(), w.Error
-}
-
-// MarshalEasyJSON supports easyjson.Marshaler interface
-func (v uploadPartDocumentRequest) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver1(w, v)
-}
-
-// UnmarshalJSON supports json.Unmarshaler interface
-func (v *uploadPartDocumentRequest) UnmarshalJSON(data []byte) error {
-	r := jlexer.Lexer{Data: data}
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver1(&r, v)
-	return r.Error()
-}
-
-// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *uploadPartDocumentRequest) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver1(l, v)
-}
-func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver2(in *jlexer.Lexer, out *uploadDocumentTransport) {
+func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver1(in *jlexer.Lexer, out *uploadDocumentTransport) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -191,7 +106,7 @@ func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Ht
 		in.Consumed()
 	}
 }
-func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver2(out *jwriter.Writer, in uploadDocumentTransport) {
+func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver1(out *jwriter.Writer, in uploadDocumentTransport) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -201,98 +116,27 @@ func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Ht
 // MarshalJSON supports json.Marshaler interface
 func (v uploadDocumentTransport) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver2(&w, v)
+	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver1(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v uploadDocumentTransport) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver2(w, v)
+	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver1(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *uploadDocumentTransport) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver2(&r, v)
+	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver1(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *uploadDocumentTransport) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver2(l, v)
+	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver1(l, v)
 }
-func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver3(in *jlexer.Lexer, out *uploadDocumentRequest) {
-	isTopLevel := in.IsStart()
-	if in.IsNull() {
-		if isTopLevel {
-			in.Consumed()
-		}
-		in.Skip()
-		return
-	}
-	in.Delim('{')
-	for !in.IsDelim('}') {
-		key := in.UnsafeString()
-		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
-		switch key {
-		case "Document":
-			if in.IsNull() {
-				in.Skip()
-				out.Document = nil
-			} else {
-				out.Document = in.Bytes()
-			}
-		default:
-			in.SkipRecursive()
-		}
-		in.WantComma()
-	}
-	in.Delim('}')
-	if isTopLevel {
-		in.Consumed()
-	}
-}
-func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver3(out *jwriter.Writer, in uploadDocumentRequest) {
-	out.RawByte('{')
-	first := true
-	_ = first
-	{
-		const prefix string = ",\"Document\":"
-		out.RawString(prefix[1:])
-		out.Base64Bytes(in.Document)
-	}
-	out.RawByte('}')
-}
-
-// MarshalJSON supports json.Marshaler interface
-func (v uploadDocumentRequest) MarshalJSON() ([]byte, error) {
-	w := jwriter.Writer{}
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver3(&w, v)
-	return w.Buffer.BuildBytes(), w.Error
-}
-
-// MarshalEasyJSON supports easyjson.Marshaler interface
-func (v uploadDocumentRequest) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver3(w, v)
-}
-
-// UnmarshalJSON supports json.Unmarshaler interface
-func (v *uploadDocumentRequest) UnmarshalJSON(data []byte) error {
-	r := jlexer.Lexer{Data: data}
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver3(&r, v)
-	return r.Error()
-}
-
-// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *uploadDocumentRequest) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver3(l, v)
-}
-func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver4(in *jlexer.Lexer, out *downloadDocumentTransport) {
+func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver2(in *jlexer.Lexer, out *downloadDocumentTransport) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -321,7 +165,7 @@ func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Ht
 		in.Consumed()
 	}
 }
-func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver4(out *jwriter.Writer, in downloadDocumentTransport) {
+func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver2(out *jwriter.Writer, in downloadDocumentTransport) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -331,27 +175,27 @@ func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Ht
 // MarshalJSON supports json.Marshaler interface
 func (v downloadDocumentTransport) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver4(&w, v)
+	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver2(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v downloadDocumentTransport) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver4(w, v)
+	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver2(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *downloadDocumentTransport) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver4(&r, v)
+	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver2(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *downloadDocumentTransport) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver4(l, v)
+	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver2(l, v)
 }
-func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver5(in *jlexer.Lexer, out *downloadDocumentResponse) {
+func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver3(in *jlexer.Lexer, out *downloadDocumentResponse) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -387,7 +231,7 @@ func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Ht
 		in.Consumed()
 	}
 }
-func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver5(out *jwriter.Writer, in downloadDocumentResponse) {
+func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver3(out *jwriter.Writer, in downloadDocumentResponse) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -402,27 +246,27 @@ func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Ht
 // MarshalJSON supports json.Marshaler interface
 func (v downloadDocumentResponse) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver5(&w, v)
+	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver3(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v downloadDocumentResponse) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver5(w, v)
+	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver3(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *downloadDocumentResponse) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver5(&r, v)
+	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver3(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *downloadDocumentResponse) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver5(l, v)
+	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver3(l, v)
 }
-func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver6(in *jlexer.Lexer, out *createMultipartUploadTransport) {
+func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver4(in *jlexer.Lexer, out *createMultipartUploadTransport) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -451,7 +295,7 @@ func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Ht
 		in.Consumed()
 	}
 }
-func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver6(out *jwriter.Writer, in createMultipartUploadTransport) {
+func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver4(out *jwriter.Writer, in createMultipartUploadTransport) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -461,27 +305,27 @@ func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Ht
 // MarshalJSON supports json.Marshaler interface
 func (v createMultipartUploadTransport) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver6(&w, v)
+	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver4(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v createMultipartUploadTransport) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver6(w, v)
+	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver4(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *createMultipartUploadTransport) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver6(&r, v)
+	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver4(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *createMultipartUploadTransport) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver6(l, v)
+	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver4(l, v)
 }
-func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver7(in *jlexer.Lexer, out *createMultipartUploadResponse) {
+func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver5(in *jlexer.Lexer, out *createMultipartUploadResponse) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -526,7 +370,7 @@ func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Ht
 		in.Consumed()
 	}
 }
-func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver7(out *jwriter.Writer, in createMultipartUploadResponse) {
+func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver5(out *jwriter.Writer, in createMultipartUploadResponse) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -560,25 +404,25 @@ func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Ht
 // MarshalJSON supports json.Marshaler interface
 func (v createMultipartUploadResponse) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver7(&w, v)
+	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver5(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v createMultipartUploadResponse) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver7(w, v)
+	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver5(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *createMultipartUploadResponse) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver7(&r, v)
+	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver5(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *createMultipartUploadResponse) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver7(l, v)
+	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver5(l, v)
 }
 func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleApiV11(in *jlexer.Lexer, out *_v1.CreateMultipartUploadData) {
 	isTopLevel := in.IsStart()
@@ -671,7 +515,7 @@ func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleApiV
 	}
 	out.RawByte('}')
 }
-func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver8(in *jlexer.Lexer, out *completeUploadTransport) {
+func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver6(in *jlexer.Lexer, out *completeUploadTransport) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -700,7 +544,7 @@ func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Ht
 		in.Consumed()
 	}
 }
-func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver8(out *jwriter.Writer, in completeUploadTransport) {
+func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver6(out *jwriter.Writer, in completeUploadTransport) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -710,89 +554,23 @@ func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Ht
 // MarshalJSON supports json.Marshaler interface
 func (v completeUploadTransport) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver8(&w, v)
+	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver6(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v completeUploadTransport) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver8(w, v)
+	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver6(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *completeUploadTransport) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver8(&r, v)
+	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver6(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *completeUploadTransport) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver8(l, v)
-}
-func easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver9(in *jlexer.Lexer, out *completeUploadRequest) {
-	isTopLevel := in.IsStart()
-	if in.IsNull() {
-		if isTopLevel {
-			in.Consumed()
-		}
-		in.Skip()
-		return
-	}
-	in.Delim('{')
-	for !in.IsDelim('}') {
-		key := in.UnsafeString()
-		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
-		switch key {
-		case "UploadID":
-			out.UploadID = string(in.String())
-		default:
-			in.SkipRecursive()
-		}
-		in.WantComma()
-	}
-	in.Delim('}')
-	if isTopLevel {
-		in.Consumed()
-	}
-}
-func easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver9(out *jwriter.Writer, in completeUploadRequest) {
-	out.RawByte('{')
-	first := true
-	_ = first
-	{
-		const prefix string = ",\"UploadID\":"
-		out.RawString(prefix[1:])
-		out.String(string(in.UploadID))
-	}
-	out.RawByte('}')
-}
-
-// MarshalJSON supports json.Marshaler interface
-func (v completeUploadRequest) MarshalJSON() ([]byte, error) {
-	w := jwriter.Writer{}
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver9(&w, v)
-	return w.Buffer.BuildBytes(), w.Error
-}
-
-// MarshalEasyJSON supports easyjson.Marshaler interface
-func (v completeUploadRequest) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC87d08bdEncodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver9(w, v)
-}
-
-// UnmarshalJSON supports json.Unmarshaler interface
-func (v *completeUploadRequest) UnmarshalJSON(data []byte) error {
-	r := jlexer.Lexer{Data: data}
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver9(&r, v)
-	return r.Error()
-}
-
-// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *completeUploadRequest) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver9(l, v)
+	easyjsonC87d08bdDecodeGithubComWildberriesRuGoTransportGeneratorExampleS3Httpserver6(l, v)
 }

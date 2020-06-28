@@ -57,6 +57,7 @@ type HTTPMethod struct {
 	ResponseFile            string
 	ResponseFileName        string
 	ResponseBodyField       string
+	LogIgnores              []string
 
 	SwaggerInfo
 }

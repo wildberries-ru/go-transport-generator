@@ -7,25 +7,14 @@ import (
 )
 
 type httpClient struct {
-	isTLS               bool
-	clientRender        httpRender
-	transportRender     httpRender
-	builderRender       httpRender
-	httpMethodProcessor HTTPMethod
+	isTLS           bool
+	clientRender    httpRender
+	transportRender httpRender
+	builderRender   httpRender
 }
 
 func (s *httpClient) Process(_ *api.GenerationInfo, iface *api.Interface) (err error) {
 	iface.IsTLSClient = s.isTLS
-	iface.HTTPMethods = make(map[string]api.HTTPMethod)
-	for _, method := range iface.Iface.Methods {
-		httpMethod := api.HTTPMethod{}
-		err = s.httpMethodProcessor.Process(&httpMethod, iface, method)
-		if err != nil {
-			err = errors.Wrap(err, "[httpClient]s.httpMethodProcessor.Process error")
-			return
-		}
-		iface.HTTPMethods[method.Name] = httpMethod
-	}
 	err = s.builderRender.Generate(*iface)
 	if err != nil {
 		err = errors.Wrap(err, "[httpClient]s.builderRender.Generate error")
@@ -50,13 +39,11 @@ func NewHTTPClient(
 	clientRender httpRender,
 	transportRender httpRender,
 	builderRender httpRender,
-	httpMethodProcessor HTTPMethod,
 ) Processor {
 	return &httpClient{
-		isTLS:               isTLS,
-		clientRender:        clientRender,
-		transportRender:     transportRender,
-		builderRender:       builderRender,
-		httpMethodProcessor: httpMethodProcessor,
+		isTLS:           isTLS,
+		clientRender:    clientRender,
+		transportRender: transportRender,
+		builderRender:   builderRender,
 	}
 }

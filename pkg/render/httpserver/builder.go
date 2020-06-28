@@ -28,7 +28,7 @@ import (
 
 const (
 	{{range .Iface.Methods}}
-	{{$ct := getValueMap $methods .Name}}httpMethod{{.Name}} = "{{$ct.Method}}" 
+	{{$ct := index $methods .Name}}httpMethod{{.Name}} = "{{$ct.Method}}" 
 	uriPath{{.Name}} = "{{$ct.URIPath}}"{{end}}
 )
 
@@ -41,7 +41,7 @@ type errorCreator func(err error) error
 // New ...
 func New(router *fasthttprouter.Router, svc service, decodeJSONErrorCreator errorCreator, encodeJSONErrorCreator errorCreator, decodeTypeIntErrorCreator errorCreator, errorProcessor errorProcessor) {
 	{{range .Iface.Methods}}
-		{{$ct := getValueMap $methods .Name}}
+		{{$ct := index $methods .Name}}
 		{{$body := $ct.Body}}
 		{{$contentType := $ct.ContentType}}
 		{{$isIntQueryPlaceholders := $ct.IsIntQueryPlaceholders}}

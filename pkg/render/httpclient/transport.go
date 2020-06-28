@@ -27,7 +27,7 @@ import (
  
 {{range .Iface.Methods}}
 
-	{{$ct := getValueMap $methods .Name}}
+	{{$ct := index $methods .Name}}
 	{{$method := $ct.Method}}
 	{{$uriPlaceholders := $ct.URIPathPlaceholders}}
 	{{$queryPlaceholders := $ct.QueryPlaceholders}}

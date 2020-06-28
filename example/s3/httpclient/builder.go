@@ -4,9 +4,9 @@
 package httpclient
 
 import (
-	"fmt"
 	"net/url"
 
+	"github.com/pkg/errors"
 	"github.com/valyala/fasthttp"
 )
 
@@ -36,7 +36,7 @@ func New(
 ) (client Service, err error) {
 	parsedServerURL, err := url.Parse(serverURL)
 	if err != nil {
-		err = fmt.Errorf("failed to parse apiserver url", err)
+		err = errors.Wrap(err, "failed to parse server url")
 		return
 	}
 	transportCreateMultipartUpload := NewCreateMultipartUploadTransport(

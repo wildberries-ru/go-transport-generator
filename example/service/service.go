@@ -19,6 +19,7 @@ type SomeService interface {
 	// @gtg http-server-value-tag categoryID categoryID
 	// @gtg http-server-value-tag contractID contractID
 	// @gtg http-server-value-tag supplierID supplierID
+	// @gtg log-ignore name
 	// @gtg http-server-file-tag data document
 	// @gtg http-server-response-content-type application/json
 	// @gtg http-server-response-status 201
@@ -26,6 +27,7 @@ type SomeService interface {
 	// @gtg http-server-method GET
 	// @gtg http-server-uri-path /api/v1/getWarehouses
 	// @gtg http-server-content-type application/json
+	// @gtg log-ignore pets
 	// @gtg http-server-response-status http.StatusOK
 	// @gtg http-server-response-content-type application/json
 	// @gtg http-server-response-body pets
@@ -35,6 +37,7 @@ type SomeService interface {
 	// @gtg http-server-query file={fileID}&some={someID}
 	// @gtg http-server-header X-Auth-Token {token}
 	// @gtg http-server-content-type application/json
+	// @gtg log-ignore namespace, detail
 	// @gtg http-server-response-header X-Auth-ID {id}
 	// @gtg http-server-response-status http.StatusOK
 	// @gtg http-server-response-content-type application/json

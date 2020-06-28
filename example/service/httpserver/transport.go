@@ -570,7 +570,7 @@ func (t *getFileTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.
 
 	r.SetBody(data)
 	if len(fileName) > 0 {
-		r.Header.Set("Content-Type", "attachment; filename=\""+fileName+"\"")
+		r.Header.Set("Content-Disposition", "attachment; filename=\""+fileName+"\"")
 	}
 	r.Header.SetStatusCode(http.StatusOK)
 	return
