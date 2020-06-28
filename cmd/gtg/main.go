@@ -56,6 +56,7 @@ const (
 	responseJsonTagSuffix          = "response-json-tag"
 	responseBodySuffix             = "response-body"
 	responseHeaderSuffix           = "response-header"
+	responseFileSuffix             = "response-file"
 	responseStatusSuffix           = "response-status"
 	swaggerDescriptionSuffix       = "description"
 	swaggerServersSuffix           = "servers"
@@ -129,16 +130,17 @@ func main() {
 				response.NewEncodingType(httpServer, responseContentEncodingSuffix,
 					response.NewJsonTag(httpServer, responseJsonTagSuffix,
 						response.NewBody(httpServer, responseBodySuffix,
-							request.NewErrorProcessor(httpServer, requestErrorsSuffix,
-								request.NewURIPath(httpServer, requestURIPathSuffix,
-									request.NewQuery(httpServer, requestQuerySuffix,
-										request.NewMethod(httpServer, requestMethodSuffix,
-											request.NewHeader(httpServer, requestHeaderSuffix,
-												request.NewContentType(httpServer, requestContentTypeSuffix,
-													request.NewMultipartFileTag(httpServer, requestMultipartFileTagSuffix,
-														request.NewMultipartValueTag(httpServer, requestMultipartValueTagSuffix,
-															request.NewJsonTag(httpServer, requestJsonTagSuffix,
-																request.NewAPIPath(httpServer, requestAPIPathSuffix, &request2.Term{}))))))))))))))))
+							response.NewFile(httpServer, responseFileSuffix,
+								request.NewErrorProcessor(httpServer, requestErrorsSuffix,
+									request.NewURIPath(httpServer, requestURIPathSuffix,
+										request.NewQuery(httpServer, requestQuerySuffix,
+											request.NewMethod(httpServer, requestMethodSuffix,
+												request.NewHeader(httpServer, requestHeaderSuffix,
+													request.NewContentType(httpServer, requestContentTypeSuffix,
+														request.NewMultipartFileTag(httpServer, requestMultipartFileTagSuffix,
+															request.NewMultipartValueTag(httpServer, requestMultipartValueTagSuffix,
+																request.NewJsonTag(httpServer, requestJsonTagSuffix,
+																	request.NewAPIPath(httpServer, requestAPIPathSuffix, &request2.Term{})))))))))))))))))
 
 	swaggerMethodTagParser := swagger2.NewVersion(swagger, swaggerVersionSuffix,
 		swagger2.NewTitle(swagger, swaggerTitleSuffix,

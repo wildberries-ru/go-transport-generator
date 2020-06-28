@@ -20,7 +20,12 @@ type byteData struct {
 func (t *byteData) Parse(info *api.HTTPMethod, firstTag string, tags ...string) (err error) {
 	if strings.HasPrefix(firstTag, t.prefix) && strings.HasSuffix(firstTag, t.suffix) {
 		if len(tags) == 1 {
-			info.ResponseByteData = tags[0]
+			info.ResponseFile = tags[0]
+			return
+		}
+		if len(tags) == 2 {
+			info.ResponseFile = tags[0]
+			info.ResponseFileName = tags[1]
 			return
 		}
 		return errors.New(errHTTPByteDataSet)

@@ -19,6 +19,7 @@ type service interface {
 	GetDetailsListEmbedStruct(ctx context.Context, namespace string, detail string) (details []v1.Detail, err error)
 	PutDetails(ctx context.Context, namespace string, detail string, testID string, blaID *string, token *string, pretty v1.Detail, yang v1.Namespace) (cool v1.Detail, nothing v1.Namespace, id *string, err error)
 	GetSomeElseDataUtf8(ctx context.Context) (cool v1.Detail, nothing v1.Namespace, id *string, err error)
+	GetFile(ctx context.Context) (data []byte, fileName string, err error)
 }
 
 type uploadDocument struct {
@@ -322,6 +323,47 @@ func (s *getSomeElseDataUtf8) ServeHTTP(ctx *fasthttp.RequestCtx) {
 // NewGetSomeElseDataUtf8 the server creator
 func NewGetSomeElseDataUtf8(transport GetSomeElseDataUtf8Transport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
 	ls := getSomeElseDataUtf8{
+		transport:      transport,
+		service:        service,
+		errorProcessor: errorProcessor,
+	}
+	return ls.ServeHTTP
+}
+
+type getFile struct {
+	transport      GetFileTransport
+	service        service
+	errorProcessor errorProcessor
+}
+
+// ServeHTTP implements http.Handler.
+func (s *getFile) ServeHTTP(ctx *fasthttp.RequestCtx) {
+	var (
+		data     []byte
+		fileName string
+		err      error
+	)
+	err = s.transport.DecodeRequest(ctx, &ctx.Request)
+	if err != nil {
+		s.errorProcessor.Encode(ctx, &ctx.Response, err)
+		return
+	}
+
+	data, fileName, err = s.service.GetFile(ctx)
+	if err != nil {
+		s.errorProcessor.Encode(ctx, &ctx.Response, err)
+		return
+	}
+
+	if err = s.transport.EncodeResponse(ctx, &ctx.Response, data, fileName); err != nil {
+		s.errorProcessor.Encode(ctx, &ctx.Response, err)
+		return
+	}
+}
+
+// NewGetFile the server creator
+func NewGetFile(transport GetFileTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
+	ls := getFile{
 		transport:      transport,
 		service:        service,
 		errorProcessor: errorProcessor,

@@ -57,3 +57,9 @@ func (s *MockService) GetSomeElseDataUtf8(ctx context.Context) (cool v1.Detail, 
 	args := s.Called(context.Background())
 	return args.Get(0).(v1.Detail), args.Get(1).(v1.Namespace), args.Get(2).(*string), args.Error(3)
 }
+
+// GetFile ...
+func (s *MockService) GetFile(ctx context.Context) (data []byte, fileName string, err error) {
+	args := s.Called(context.Background())
+	return args.Get(0).([]byte), args.Get(1).(string), args.Error(2)
+}

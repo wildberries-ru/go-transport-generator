@@ -55,7 +55,7 @@ func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fas
 		_ContractID := _contractID[0]
 		if _ContractID != "" {
 			var i int
-			i, err = strconv.Atoi(string(_ContractID))
+			i, err = strconv.Atoi(_ContractID)
 			if err != nil {
 				err = t.decodeTypeIntErrorCreator(err)
 				return
@@ -93,7 +93,7 @@ func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fas
 		_SupplierID := _supplierID[0]
 		if _SupplierID != "" {
 			var i int
-			i, err = strconv.Atoi(string(_SupplierID))
+			i, err = strconv.Atoi(_SupplierID)
 			if err != nil {
 				err = t.decodeTypeIntErrorCreator(err)
 				return
@@ -546,6 +546,39 @@ func NewGetSomeElseDataUtf8Transport(
 
 		encodeJSONErrorCreator: encodeJSONErrorCreator,
 	}
+}
+
+// GetFileTransport transport interface
+type GetFileTransport interface {
+	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (err error)
+	EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, data []byte, fileName string) (err error)
+}
+
+type getFileTransport struct {
+}
+
+// DecodeRequest method for decoding requests on server side
+func (t *getFileTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (err error) {
+
+	return
+}
+
+// EncodeResponse method for encoding response on server side
+func (t *getFileTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, data []byte, fileName string) (err error) {
+
+	r.Header.Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+	r.SetBody(data)
+	if len(fileName) > 0 {
+		r.Header.Set("Content-Type", "attachment; filename=\""+fileName+"\"")
+	}
+	r.Header.SetStatusCode(http.StatusOK)
+	return
+}
+
+// NewGetFileTransport the transport creator for http requests
+func NewGetFileTransport() GetFileTransport {
+	return &getFileTransport{}
 }
 
 func ptr(in []byte) *string {
