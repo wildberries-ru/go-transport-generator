@@ -27,6 +27,8 @@ const (
 	uriPathPutDetails                   = "/api/v1/namespaces/:namespace/details/:detail"
 	httpMethodGetSomeElseDataUtf8       = "GET"
 	uriPathGetSomeElseDataUtf8          = "/api/v1/someelsedata"
+	httpMethodGetFile                   = "GET"
+	uriPathGetFile                      = "/api/v1/file"
 )
 
 type errorProcessor interface {
@@ -80,6 +82,9 @@ func New(router *fasthttprouter.Router, svc service, decodeJSONErrorCreator erro
 		encodeJSONErrorCreator,
 	)
 	router.Handle(httpMethodGetSomeElseDataUtf8, uriPathGetSomeElseDataUtf8, NewGetSomeElseDataUtf8(getSomeElseDataUtf8Transport, svc, errorProcessor))
+
+	getFileTransport := NewGetFileTransport()
+	router.Handle(httpMethodGetFile, uriPathGetFile, NewGetFile(getFileTransport, svc, errorProcessor))
 
 	router.Handle("GET", "/debug/pprof/", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Index))
 	router.Handle("GET", "/debug/pprof/profile", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Profile))

@@ -548,6 +548,39 @@ func NewGetSomeElseDataUtf8Transport(
 	}
 }
 
+// GetFileTransport transport interface
+type GetFileTransport interface {
+	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (err error)
+	EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, data []byte, fileName string) (err error)
+}
+
+type getFileTransport struct {
+}
+
+// DecodeRequest method for decoding requests on server side
+func (t *getFileTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (err error) {
+
+	return
+}
+
+// EncodeResponse method for encoding response on server side
+func (t *getFileTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, data []byte, fileName string) (err error) {
+
+	r.Header.Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+	r.SetBody(data)
+	if len(fileName) > 0 {
+		r.Header.Set("Content-Disposition", "attachment; filename=\""+fileName+"\"")
+	}
+	r.Header.SetStatusCode(http.StatusOK)
+	return
+}
+
+// NewGetFileTransport the transport creator for http requests
+func NewGetFileTransport() GetFileTransport {
+	return &getFileTransport{}
+}
+
 func ptr(in []byte) *string {
 	if bytes.Equal(in, emptyBytes) {
 		return nil

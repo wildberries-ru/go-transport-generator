@@ -76,4 +76,10 @@ type SomeService interface {
 	// @gtg http-server-response-json-tag nothing TheNothing
 	// @gtg http-server-response-json-tag id id
 	GetSomeElseDataUtf8(ctx context.Context) (cool v1.Detail, nothing v1.Namespace, id *string, err error)
+	// @gtg http-server-method GET
+	// @gtg http-server-uri-path /api/v1/file
+	// @gtg http-server-response-header Content-Type application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+	// @gtg http-server-response-status http.StatusOK
+	// @gtg http-server-response-file data fileName
+	GetFile(ctx context.Context) (data []byte, fileName string, err error)
 }

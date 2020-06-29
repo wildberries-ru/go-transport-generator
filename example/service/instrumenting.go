@@ -62,6 +62,12 @@ func (s *instrumentingMiddleware) GetSomeElseDataUtf8(ctx context.Context) (cool
 	return s.svc.GetSomeElseDataUtf8(ctx)
 }
 
+// GetFile ...
+func (s *instrumentingMiddleware) GetFile(ctx context.Context) (data []byte, fileName string, err error) {
+	defer s.recordMetrics("GetFile", time.Now(), err)
+	return s.svc.GetFile(ctx)
+}
+
 func (s *instrumentingMiddleware) recordMetrics(method string, startTime time.Time, err error) {
 	labels := []string{
 		"method", method,

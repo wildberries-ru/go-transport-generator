@@ -137,6 +137,20 @@ func (s *loggingMiddleware) GetSomeElseDataUtf8(ctx context.Context) (cool v1.De
 	return s.svc.GetSomeElseDataUtf8(ctx)
 }
 
+// GetFile ...
+func (s *loggingMiddleware) GetFile(ctx context.Context) (data []byte, fileName string, err error) {
+	defer func(begin time.Time) {
+		_ = s.wrap(err).Log(
+			"method", "GetFile",
+			"data", data,
+			"fileName", fileName,
+			"err", err,
+			"elapsed", time.Since(begin),
+		)
+	}(time.Now())
+	return s.svc.GetFile(ctx)
+}
+
 func (s *loggingMiddleware) wrap(err error) log.Logger {
 	lvl := level.Debug
 	if err != nil {

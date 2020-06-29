@@ -90,6 +90,8 @@ for example `utf-8`
 
 for example `nothing TheNothing` 
 
+**http-server-response-file** Allows you to return a file as a set of bytes
+
 ### Generation
 Build binary and put it into binary path.
 ```

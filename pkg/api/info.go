@@ -54,6 +54,8 @@ type HTTPMethod struct {
 	ResponseContentEncoding string
 	ResponseJsonTags        map[string]string
 	ResponseBody            map[string]string
+	ResponseFile            string
+	ResponseFileName        string
 	ResponseBodyField       string
 	LogIgnores              []string
 

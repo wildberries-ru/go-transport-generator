@@ -48,6 +48,8 @@ var (
 	{{$responseContentType := $ct.ResponseContentType}}
 	{{$responseContentEncoding := $ct.ResponseContentEncoding}}
 	{{$responseJsonTags := $ct.ResponseJsonTags}}
+	{{$responseFile := $ct.ResponseFile}}
+	{{$responseFileName := $ct.ResponseFileName}}
 	{{$responseBody := $ct.ResponseBody}}
 	{{$responseBodyField := $ct.ResponseBodyField}}
 	{{$responseBodyType := index $responseBody $ct.ResponseBodyField}}
@@ -252,6 +254,10 @@ var (
 		{{range $to, $from := $responseHeaderPlaceholders}}
 			r.Header.Set("{{$to}}", "{{$from}}")
 		{{end}}
+		{{if $responseFile}}r.SetBody({{$responseFile}}){{end}}
+		{{if $responseFileName}}if len(fileName) > 0 {
+		r.Header.Set("Content-Disposition", "attachment; filename=\""+fileName+"\"")
+			}{{end}}
 		r.Header.SetStatusCode({{$responseStatus}})
 		return
 	}
