@@ -13,16 +13,21 @@ import (
 	"golang.org/x/mod/modfile"
 )
 
-// Mod ...
-type Mod struct {
+type Mod interface {
+	PkgModPath(pkgName string) (mod string)
+}
+
+// mod ...
+type mod struct {
 }
 
 // PkgModPath ...
-func (m *Mod) PkgModPath(pkgName string) string {
+func (m *mod) PkgModPath(pkgName string) (mod string) {
 	modPath, _ := m.goModPath(".")
 	module, require := m.parseMod(modPath)
 	if strings.HasPrefix(pkgName, module) {
-		return "." + pkgName[len(module):]
+		mod = "." + pkgName[len(module):]
+		return
 	}
 	// todo mod
 	pkgTokens := strings.Split(pkgName, "/")
@@ -30,14 +35,15 @@ func (m *Mod) PkgModPath(pkgName string) string {
 		pathTry := strings.Join(pkgTokens[:len(pkgTokens)-i], "/")
 		for modPkg, modPath := range require {
 			if pathTry == modPkg {
-				return path.Join(modPath, strings.Join(pkgTokens[len(pkgTokens)-i:], "/"))
+				mod = path.Join(modPath, strings.Join(pkgTokens[len(pkgTokens)-i:], "/"))
+				return
 			}
 		}
 	}
-	return ""
+	return
 }
 
-func (m *Mod) parseMod(modPath string) (module string, require map[string]string) {
+func (m *mod) parseMod(modPath string) (module string, require map[string]string) {
 	var (
 		err error
 		b   []byte
@@ -59,9 +65,8 @@ func (m *Mod) parseMod(modPath string) (module string, require map[string]string
 }
 
 // empty if no go.mod, GO111MODULE=off or go without go modules support
-func (m *Mod) goModPath(root string) (string, error) {
+func (m *mod) goModPath(root string) (goModPath string, err error) {
 	var stdout []byte
-	var err error
 	for {
 		cmd := exec.Command("go", "env", "GOMOD")
 		cmd.Dir = root
@@ -73,18 +78,18 @@ func (m *Mod) goModPath(root string) (string, error) {
 			// try to find go.mod on level higher
 			r := filepath.Join(root, "..")
 			if r == root { // when we in root directory stop trying
-				return "", err
+				return
 			}
 			root = r
 			continue
 		}
-		return "", err
+		return
 	}
-	goModPath := string(bytes.TrimSpace(stdout))
-	return goModPath, nil
+	goModPath = string(bytes.TrimSpace(stdout))
+	return
 }
 
 // NewMod ...
-func NewMod() *Mod {
-	return &Mod{}
+func NewMod() Mod {
+	return &mod{}
 }

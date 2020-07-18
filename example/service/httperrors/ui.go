@@ -52,7 +52,7 @@ func (e *ErrorProcessor) Encode(ctx context.Context, r *fasthttp.Response, err e
 		Error:     true,
 		ErrorText: errorText,
 	}
-	r.SetStatusCode(200)
+	r.SetStatusCode(http.StatusOK)
 	r.Header.Set("Content-Type", "application/json")
 	body, err := json.Marshal(res)
 	if err != nil {

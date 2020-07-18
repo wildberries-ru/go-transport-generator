@@ -162,7 +162,6 @@ type Components struct {
 
 // SaveJSON ...
 func (s *Swagger) SaveJSON(path string) (err error) {
-
 	var data []byte
 	if data, err = json.MarshalIndent(s, "", " "); err != nil {
 		return
