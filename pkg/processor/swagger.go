@@ -33,7 +33,7 @@ type swaggerTagsParser interface {
 }
 
 type mod interface {
-	PkgModPath(pkgName string) string
+	PkgModPath(pkgName string) (mod string)
 }
 
 type swagger struct {
@@ -377,7 +377,7 @@ func (s *swagger) castBuiltinType(tp types.Type) (typeName, format string) {
 	case "float32", "float64":
 		format = "float"
 		typeName = "number"
-	case "int", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
+	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
 		typeName = "number"
 	default:
 		typeName = tp.String()

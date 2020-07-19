@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	errHTTPMthodGETCouldNotHaveRequestBody = "http method GET could not have request body in %s interface %s method %s"
+	errHTTPMethodGETCouldNotHaveRequestBody = "http method GET could not have request body in %s interface %s method %s"
 )
 
 // HTTPMethod ...
@@ -65,7 +65,7 @@ func (s *httpMethod) Process(httpMethod *api.HTTPMethod, iface *api.Interface, m
 		delete(diff, to)
 	}
 	if httpMethod.Method == http.MethodGet && len(diff) > 0 {
-		return fmt.Errorf(errHTTPMthodGETCouldNotHaveRequestBody, iface.RelOutputPath, iface.Iface.Name, method.Name)
+		return fmt.Errorf(errHTTPMethodGETCouldNotHaveRequestBody, iface.RelOutputPath, iface.Iface.Name, method.Name)
 	}
 	httpMethod.Body = diff
 	if len(diff) > 0 {
@@ -131,7 +131,7 @@ func (s *httpMethod) castBodyPlaceholder(to string, arg types.Variable, argType 
 
 func (s *httpMethod) isInt(tp types.Type) bool {
 	switch tp.String() {
-	case "int", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
+	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
 		return true
 	}
 	return false
