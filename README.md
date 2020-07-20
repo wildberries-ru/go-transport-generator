@@ -108,3 +108,8 @@ Swagger generation
 ```
 gtg --in="./example" --desc="service description" --title="some title for service" --version="v0.0.10" --servers="http://some.url = some url description\r\nhttp://another.url = another url description"
 ```
+
+### Docker running example
+```
+docker run --rm -v $(pwd):/app -w /app/  frankegoesdown/gtg:v0.1.1 gtg --in example/service/
+```
