@@ -92,6 +92,14 @@ for example `nothing TheNothing`
 
 **http-server-response-file** Allows you to return a file as a set of bytes
 
+**swagger-summary** Method summary for a swagger
+
+for example `Return list of items`
+
+**swagger-description** Method description for a swagger
+
+for example `size - set page size for pagination, offset - set offset for pagination`
+
 ### Generation
 Build binary and put it into binary path.
 ```

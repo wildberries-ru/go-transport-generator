@@ -24,7 +24,7 @@ type title struct {
 
 func (t *title) Parse(info *api.SwaggerInfo, firstTag string, tags ...string) (err error) {
 	if strings.HasPrefix(firstTag, t.prefix) && strings.HasSuffix(firstTag, t.suffix) {
-		if len(tags) > 1 {
+		if len(tags) > 0 {
 			var b strings.Builder
 			b.Grow(len(tags))
 			for _, tag := range tags {
