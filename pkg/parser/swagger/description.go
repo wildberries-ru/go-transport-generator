@@ -19,8 +19,15 @@ type description struct {
 
 func (t *description) Parse(info *api.SwaggerInfo, firstTag string, tags ...string) (err error) {
 	if strings.HasPrefix(firstTag, t.prefix) && strings.HasSuffix(firstTag, t.suffix) {
-		if len(tags) == 1 {
-			info.Description = &tags[0]
+		if len(tags) > 0 {
+			var b strings.Builder
+			b.Grow(len(tags))
+			for _, tag := range tags {
+				b.WriteString(tag)
+				b.WriteString(" ")
+			}
+			desc := b.String()
+			info.Description = &desc
 			return
 		}
 		return errSwaggerDescriptionDidNotSet

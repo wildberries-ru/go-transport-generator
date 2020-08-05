@@ -20,8 +20,15 @@ type summary struct {
 // Parse ...
 func (t *summary) Parse(info *api.SwaggerInfo, firstTag string, tags ...string) (err error) {
 	if strings.HasPrefix(firstTag, t.prefix) && strings.HasSuffix(firstTag, t.suffix) {
-		if len(tags) == 1 {
-			info.Summary = &tags[0]
+		if len(tags) > 0 {
+			var b strings.Builder
+			b.Grow(len(tags))
+			for _, tag := range tags {
+				b.WriteString(tag)
+				b.WriteString(" ")
+			}
+			summary := b.String()
+			info.Summary = &summary
 			return
 		}
 		return errSwaggerSummaryDidNotSet
