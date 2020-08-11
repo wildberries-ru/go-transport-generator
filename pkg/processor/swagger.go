@@ -137,7 +137,7 @@ func (s *swagger) Process(info *api.GenerationInfo, iface *api.Interface) (err e
 						err = errors.Wrap(err, "[swagger.resSchema]s.makeType error")
 						return
 					}
-					resSchema.Properties[arg.Name] = prop
+					resSchema.Properties[httpMethod.ResponseJsonTags[arg.Name]] = prop
 				}
 			}
 		}
