@@ -225,6 +225,9 @@ func main() {
 	t.Funcs(template.FuncMap{"isMapType": func(s string) bool {
 		return len(s) > 3 && s[0] == 'm' && s[1] == 'a' && s[2] == 'p'
 	}})
+	t.Funcs(template.FuncMap{"isError": func(t types.Type) bool {
+		return strings.EqualFold(t.String(), "error")
+	}})
 	t.Funcs(template.FuncMap{"notin": func(s []string, f string) bool {
 		for _, v := range s {
 			if v == f {
