@@ -233,10 +233,10 @@ func TestNewClient(t *testing.T) {
 	}
 
 	type args struct {
-		cli                  *fasthttp.HostClient
-		transportGetUser     GetUserTransport
-		transportGetSupplier GetSupplierTransport
-		options              map[interface{}]Option
+		cli *fasthttp.HostClient
+		{{range .Iface.Methods}}transport{{.Name}} {{.Name}}Transport
+		{{end}}
+		options map[interface{}]Option
 	}
 	tests := []struct {
 		name string
@@ -247,7 +247,7 @@ func TestNewClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewClient(tt.args.cli, tt.args.transportGetUser, tt.args.transportGetSupplier, tt.args.options); !reflect.DeepEqual(got, tt.want) {
+			if got := NewClient(tt.args.cli, {{range .Iface.Methods}}tt.args.transport{{.Name}},{{end}} tt.args.options); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewClient() = %v, want %v", got, tt.want)
 			}
 		})
