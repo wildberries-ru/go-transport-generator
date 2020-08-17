@@ -48,13 +48,13 @@ import (
 	{{$responseBodyTypeIsSlice := isSliceType $responseBodyType}}
 	{{$responseBodyTypeIsMap := isMapType $responseBodyType}}
 
-	{{if ne $contentType "application/json"}}//easyjson:skip{{end}}
-	{{if lenMap $body}}type {{low .Name}}Request struct {
+	{{if lenMap $body}}{{if eq $contentType "application/json"}}//easyjson:json{{else}}//easyjson:skip{{end}}
+	type {{low .Name}}Request struct {
 		{{range $name, $tp := $body}}{{up $name}} {{$tp}}{{$tag := index $jsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
 		{{end}}
 	}{{end}}
 
-	{{if lenMap $responseBody}}{{if ne $contentType "application/json"}}//easyjson:skip{{end}}
+	{{if lenMap $responseBody}}{{if eq $contentType "application/json"}}//easyjson:json{{else}}//easyjson:skip{{end}}
 		type {{low .Name}}Response {{if or $responseBodyTypeIsSlice $responseBodyTypeIsMap}}{{$responseBodyType}}{{else}} struct {
   			{{if $responseBodyType}}
     			{{$responseBodyType}}
@@ -119,10 +119,14 @@ import (
 			{{end}}
 
 			{{range $from, $to := $multipartFileTags}}
-				for name, file := range {{$from}} {
-					part, _ := writer.CreateFormFile("{{$to}}", name)
-					reader := bytes.NewReader(file)
-					io.Copy(part, reader)
+				for i := range {{$from}} {
+					part, _ := writer.CreateFormFile("{{$to}}", {{$from}}[i].Filename)
+					var file multipart.File
+					file, err = {{$from}}[i].Open()
+					if err != nil {
+						return
+					}
+					io.Copy(part, file)
 				}
 			{{end}}
 

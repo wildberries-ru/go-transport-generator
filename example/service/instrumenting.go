@@ -21,7 +21,7 @@ type instrumentingMiddleware struct {
 }
 
 // UploadDocument ...
-func (s *instrumentingMiddleware) UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data multipart.File) (err error) {
+func (s *instrumentingMiddleware) UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader) (err error) {
 	defer s.recordMetrics("UploadDocument", time.Now(), err)
 	return s.svc.UploadDocument(ctx, token, name, extension, categoryID, supplierID, contractID, data)
 }

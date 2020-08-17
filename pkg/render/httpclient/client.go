@@ -102,16 +102,21 @@ import (
 func Test_client_{{.Name}}(t *testing.T) {
 	{{range $index, $tp := .Args}}
 	{{if ne $index 0}}
-	var {{$tp.Name}} {{$tp.Type}}
-	_ = faker.FakeData(&{{$tp.Name}})
+	{{$isFile := isFile $tp.Type}}
+	{{if $isFile}}
+		var {{$tp.Name}} {{$tp.Type}}
+	{{else}}	
+		var {{$tp.Name}} {{$tp.Type}}
+		_ = faker.FakeData(&{{$tp.Name}})
+	{{end}}
 	{{end}}
 	{{end}}
 
 	{{range $index, $tp := .Results}}
 	{{$isErr := isError $tp.Type}}
 	{{if not $isErr}}
-	var {{$tp.Name}} {{$tp.Type}}
-	_ = faker.FakeData(&{{$tp.Name}})
+		var {{$tp.Name}} {{$tp.Type}}
+		_ = faker.FakeData(&{{$tp.Name}})
 	{{end}}
 	{{end}}
 		

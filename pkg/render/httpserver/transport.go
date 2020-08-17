@@ -161,7 +161,7 @@ var (
 				return
 			}
 			{{range $t, $from := $multipartValueTags}}
-				{{$to := index $bodyPlaceholders $from}}
+				{{$to := index $bodyPlaceholders $t}}
 				_{{$to.Name}} := form.Value["{{$from}}"]
 				{{if $to.IsPointer}}
 					if len(_{{$to.Name}}) == 1 {
@@ -221,11 +221,7 @@ var (
 					err = errors.New("failed to read file in MultipartForm: too many files in {{$from}}")
 					return
 				}
-				{{$to}}, err = _{{$to}}[0].Open()
-				if err != nil {
-					err = errors.Wrap(err, "failed to open file {{$from}} in MultipartForm")
-					return
-				}
+				{{$to}} = _{{$to}}[0]
 			{{end}}
 		{{end}}
 		return
