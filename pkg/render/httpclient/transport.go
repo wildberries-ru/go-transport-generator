@@ -131,6 +131,7 @@ import (
 			{{end}}
 
 			writer.Close()
+			r.Header.Set("Content-Type", writer.FormDataContentType())
 			r.SetBody(body.Bytes())
 		{{end}}
 		return
