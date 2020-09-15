@@ -56,7 +56,8 @@ import (
   			{{if $responseBodyType}}
     			{{$responseBodyType}}
   			{{else}}
-    			{{range $name, $tp := $responseBody}}{{up $name}} {{$tp}}{{$tag := index $responseJsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
+			    {{$respLen := lenMap $responseBody}}	
+			    {{range $name, $tp := $responseBody}}{{if eq $respLen 1}}{{$tp}}{{else}}{{up $name}} {{$tp}}{{end}}{{$tag := index $responseJsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
     			{{end}}
   			{{end}}
 		}{{end}}
