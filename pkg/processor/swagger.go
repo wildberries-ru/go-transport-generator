@@ -401,6 +401,10 @@ func (s *swagger) searchStructInfo(pkg, name string) (structInfo types.Struct, e
 	if tmpStructInfo, err = s.getStructInfo(pkgPath, name); err == nil && tmpStructInfo != nil {
 		return *tmpStructInfo, nil
 	}
+	pkgPath = path.Join(os.Getenv("GOROOT"), "src", pkg)
+	if tmpStructInfo, err = s.getStructInfo(pkgPath, name); err == nil && tmpStructInfo != nil {
+		return *tmpStructInfo, nil
+	}
 	if err != nil {
 		err = errors.Wrapf(err, errStructNotFound, pkg, name)
 	} else {
@@ -448,6 +452,19 @@ func (s *swagger) getStructInfo(relPath, name string) (structInfo *types.Struct,
 		for _, st = range srcFile.Structures {
 			if st.Name == name {
 				structInfo = &st
+				return
+			}
+		}
+		for _, in := range srcFile.Interfaces {
+			if in.Name == name {
+				structInfo = &types.Struct{
+					Base:    types.Base{
+						Name: in.Name + "interface",
+						Docs: in.Docs,
+					},
+					Fields:  nil,
+					Methods: nil,
+				}
 				return
 			}
 		}
