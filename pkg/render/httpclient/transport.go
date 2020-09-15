@@ -21,6 +21,7 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+	"mime/multipart"
 
 	"github.com/valyala/fasthttp"
 )
@@ -35,6 +36,8 @@ import (
 	{{$body := $ct.Body}}
 	{{$contentType := $ct.ContentType}}
 	{{$jsonTags := $ct.JsonTags}}
+	{{$multipartValueTags := $ct.MultipartValueTags}}
+	{{$multipartFileTags := $ct.MultipartFileTags}}	
 	{{$responseJsonTags := $ct.ResponseJsonTags}}
 	{{$responseHeaderPlaceholders := $ct.ResponseHeaders}}
 	{{$responseStatus := $ct.ResponseStatus}}
@@ -45,13 +48,13 @@ import (
 	{{$responseBodyTypeIsSlice := isSliceType $responseBodyType}}
 	{{$responseBodyTypeIsMap := isMapType $responseBodyType}}
 
-
-	{{if lenMap $body}}type {{low .Name}}Request struct {
+	{{if lenMap $body}}{{if eq $contentType "application/json"}}//easyjson:json{{else}}//easyjson:skip{{end}}
+	type {{low .Name}}Request struct {
 		{{range $name, $tp := $body}}{{up $name}} {{$tp}}{{$tag := index $jsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
 		{{end}}
 	}{{end}}
 
-	{{if lenMap $responseBody}}//easyjson:json
+	{{if lenMap $responseBody}}{{if eq $contentType "application/json"}}//easyjson:json{{else}}//easyjson:skip{{end}}
 		type {{low .Name}}Response {{if or $responseBodyTypeIsSlice $responseBodyTypeIsMap}}{{$responseBodyType}}{{else}} struct {
   			{{if $responseBodyType}}
     			{{$responseBodyType}}
@@ -69,6 +72,7 @@ import (
 		DecodeResponse(ctx context.Context, r *fasthttp.Response) ({{$args := popLast .Results}}{{joinFullVariables $args "," "err error"}})
 	}
 
+	{{if ne $contentType "application/json"}}//easyjson:skip{{end}}
 	type {{low .Name}}Transport struct {
 		errorProcessor errorProcessor
 		pathTemplate   string
@@ -104,6 +108,31 @@ import (
 				}
 				r.SetBody(body)
 			{{end}}
+		{{end}}
+		
+		{{if eq $contentType "multipart/form-data"}}r.Header.Set("Content-Type", "multipart/form-data")
+			body := &bytes.Buffer{}
+			writer := multipart.NewWriter(body)
+			
+			{{range $from, $to := $multipartValueTags}}
+				writer.WriteField("{{$to}}", {{$from}})
+			{{end}}
+
+			{{range $from, $to := $multipartFileTags}}
+				for i := range {{$from}} {
+					part, _ := writer.CreateFormFile("{{$to}}", {{$from}}[i].Filename)
+					var file multipart.File
+					file, err = {{$from}}[i].Open()
+					if err != nil {
+						return
+					}
+					io.Copy(part, file)
+				}
+			{{end}}
+
+			writer.Close()
+			r.Header.Set("Content-Type", writer.FormDataContentType())
+			r.SetBody(body.Bytes())
 		{{end}}
 		return
 	}

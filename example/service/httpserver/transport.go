@@ -20,7 +20,7 @@ var (
 
 // UploadDocumentTransport transport interface
 type UploadDocumentTransport interface {
-	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data multipart.File, err error)
+	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader, err error)
 	EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response) (err error)
 }
 
@@ -29,7 +29,7 @@ type uploadDocumentTransport struct {
 }
 
 // DecodeRequest method for decoding requests on server side
-func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data multipart.File, err error) {
+func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader, err error) {
 
 	token = ptr(r.Header.Peek("Authorization"))
 
@@ -115,11 +115,7 @@ func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fas
 		err = errors.New("failed to read file in MultipartForm: too many files in document")
 		return
 	}
-	data, err = _data[0].Open()
-	if err != nil {
-		err = errors.Wrap(err, "failed to open file document in MultipartForm")
-		return
-	}
+	data = _data[0]
 
 	return
 }

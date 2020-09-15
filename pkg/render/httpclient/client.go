@@ -101,18 +101,22 @@ import (
 {{range .Iface.Methods}}
 func Test_client_{{.Name}}(t *testing.T) {
 	{{range $index, $tp := .Args}}
-	{{if ne $index 0}}
-	var {{$tp.Name}} {{$tp.Type}}
-	_ = faker.FakeData(&{{$tp.Name}})
-	{{end}}
+		{{if ne $index 0}}
+			{{if isFile $tp.Type}}
+				var {{$tp.Name}} {{$tp.Type}}
+			{{else}}	
+				var {{$tp.Name}} {{$tp.Type}}
+				_ = faker.FakeData(&{{$tp.Name}})
+			{{end}}
+		{{end}}
 	{{end}}
 
 	{{range $index, $tp := .Results}}
-	{{$isErr := isError $tp.Type}}
-	{{if not $isErr}}
-	var {{$tp.Name}} {{$tp.Type}}
-	_ = faker.FakeData(&{{$tp.Name}})
-	{{end}}
+		{{$isErr := isError $tp.Type}}
+		{{if not $isErr}}
+			var {{$tp.Name}} {{$tp.Type}}
+			_ = faker.FakeData(&{{$tp.Name}})
+		{{end}}
 	{{end}}
 		
 	maxConns := rand.Int() + 1
@@ -121,22 +125,22 @@ func Test_client_{{.Name}}(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		{{$lenRes := lenVariables .Results}}
 		{{if eq $lenRes 2}}
-		{{$first := index .Results 0}}
-		result := {{$first.Name}}
+			{{$first := index .Results 0}}
+			result := {{$first.Name}}
 		{{else}}
-		result := struct{
-			{{range $index, $tp := .Results}}
-			{{$isErr := isError $tp.Type}}
-			{{if not $isErr}}{{up $tp.Name}} {{$tp.Type}} ` + "`" + `json:"{{up $tp.Name}}"` + "`" + `{{end}}
-			{{end}}
-		}{
-			{{range $index, $tp := .Results}}
-			{{$isErr := isError $tp.Type}}
-			{{if not $isErr}}
-			{{up $tp.Name}}: {{$tp.Name}},
-			{{end}}
-			{{end}}
-		}
+			result := struct{
+				{{range $index, $tp := .Results}}
+					{{$isErr := isError $tp.Type}}
+					{{if not $isErr}}{{up $tp.Name}} {{$tp.Type}} ` + "`" + `json:"{{up $tp.Name}}"` + "`" + `{{end}}
+				{{end}}
+			}{
+				{{range $index, $tp := .Results}}
+					{{$isErr := isError $tp.Type}}
+					{{if not $isErr}}
+						{{up $tp.Name}}: {{$tp.Name}},
+					{{end}}
+				{{end}}
+			}
 		{{end}}
 		b, _ := json.Marshal(result)
 		w.Write(b)
@@ -170,10 +174,11 @@ func Test_client_{{.Name}}(t *testing.T) {
 		fields  fields
 		args    args
 		{{range $index, $tp := .Results}}
-		{{$isErr := isError $tp.Type}}
-		{{if not $isErr}}
-		want{{up $tp.Name}} {{$tp.Type}}
-		{{end}}{{end}}
+			{{$isErr := isError $tp.Type}}
+			{{if not $isErr}}
+				want{{up $tp.Name}} {{$tp.Type}}
+			{{end}}
+		{{end}}
 		wantErr bool
 	}{
 		{
@@ -197,12 +202,12 @@ func Test_client_{{.Name}}(t *testing.T) {
 				return
 			}
 			{{range $index, $tp := .Results}}
-			{{$isErr := isError $tp.Type}}
-			{{if not $isErr}}
-			if !reflect.DeepEqual(got{{up $tp.Name}}, tt.want{{up $tp.Name}}) {
-				t.Errorf("client.{{.Name}}() = %v, want %v", got{{up $tp.Name}}, tt.want{{up $tp.Name}})
-			}
-			{{end}}
+				{{$isErr := isError $tp.Type}}
+				{{if not $isErr}}
+					if !reflect.DeepEqual(got{{up $tp.Name}}, tt.want{{up $tp.Name}}) {
+						t.Errorf("client.{{.Name}}() = %v, want %v", got{{up $tp.Name}}, tt.want{{up $tp.Name}})
+					}
+				{{end}}
 			{{end}}
 		})
 	}
@@ -219,11 +224,12 @@ func TestNewClient(t *testing.T) {
 	}
 	opts := map[interface{}]Option{}
 
-	{{range .Iface.Methods}}transport{{.Name}} := New{{.Name}}Transport(
-		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClient{{.Name}},
-		httpMethod{{.Name}},
-	)
+	{{range .Iface.Methods}}
+		transport{{.Name}} := New{{.Name}}Transport(
+			&testErrorProcessor{},
+			parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClient{{.Name}},
+			httpMethod{{.Name}},
+		)
 	{{end}}
 
 	cl := &client{
@@ -234,7 +240,8 @@ func TestNewClient(t *testing.T) {
 
 	type args struct {
 		cli *fasthttp.HostClient
-		{{range .Iface.Methods}}transport{{.Name}} {{.Name}}Transport
+		{{range .Iface.Methods}}
+			transport{{.Name}} {{.Name}}Transport
 		{{end}}
 		options map[interface{}]Option
 	}
