@@ -4,168 +4,278 @@ info:
   description: ""
   version: ""
 paths:
-  /api/v1/doc/{bucket}/{key}:
+  /api/v1/document:
+    post:
+      tags:
+      - service/SomeService
+      parameters:
+      - in: header
+        name: token
+        schema:
+          type: string
+          nullable: true
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                categoryID:
+                  type: string
+                contractID:
+                  type: number
+                  nullable: true
+                data:
+                  type: string
+                  format: binary
+                  nullable: true
+                extension:
+                  type: string
+                name:
+                  type: string
+                supplierID:
+                  type: number
+                  nullable: true
+      responses:
+        "201":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+  /api/v1/file:
     get:
       tags:
-      - s3/Service
-      parameters:
-      - in: path
-        name: bucket
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: key
-        required: true
-        schema:
-          type: string
+      - service/SomeService
       responses:
-        "200":
+        http.StatusOK:
+          description: ""
+          content:
+            "":
+              schema:
+                type: object
+                properties:
+                  "":
+                    type: string
+  /api/v1/getWarehouses:
+    get:
+      tags:
+      - service/SomeService
+      responses:
+        http.StatusOK:
           description: ""
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  document:
+                  "":
+                    type: object
+  /api/v1/namespaces/{namespace}/details-embed-array/{detail}:
+    get:
+      tags:
+      - service/SomeService
+      parameters:
+      - in: path
+        name: namespace
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: detail
+        required: true
+        schema:
+          type: string
+      responses:
+        http.StatusOK:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  "":
                     type: array
                     items:
-                      type: string
-                      format: byte
-    post:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        namespace:
+                          type: string
+  /api/v1/namespaces/{namespace}/details-embed/{detail}:
+    get:
       tags:
-      - s3/Service
+      - service/SomeService
       parameters:
       - in: path
-        name: bucket
+        name: namespace
         required: true
         schema:
           type: string
       - in: path
-        name: key
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          "":
-            schema:
-              type: object
-              properties:
-                document:
-                  type: array
-                  items:
-                    type: string
-                    format: byte
-      responses:
-        "201":
-          description: ""
-          content:
-            application/json:
-              schema:
-                type: object
-  /api/v1/multipart/{bucket}/{key}:
-    post:
-      tags:
-      - s3/Service
-      parameters:
-      - in: path
-        name: bucket
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: key
+        name: detail
         required: true
         schema:
           type: string
       responses:
-        "201":
+        http.StatusOK:
           description: ""
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  additionalErrors:
+                  "":
                     type: object
                     properties:
-                      lastName:
-                        type: string
+                      detail:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          namespace:
+                            type: string
+                      namespace:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+  /api/v1/namespaces/{namespace}/details/{detail}:
+    get:
+      tags:
+      - service/SomeService
+      parameters:
+      - in: path
+        name: namespace
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: detail
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: token
+        schema:
+          type: string
+          nullable: true
+      - in: query
+        name: fileID
+        schema:
+          type: number
+      - in: query
+        name: someID
+        schema:
+          type: number
+          nullable: true
+      responses:
+        http.StatusOK:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  "":
+                    type: object
+                    properties:
                       name:
                         type: string
-                    nullable: true
-                  data:
-                    type: object
-                    properties:
-                      upload_id:
-                        type: string
-                  errorFlag:
-                    type: boolean
-                  errorText:
-                    type: string
-    patch:
-      tags:
-      - s3/Service
-      parameters:
-      - in: path
-        name: bucket
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: key
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          "":
-            schema:
-              type: object
-              properties:
-                document:
-                  type: array
-                  items:
-                    type: string
-                    format: byte
-                partNumber:
-                  type: number
-                uploadID:
-                  type: string
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
+          headers:
+            X-Auth-ID:
               schema:
-                type: object
+                type: string
+                nullable: true
     put:
       tags:
-      - s3/Service
+      - service/SomeService
       parameters:
       - in: path
-        name: bucket
+        name: namespace
         required: true
         schema:
           type: string
       - in: path
-        name: key
+        name: detail
         required: true
         schema:
           type: string
+      - in: header
+        name: token
+        schema:
+          type: string
+          nullable: true
+      - in: query
+        name: testID
+        schema:
+          type: string
+      - in: query
+        name: blaID
+        schema:
+          type: string
+          nullable: true
       requestBody:
         content:
-          "":
+          application/json:
             schema:
               type: object
               properties:
-                uploadID:
-                  type: string
+                pretty:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    namespace:
+                      type: string
+                yang:
+                  type: object
+                  properties:
+                    name:
+                      type: string
       responses:
-        "200":
+        http.StatusOK:
           description: ""
           content:
             application/json:
               schema:
                 type: object
+                properties:
+                  "":
+                    type: object
+                    properties:
+                      name:
+                        type: string
+          headers:
+            X-Auth-ID:
+              schema:
+                type: string
+                nullable: true
+  /api/v1/someelsedata:
+    get:
+      tags:
+      - service/SomeService
+      responses:
+        http.StatusOK:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  TheNothing:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                  cool:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                  id:
+                    type: string
+                    nullable: true
