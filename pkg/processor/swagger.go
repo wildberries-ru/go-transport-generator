@@ -379,6 +379,9 @@ func (s *swagger) castBuiltinType(tp types.Type) (typeName, format string) {
 		typeName = "number"
 	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
 		typeName = "number"
+	case "multipart.FileHeader":
+		format = "binary"
+		typeName = "string"
 	default:
 		typeName = tp.String()
 	}
@@ -499,7 +502,7 @@ func (s *swagger) isBuiltin(t types.Type) bool {
 		return true
 	}
 	switch strings.TrimPrefix(t.String(), "*") {
-	case "uuid.UUID", "UUID", "json.RawMessage", "bson.ObjectId", "time.Time":
+	case "uuid.UUID", "UUID", "json.RawMessage", "bson.ObjectId", "time.Time", "multipart.FileHeader":
 		return true
 	default:
 		return false
