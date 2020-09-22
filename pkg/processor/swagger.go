@@ -282,10 +282,13 @@ func (s *swagger) makeType(pkgPath string, field types.Variable, fieldType types
 			return
 		}
 		schema.Type = "object"
-		schema.Properties, err = s.fillProps(structInfo, pkgPath)
+		schema.Properties, err = s.fillProps(structInfo, f.Import.Package)
 		if err != nil {
-			err = errors.Wrap(err, "[swagger.TImport]s.fillProps error")
-			return
+			schema.Properties, err = s.fillProps(structInfo, pkgPath)
+			if err != nil {
+				err = errors.Wrap(err, "[swagger.TImport]s.fillProps error")
+				return
+			}
 		}
 	case types.TArray:
 		schema.Type = "array"
