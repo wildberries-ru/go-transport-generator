@@ -12,7 +12,7 @@ import (
 )
 
 type service interface {
-	UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data multipart.File) (err error)
+	UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader) (err error)
 	GetWarehouses(ctx context.Context) (pets map[string]v1.Detail, err error)
 	GetDetails(ctx context.Context, namespace string, detail string, fileID uint32, someID *uint64, token *string) (det v1.Detail, ns v1.Namespace, id *string, err error)
 	GetDetailsEmbedStruct(ctx context.Context, namespace string, detail string) (response v1.GetDetailsEmbedStructResponse, err error)
@@ -37,7 +37,7 @@ func (s *uploadDocument) ServeHTTP(ctx *fasthttp.RequestCtx) {
 		categoryID string
 		supplierID *int64
 		contractID *int64
-		data       multipart.File
+		data       *multipart.FileHeader
 		err        error
 	)
 	token, name, extension, categoryID, supplierID, contractID, data, err = s.transport.DecodeRequest(ctx, &ctx.Request)

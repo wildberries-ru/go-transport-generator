@@ -8,7 +8,7 @@ import (
 )
 
 // SomeService ...
-// @gtg http-server log metrics mock http-errors
+// @gtg http-server log metrics mock http-errors swagger
 type SomeService interface {
 	// @gtg http-server-method POST
 	// @gtg http-server-uri-path /api/v1/document
@@ -23,7 +23,7 @@ type SomeService interface {
 	// @gtg http-server-file-tag data document
 	// @gtg http-server-response-content-type application/json
 	// @gtg http-server-response-status 201
-	UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data multipart.File) (err error)
+	UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader) (err error)
 	// @gtg http-server-method GET
 	// @gtg http-server-uri-path /api/v1/getWarehouses
 	// @gtg http-server-content-type application/json

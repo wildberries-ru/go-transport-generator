@@ -20,7 +20,7 @@ type loggingMiddleware struct {
 }
 
 // UploadDocument ...
-func (s *loggingMiddleware) UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data multipart.File) (err error) {
+func (s *loggingMiddleware) UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader) (err error) {
 	defer func(begin time.Time) {
 		_ = s.wrap(err).Log(
 			"method", "UploadDocument",
