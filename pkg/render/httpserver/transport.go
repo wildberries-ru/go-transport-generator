@@ -36,6 +36,7 @@ var (
 	{{$queryPlaceholders := $ct.QueryPlaceholders}}
 	{{$isIntQueryPlaceholders := $ct.IsIntQueryPlaceholders}}
 	{{$headerPlaceholders := $ct.HeaderPlaceholders}}
+	{{$cookiePlaceholders := $ct.CookiePlaceholders}}
 	{{$body := $ct.Body}}
 	{{$bodyPlaceholders := $ct.BodyPlaceholders}}
 	{{$isIntBodyPlaceholders := $ct.IsIntBodyPlaceholders}}
@@ -143,6 +144,9 @@ var (
 		{{end}}
 		{{range $from, $to := $headerPlaceholders}}
 			{{$to}} = ptr(r.Header.Peek("{{$from}}"))
+		{{end}}
+		{{range $from, $to := $cookiePlaceholders}}
+			{{$to}} = ptr(r.Header.Cookie("{{$from}}"))
 		{{end}}
 		{{if eq $contentType "application/json"}}
 			{{if lenMap $body}}var request {{low .Name}}Request

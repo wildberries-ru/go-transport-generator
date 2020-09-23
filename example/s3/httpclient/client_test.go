@@ -46,13 +46,13 @@ func Test_client_CreateMultipartUpload(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		result := struct {
-			Data v1.CreateMultipartUploadData `json:"Data"`
+			Data v1.CreateMultipartUploadData `json:"data"`
 
-			ErrorFlag bool `json:"ErrorFlag"`
+			ErrorFlag bool `json:"error"`
 
-			ErrorText string `json:"ErrorText"`
+			ErrorText string `json:"errorText"`
 
-			AdditionalErrors *v1.AdditionalErrors `json:"AdditionalErrors"`
+			AdditionalErrors *v1.AdditionalErrors `json:"additionalErrors"`
 		}{
 
 			Data: data,
@@ -503,9 +503,9 @@ func Test_client_GetToken(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		result := struct {
-			Token string `json:"Token"`
+			Token string `json:"token"`
 
-			ExpiresIn int `json:"ExpiresIn"`
+			ExpiresIn int `json:"expiresIn"`
 		}{
 
 			Token: token,
@@ -587,6 +587,90 @@ func Test_client_GetToken(t *testing.T) {
 	}
 }
 
+func Test_client_GetBranches(t *testing.T) {
+
+	var authToken *string
+	_ = faker.FakeData(&authToken)
+
+	var supplierID *string
+	_ = faker.FakeData(&supplierID)
+
+	var branches []int
+	_ = faker.FakeData(&branches)
+
+	maxConns := rand.Int() + 1
+	opts := map[interface{}]Option{}
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		result := branches
+
+		b, _ := json.Marshal(result)
+		w.Write(b)
+	}))
+	defer ts.Close()
+
+	parsedServerURL, _ := url.Parse(ts.URL)
+
+	hostClient := &fasthttp.HostClient{
+		Addr:     parsedServerURL.Host,
+		MaxConns: maxConns,
+	}
+
+	transportGetBranches := NewGetBranchesTransport(
+		&testErrorProcessor{},
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetBranches,
+		httpMethodGetBranches,
+	)
+
+	type fields struct {
+		cli                  *fasthttp.HostClient
+		transportGetBranches GetBranchesTransport
+		options              map[interface{}]Option
+	}
+	type args struct {
+		ctx        context.Context
+		authToken  *string
+		supplierID *string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+
+		wantBranches []int
+
+		wantErr bool
+	}{
+		{
+			"test GetBranches",
+			fields{hostClient, transportGetBranches, opts},
+			args{context.Background(), authToken, supplierID},
+			branches,
+
+			false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &client{
+				cli:                  tt.fields.cli,
+				transportGetBranches: tt.fields.transportGetBranches,
+				options:              tt.fields.options,
+			}
+			gotBranches, err := s.GetBranches(tt.args.ctx, tt.args.authToken, tt.args.supplierID)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("client.GetBranches() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if !reflect.DeepEqual(gotBranches, tt.wantBranches) {
+				t.Errorf("client.branches() = %v, want %v", gotBranches, tt.wantBranches)
+			}
+
+		})
+	}
+}
+
 func TestNewClient(t *testing.T) {
 	serverURL := fmt.Sprintf("https://%v.com", time.Now().UnixNano())
 	parsedServerURL, _ := url.Parse(serverURL)
@@ -632,6 +716,12 @@ func TestNewClient(t *testing.T) {
 		httpMethodGetToken,
 	)
 
+	transportGetBranches := NewGetBranchesTransport(
+		&testErrorProcessor{},
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetBranches,
+		httpMethodGetBranches,
+	)
+
 	cl := &client{
 		hostClient,
 		transportCreateMultipartUpload,
@@ -640,6 +730,7 @@ func TestNewClient(t *testing.T) {
 		transportUploadDocument,
 		transportDownloadDocument,
 		transportGetToken,
+		transportGetBranches,
 		opts,
 	}
 
@@ -658,6 +749,8 @@ func TestNewClient(t *testing.T) {
 
 		transportGetToken GetTokenTransport
 
+		transportGetBranches GetBranchesTransport
+
 		options map[interface{}]Option
 	}
 	tests := []struct {
@@ -665,11 +758,11 @@ func TestNewClient(t *testing.T) {
 		args args
 		want Service
 	}{
-		{"test new client", args{hostClient, transportCreateMultipartUpload, transportUploadPartDocument, transportCompleteUpload, transportUploadDocument, transportDownloadDocument, transportGetToken, opts}, cl},
+		{"test new client", args{hostClient, transportCreateMultipartUpload, transportUploadPartDocument, transportCompleteUpload, transportUploadDocument, transportDownloadDocument, transportGetToken, transportGetBranches, opts}, cl},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewClient(tt.args.cli, tt.args.transportCreateMultipartUpload, tt.args.transportUploadPartDocument, tt.args.transportCompleteUpload, tt.args.transportUploadDocument, tt.args.transportDownloadDocument, tt.args.transportGetToken, tt.args.options); !reflect.DeepEqual(got, tt.want) {
+			if got := NewClient(tt.args.cli, tt.args.transportCreateMultipartUpload, tt.args.transportUploadPartDocument, tt.args.transportCompleteUpload, tt.args.transportUploadDocument, tt.args.transportDownloadDocument, tt.args.transportGetToken, tt.args.transportGetBranches, tt.args.options); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewClient() = %v, want %v", got, tt.want)
 			}
 		})

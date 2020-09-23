@@ -4,6 +4,28 @@ info:
   description: ""
   version: ""
 paths:
+  /api/v1/branches:
+    get:
+      tags:
+      - s3/Service
+      parameters:
+      - in: header
+        name: authToken
+        schema:
+          type: string
+          nullable: true
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  branches:
+                    type: array
+                    items:
+                      type: number
   /api/v1/doc/{bucket}/{key}:
     get:
       tags:

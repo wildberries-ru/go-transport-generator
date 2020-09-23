@@ -50,4 +50,12 @@ type Service interface {
 	// @gtg http-server-response-json-tag token token
 	// @gtg http-server-response-json-tag expiresIn expiresIn
 	GetToken(ctx context.Context, authToken *string, scope string, grantType string) (token string, expiresIn int, err error)
+	// @gtg http-server-method GET
+	// @gtg http-server-uri-path /api/v1/branches
+	// @gtg http-server-header Authorization {authToken}
+	// @gtg http-server-cookie x-supplier-id supplierID
+	// @gtg http-server-response-status 200
+	// @gtg http-server-response-content-type application/json
+	// @gtg http-server-response-json-tag branches branches
+	GetBranches(ctx context.Context, authToken *string, supplierID *string) (branches []int, err error)
 }

@@ -52,6 +52,11 @@ func TestNew(t *testing.T) {
 		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetToken,
 		httpMethodGetToken,
 	)
+	transportGetBranches := NewGetBranchesTransport(
+		&testErrorProcessor{},
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetBranches,
+		httpMethodGetBranches,
+	)
 
 	cl := client{
 		&fasthttp.HostClient{
@@ -64,6 +69,7 @@ func TestNew(t *testing.T) {
 		transportUploadDocument,
 		transportDownloadDocument,
 		transportGetToken,
+		transportGetBranches,
 		opts,
 	}
 

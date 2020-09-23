@@ -18,6 +18,7 @@ var (
 	UploadDocument        = option{}
 	DownloadDocument      = option{}
 	GetToken              = option{}
+	GetBranches           = option{}
 )
 
 type option struct{}
@@ -35,6 +36,7 @@ type Service interface {
 	UploadDocument(ctx context.Context, bucket string, key string, document []byte) (err error)
 	DownloadDocument(ctx context.Context, bucket string, key string) (document []byte, err error)
 	GetToken(ctx context.Context, authToken *string, scope string, grantType string) (token string, expiresIn int, err error)
+	GetBranches(ctx context.Context, authToken *string, supplierID *string) (branches []int, err error)
 }
 
 type client struct {
@@ -45,6 +47,7 @@ type client struct {
 	transportUploadDocument        UploadDocumentTransport
 	transportDownloadDocument      DownloadDocumentTransport
 	transportGetToken              GetTokenTransport
+	transportGetBranches           GetBranchesTransport
 	options                        map[interface{}]Option
 }
 
@@ -168,6 +171,26 @@ func (s *client) GetToken(ctx context.Context, authToken *string, scope string, 
 	return s.transportGetToken.DecodeResponse(ctx, res)
 }
 
+// GetBranches ...
+func (s *client) GetBranches(ctx context.Context, authToken *string, supplierID *string) (branches []int, err error) {
+	req, res := fasthttp.AcquireRequest(), fasthttp.AcquireResponse()
+	defer func() {
+		fasthttp.ReleaseRequest(req)
+		fasthttp.ReleaseResponse(res)
+	}()
+	if opt, ok := s.options[GetBranches]; ok {
+		opt.Prepare(ctx, req)
+	}
+	if err = s.transportGetBranches.EncodeRequest(ctx, req, authToken, supplierID); err != nil {
+		return
+	}
+	err = s.cli.Do(req, res)
+	if err != nil {
+		return
+	}
+	return s.transportGetBranches.DecodeResponse(ctx, res)
+}
+
 // NewClient the client creator
 func NewClient(
 	cli *fasthttp.HostClient,
@@ -177,6 +200,7 @@ func NewClient(
 	transportUploadDocument UploadDocumentTransport,
 	transportDownloadDocument DownloadDocumentTransport,
 	transportGetToken GetTokenTransport,
+	transportGetBranches GetBranchesTransport,
 	options map[interface{}]Option,
 ) Service {
 	return &client{
@@ -187,6 +211,7 @@ func NewClient(
 		transportUploadDocument:        transportUploadDocument,
 		transportDownloadDocument:      transportDownloadDocument,
 		transportGetToken:              transportGetToken,
+		transportGetBranches:           transportGetBranches,
 		options:                        options,
 	}
 }

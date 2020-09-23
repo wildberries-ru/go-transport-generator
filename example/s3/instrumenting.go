@@ -55,6 +55,12 @@ func (s *instrumentingMiddleware) GetToken(ctx context.Context, authToken *strin
 	return s.svc.GetToken(ctx, authToken, scope, grantType)
 }
 
+// GetBranches ...
+func (s *instrumentingMiddleware) GetBranches(ctx context.Context, authToken *string, supplierID *string) (branches []int, err error) {
+	defer s.recordMetrics("GetBranches", time.Now(), err)
+	return s.svc.GetBranches(ctx, authToken, supplierID)
+}
+
 func (s *instrumentingMiddleware) recordMetrics(method string, startTime time.Time, err error) {
 	labels := []string{
 		"method", method,

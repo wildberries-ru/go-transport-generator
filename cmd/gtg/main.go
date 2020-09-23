@@ -44,6 +44,7 @@ const (
 	requestFormUrlencodedTagSuffix = "form-urlencoded"
 	requestJsonTagSuffix           = "json-tag"
 	requestHeaderSuffix            = "header"
+	requestCookieSuffix            = "cookie"
 	requestMethodSuffix            = "method"
 	requestQuerySuffix             = "query"
 	requestURIPathSuffix           = "uri-path"
@@ -135,12 +136,13 @@ func main() {
 			request.NewQuery(httpServer, requestQuerySuffix,
 				request.NewMethod(httpServer, requestMethodSuffix,
 					request.NewHeader(httpServer, requestHeaderSuffix,
-						request.NewContentType(httpServer, requestContentTypeSuffix,
-							request.NewMultipartFileTag(httpServer, requestMultipartFileTagSuffix,
-								request.NewMultipartValueTag(httpServer, requestMultipartValueTagSuffix,
-									request.NewJsonTag(httpServer, requestJsonTagSuffix,
-										request.NewAPIPath(httpServer, requestAPIPathSuffix,
-											request.NewFormUrlencodedTag(httpServer, requestFormUrlencodedTagSuffix, &request2.Term{})))))))))))
+						request.NewCookie(httpServer, requestCookieSuffix,
+							request.NewContentType(httpServer, requestContentTypeSuffix,
+								request.NewMultipartFileTag(httpServer, requestMultipartFileTagSuffix,
+									request.NewMultipartValueTag(httpServer, requestMultipartValueTagSuffix,
+										request.NewJsonTag(httpServer, requestJsonTagSuffix,
+											request.NewAPIPath(httpServer, requestAPIPathSuffix,
+												request.NewFormUrlencodedTag(httpServer, requestFormUrlencodedTagSuffix, &request2.Term{}))))))))))))
 	tagsParser = response.NewStatus(httpServer, responseStatusSuffix,
 		response.NewHeader(httpServer, responseHeaderSuffix,
 			response.NewContentType(httpServer, responseContentTypeSuffix,

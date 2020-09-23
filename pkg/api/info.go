@@ -41,6 +41,7 @@ type HTTPMethod struct {
 	QueryPlaceholders       map[string]*Placeholder
 	IsIntQueryPlaceholders  bool
 	HeaderPlaceholders      map[string]string
+	CookiePlaceholders      map[string]string
 	ContentType             string
 	JsonTags                map[string]string
 	MultipartValueTags      map[string]string

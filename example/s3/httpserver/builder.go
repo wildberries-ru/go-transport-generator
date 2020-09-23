@@ -25,6 +25,8 @@ const (
 	uriPathDownloadDocument         = "/api/v1/doc/:bucket/:key"
 	httpMethodGetToken              = "POST"
 	uriPathGetToken                 = "/token"
+	httpMethodGetBranches           = "GET"
+	uriPathGetBranches              = "/api/v1/branches"
 )
 
 type errorProcessor interface {
@@ -62,6 +64,12 @@ func New(router *fasthttprouter.Router, svc service, decodeJSONErrorCreator erro
 		encodeJSONErrorCreator,
 	)
 	router.Handle(httpMethodGetToken, uriPathGetToken, NewGetToken(getTokenTransport, svc, errorProcessor))
+
+	getBranchesTransport := NewGetBranchesTransport(
+
+		encodeJSONErrorCreator,
+	)
+	router.Handle(httpMethodGetBranches, uriPathGetBranches, NewGetBranches(getBranchesTransport, svc, errorProcessor))
 
 	router.Handle("GET", "/debug/pprof/", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Index))
 	router.Handle("GET", "/debug/pprof/profile", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Profile))
