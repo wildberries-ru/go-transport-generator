@@ -17,6 +17,7 @@ var (
 	CompleteUpload        = option{}
 	UploadDocument        = option{}
 	DownloadDocument      = option{}
+	GetToken              = option{}
 )
 
 type option struct{}
@@ -33,6 +34,7 @@ type Service interface {
 	CompleteUpload(ctx context.Context, bucket string, key string, uploadID string) (err error)
 	UploadDocument(ctx context.Context, bucket string, key string, document []byte) (err error)
 	DownloadDocument(ctx context.Context, bucket string, key string) (document []byte, err error)
+	GetToken(ctx context.Context, authToken *string, scope string, grantType string) (token string, expiresIn int, err error)
 }
 
 type client struct {
@@ -42,6 +44,7 @@ type client struct {
 	transportCompleteUpload        CompleteUploadTransport
 	transportUploadDocument        UploadDocumentTransport
 	transportDownloadDocument      DownloadDocumentTransport
+	transportGetToken              GetTokenTransport
 	options                        map[interface{}]Option
 }
 
@@ -145,6 +148,26 @@ func (s *client) DownloadDocument(ctx context.Context, bucket string, key string
 	return s.transportDownloadDocument.DecodeResponse(ctx, res)
 }
 
+// GetToken ...
+func (s *client) GetToken(ctx context.Context, authToken *string, scope string, grantType string) (token string, expiresIn int, err error) {
+	req, res := fasthttp.AcquireRequest(), fasthttp.AcquireResponse()
+	defer func() {
+		fasthttp.ReleaseRequest(req)
+		fasthttp.ReleaseResponse(res)
+	}()
+	if opt, ok := s.options[GetToken]; ok {
+		opt.Prepare(ctx, req)
+	}
+	if err = s.transportGetToken.EncodeRequest(ctx, req, authToken, scope, grantType); err != nil {
+		return
+	}
+	err = s.cli.Do(req, res)
+	if err != nil {
+		return
+	}
+	return s.transportGetToken.DecodeResponse(ctx, res)
+}
+
 // NewClient the client creator
 func NewClient(
 	cli *fasthttp.HostClient,
@@ -153,6 +176,7 @@ func NewClient(
 	transportCompleteUpload CompleteUploadTransport,
 	transportUploadDocument UploadDocumentTransport,
 	transportDownloadDocument DownloadDocumentTransport,
+	transportGetToken GetTokenTransport,
 	options map[interface{}]Option,
 ) Service {
 	return &client{
@@ -162,6 +186,7 @@ func NewClient(
 		transportCompleteUpload:        transportCompleteUpload,
 		transportUploadDocument:        transportUploadDocument,
 		transportDownloadDocument:      transportDownloadDocument,
+		transportGetToken:              transportGetToken,
 		options:                        options,
 	}
 }

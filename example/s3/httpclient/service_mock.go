@@ -44,3 +44,9 @@ func (s *MockService) DownloadDocument(ctx context.Context, bucket string, key s
 	args := s.Called(context.Background(), bucket, key)
 	return args.Get(0).([]byte), args.Error(1)
 }
+
+// GetToken ...
+func (s *MockService) GetToken(ctx context.Context, authToken *string, scope string, grantType string) (token string, expiresIn int, err error) {
+	args := s.Called(context.Background(), authToken, scope, grantType)
+	return args.Get(0).(string), args.Get(1).(int), args.Error(2)
+}

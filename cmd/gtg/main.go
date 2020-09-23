@@ -41,6 +41,7 @@ const (
 	requestContentTypeSuffix       = "content-type"
 	requestMultipartValueTagSuffix = "value-tag"
 	requestMultipartFileTagSuffix  = "file-tag"
+	requestFormUrlencodedTagSuffix = "form-urlencoded"
 	requestJsonTagSuffix           = "json-tag"
 	requestHeaderSuffix            = "header"
 	requestMethodSuffix            = "method"
@@ -138,7 +139,8 @@ func main() {
 							request.NewMultipartFileTag(httpServer, requestMultipartFileTagSuffix,
 								request.NewMultipartValueTag(httpServer, requestMultipartValueTagSuffix,
 									request.NewJsonTag(httpServer, requestJsonTagSuffix,
-										request.NewAPIPath(httpServer, requestAPIPathSuffix, &request2.Term{}))))))))))
+										request.NewAPIPath(httpServer, requestAPIPathSuffix,
+											request.NewFormUrlencodedTag(httpServer, requestFormUrlencodedTagSuffix, &request2.Term{})))))))))))
 	tagsParser = response.NewStatus(httpServer, responseStatusSuffix,
 		response.NewHeader(httpServer, responseHeaderSuffix,
 			response.NewContentType(httpServer, responseContentTypeSuffix,
@@ -238,6 +240,9 @@ func main() {
 			}
 		}
 		return true
+	}})
+	t.Funcs(template.FuncMap{"contains": func(s string, substr string) bool {
+		return strings.Contains(s, substr)
 	}})
 
 	imp := imports.NewImports()

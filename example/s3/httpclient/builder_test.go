@@ -4,75 +4,56 @@
 package httpclient
 
 import (
+	"fmt"
+	"math/rand"
 	"net/url"
+	"reflect"
+	"testing"
+	"time"
 
-	"github.com/pkg/errors"
 	"github.com/valyala/fasthttp"
 )
 
-const (
-	httpMethodCreateMultipartUpload    = "POST"
-	uriPathClientCreateMultipartUpload = "/api/v1/multipart/%s/%s"
-	httpMethodUploadPartDocument       = "PATCH"
-	uriPathClientUploadPartDocument    = "/api/v1/multipart/%s/%s"
-	httpMethodCompleteUpload           = "PUT"
-	uriPathClientCompleteUpload        = "/api/v1/multipart/%s/%s"
-	httpMethodUploadDocument           = "POST"
-	uriPathClientUploadDocument        = "/api/v1/doc/%s/%s"
-	httpMethodDownloadDocument         = "GET"
-	uriPathClientDownloadDocument      = "/api/v1/doc/%s/%s"
-	httpMethodGetToken                 = "POST"
-	uriPathClientGetToken              = "/token"
-)
+type testErrorProcessor struct{}
 
-type errorProcessor interface {
-	Decode(r *fasthttp.Response) error
-}
+func TestNew(t *testing.T) {
+	serverURL := fmt.Sprintf("https://%v.com", time.Now().UnixNano())
+	parsedServerURL, _ := url.Parse(serverURL)
+	maxConns := rand.Int()
+	opts := map[interface{}]Option{}
 
-// New ...
-func New(
-	serverURL string,
-	maxConns int,
-	errorProcessor errorProcessor,
-	options map[interface{}]Option,
-) (client Service, err error) {
-	parsedServerURL, err := url.Parse(serverURL)
-	if err != nil {
-		err = errors.Wrap(err, "failed to parse server url")
-		return
-	}
 	transportCreateMultipartUpload := NewCreateMultipartUploadTransport(
-		errorProcessor,
+		&testErrorProcessor{},
 		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientCreateMultipartUpload,
 		httpMethodCreateMultipartUpload,
 	)
 	transportUploadPartDocument := NewUploadPartDocumentTransport(
-		errorProcessor,
+		&testErrorProcessor{},
 		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientUploadPartDocument,
 		httpMethodUploadPartDocument,
 	)
 	transportCompleteUpload := NewCompleteUploadTransport(
-		errorProcessor,
+		&testErrorProcessor{},
 		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientCompleteUpload,
 		httpMethodCompleteUpload,
 	)
 	transportUploadDocument := NewUploadDocumentTransport(
-		errorProcessor,
+		&testErrorProcessor{},
 		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientUploadDocument,
 		httpMethodUploadDocument,
 	)
 	transportDownloadDocument := NewDownloadDocumentTransport(
-		errorProcessor,
+		&testErrorProcessor{},
 		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientDownloadDocument,
 		httpMethodDownloadDocument,
 	)
 	transportGetToken := NewGetTokenTransport(
-		errorProcessor,
+		&testErrorProcessor{},
 		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetToken,
 		httpMethodGetToken,
 	)
 
-	client = NewClient(
+	cl := client{
 		&fasthttp.HostClient{
 			Addr:     parsedServerURL.Host,
 			MaxConns: maxConns,
@@ -83,7 +64,38 @@ func New(
 		transportUploadDocument,
 		transportDownloadDocument,
 		transportGetToken,
-		options,
-	)
-	return
+		opts,
+	}
+
+	type args struct {
+		serverURL      string
+		maxConns       int
+		errorProcessor errorProcessor
+		options        map[interface{}]Option
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantClient Service
+		wantErr    bool
+	}{
+		{"test new builder", args{serverURL, maxConns, &testErrorProcessor{}, opts}, &cl, false},
+		{"test new builder incorrect URL", args{" http:example%20.com", maxConns, &testErrorProcessor{}, opts}, nil, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotClient, err := New(tt.args.serverURL, tt.args.maxConns, tt.args.errorProcessor, tt.args.options)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotClient, tt.wantClient) {
+				t.Errorf("New() = %v, want %v", gotClient, tt.wantClient)
+			}
+		})
+	}
+}
+
+func (ep *testErrorProcessor) Decode(r *fasthttp.Response) error {
+	return nil
 }
