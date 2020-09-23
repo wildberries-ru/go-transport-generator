@@ -16,6 +16,7 @@ type service interface {
 	CompleteUpload(ctx context.Context, bucket string, key string, uploadID string) (err error)
 	UploadDocument(ctx context.Context, bucket string, key string, document []byte) (err error)
 	DownloadDocument(ctx context.Context, bucket string, key string) (document []byte, err error)
+	GetToken(ctx context.Context, authToken *string, scope string, grantType string) (token string, expiresIn int, err error)
 }
 
 type createMultipartUpload struct {
@@ -226,6 +227,50 @@ func (s *downloadDocument) ServeHTTP(ctx *fasthttp.RequestCtx) {
 // NewDownloadDocument the server creator
 func NewDownloadDocument(transport DownloadDocumentTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
 	ls := downloadDocument{
+		transport:      transport,
+		service:        service,
+		errorProcessor: errorProcessor,
+	}
+	return ls.ServeHTTP
+}
+
+type getToken struct {
+	transport      GetTokenTransport
+	service        service
+	errorProcessor errorProcessor
+}
+
+// ServeHTTP implements http.Handler.
+func (s *getToken) ServeHTTP(ctx *fasthttp.RequestCtx) {
+	var (
+		authToken *string
+		scope     string
+		grantType string
+		token     string
+		expiresIn int
+		err       error
+	)
+	authToken, scope, grantType, err = s.transport.DecodeRequest(ctx, &ctx.Request)
+	if err != nil {
+		s.errorProcessor.Encode(ctx, &ctx.Response, err)
+		return
+	}
+
+	token, expiresIn, err = s.service.GetToken(ctx, authToken, scope, grantType)
+	if err != nil {
+		s.errorProcessor.Encode(ctx, &ctx.Response, err)
+		return
+	}
+
+	if err = s.transport.EncodeResponse(ctx, &ctx.Response, token, expiresIn); err != nil {
+		s.errorProcessor.Encode(ctx, &ctx.Response, err)
+		return
+	}
+}
+
+// NewGetToken the server creator
+func NewGetToken(transport GetTokenTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
+	ls := getToken{
 		transport:      transport,
 		service:        service,
 		errorProcessor: errorProcessor,

@@ -6,6 +6,7 @@ package httpclient
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/valyala/fasthttp"
 	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
@@ -25,6 +26,7 @@ type CreateMultipartUploadTransport interface {
 	DecodeResponse(ctx context.Context, r *fasthttp.Response) (data v1.CreateMultipartUploadData, errorFlag bool, errorText string, additionalErrors *v1.AdditionalErrors, err error)
 }
 
+//easyjson:skip
 type createMultipartUploadTransport struct {
 	errorProcessor errorProcessor
 	pathTemplate   string
@@ -75,6 +77,7 @@ func NewCreateMultipartUploadTransport(
 	}
 }
 
+//easyjson:skip
 type uploadPartDocumentRequest struct {
 	Document   []byte
 	PartNumber int64
@@ -87,6 +90,7 @@ type UploadPartDocumentTransport interface {
 	DecodeResponse(ctx context.Context, r *fasthttp.Response) (err error)
 }
 
+//easyjson:skip
 type uploadPartDocumentTransport struct {
 	errorProcessor errorProcessor
 	pathTemplate   string
@@ -124,6 +128,7 @@ func NewUploadPartDocumentTransport(
 	}
 }
 
+//easyjson:skip
 type completeUploadRequest struct {
 	UploadID string
 }
@@ -134,6 +139,7 @@ type CompleteUploadTransport interface {
 	DecodeResponse(ctx context.Context, r *fasthttp.Response) (err error)
 }
 
+//easyjson:skip
 type completeUploadTransport struct {
 	errorProcessor errorProcessor
 	pathTemplate   string
@@ -171,6 +177,7 @@ func NewCompleteUploadTransport(
 	}
 }
 
+//easyjson:skip
 type uploadDocumentRequest struct {
 	Document []byte
 }
@@ -181,6 +188,7 @@ type UploadDocumentTransport interface {
 	DecodeResponse(ctx context.Context, r *fasthttp.Response) (err error)
 }
 
+//easyjson:skip
 type uploadDocumentTransport struct {
 	errorProcessor errorProcessor
 	pathTemplate   string
@@ -220,7 +228,7 @@ func NewUploadDocumentTransport(
 
 //easyjson:json
 type downloadDocumentResponse struct {
-	Document []byte
+	Document []byte `json:"document"`
 }
 
 // DownloadDocumentTransport transport interface
@@ -229,6 +237,7 @@ type DownloadDocumentTransport interface {
 	DecodeResponse(ctx context.Context, r *fasthttp.Response) (document []byte, err error)
 }
 
+//easyjson:skip
 type downloadDocumentTransport struct {
 	errorProcessor errorProcessor
 	pathTemplate   string
@@ -267,6 +276,79 @@ func NewDownloadDocumentTransport(
 	method string,
 ) DownloadDocumentTransport {
 	return &downloadDocumentTransport{
+		errorProcessor: errorProcessor,
+		pathTemplate:   pathTemplate,
+		method:         method,
+	}
+}
+
+//easyjson:skip
+type getTokenRequest struct {
+	GrantType string
+	Scope     string
+}
+
+//easyjson:json
+type getTokenResponse struct {
+	ExpiresIn int    `json:"expiresIn"`
+	Token     string `json:"token"`
+}
+
+// GetTokenTransport transport interface
+type GetTokenTransport interface {
+	EncodeRequest(ctx context.Context, r *fasthttp.Request, authToken *string, scope string, grantType string) (err error)
+	DecodeResponse(ctx context.Context, r *fasthttp.Response) (token string, expiresIn int, err error)
+}
+
+//easyjson:skip
+type getTokenTransport struct {
+	errorProcessor errorProcessor
+	pathTemplate   string
+	method         string
+}
+
+// EncodeRequest method for decoding requests on server side
+func (t *getTokenTransport) EncodeRequest(ctx context.Context, r *fasthttp.Request, authToken *string, scope string, grantType string) (err error) {
+	r.Header.SetMethod(t.method)
+	r.SetRequestURI(t.pathTemplate)
+
+	r.Header.Set("Authorization", *authToken)
+
+	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	r.PostArgs().Add("grant_type", grantType)
+
+	r.PostArgs().Add("scope", scope)
+
+	return
+}
+
+// DecodeResponse method for encoding response on server side
+func (t *getTokenTransport) DecodeResponse(ctx context.Context, r *fasthttp.Response) (token string, expiresIn int, err error) {
+	if r.StatusCode() != http.StatusOK {
+		err = t.errorProcessor.Decode(r)
+		return
+	}
+
+	var theResponse getTokenResponse
+	if err = theResponse.UnmarshalJSON(r.Body()); err != nil {
+		return
+	}
+
+	expiresIn = theResponse.ExpiresIn
+
+	token = theResponse.Token
+
+	return
+}
+
+// NewGetTokenTransport the transport creator for http requests
+func NewGetTokenTransport(
+	errorProcessor errorProcessor,
+	pathTemplate string,
+	method string,
+) GetTokenTransport {
+	return &getTokenTransport{
 		errorProcessor: errorProcessor,
 		pathTemplate:   pathTemplate,
 		method:         method,

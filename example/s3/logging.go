@@ -98,6 +98,23 @@ func (s *loggingMiddleware) DownloadDocument(ctx context.Context, bucket string,
 	return s.svc.DownloadDocument(ctx, bucket, key)
 }
 
+// GetToken ...
+func (s *loggingMiddleware) GetToken(ctx context.Context, authToken *string, scope string, grantType string) (token string, expiresIn int, err error) {
+	defer func(begin time.Time) {
+		_ = s.wrap(err).Log(
+			"method", "GetToken",
+			"authToken", authToken,
+			"scope", scope,
+			"grantType", grantType,
+			"token", token,
+			"expiresIn", expiresIn,
+			"err", err,
+			"elapsed", time.Since(begin),
+		)
+	}(time.Now())
+	return s.svc.GetToken(ctx, authToken, scope, grantType)
+}
+
 func (s *loggingMiddleware) wrap(err error) log.Logger {
 	lvl := level.Debug
 	if err != nil {

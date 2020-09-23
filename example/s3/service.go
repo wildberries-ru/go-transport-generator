@@ -37,5 +37,17 @@ type Service interface {
 	// @gtg http-server-uri-path /api/v1/doc/{bucket}/{key}
 	// @gtg http-server-response-status 200
 	// @gtg http-server-response-content-type application/json
+	// @gtg http-server-response-json-tag document document
 	DownloadDocument(ctx context.Context, bucket string, key string) (document []byte, err error)
+	// @gtg http-server-method POST
+	// @gtg http-server-uri-path /token
+	// @gtg http-server-header Authorization {authToken}
+	// @gtg http-server-content-type application/x-www-form-urlencoded
+	// @gtg http-server-form-urlencoded scope scope
+	// @gtg http-server-form-urlencoded grantType grant_type
+	// @gtg http-server-response-content-type application/json
+	// @gtg http-server-response-status http.StatusOK
+	// @gtg http-server-response-json-tag token token
+	// @gtg http-server-response-json-tag expiresIn expiresIn
+	GetToken(ctx context.Context, authToken *string, scope string, grantType string) (token string, expiresIn int, err error)
 }
