@@ -17,6 +17,7 @@ const clientTransportTpl = `// Package {{.PkgName}} ...
 // DO NOT EDIT
 package {{.PkgName}}
 {{$methods := .HTTPMethods}}
+{{$isTLS := .IsTLSClient}}
 import (
 	"context"
 	"net/http"
@@ -37,7 +38,8 @@ import (
 	{{$contentType := $ct.ContentType}}
 	{{$jsonTags := $ct.JsonTags}}
 	{{$multipartValueTags := $ct.MultipartValueTags}}
-	{{$multipartFileTags := $ct.MultipartFileTags}}	
+	{{$multipartFileTags := $ct.MultipartFileTags}}
+	{{$formUrlencodedTags := $ct.FormUrlencodedTags}}
 	{{$responseJsonTags := $ct.ResponseJsonTags}}
 	{{$responseHeaderPlaceholders := $ct.ResponseHeaders}}
 	{{$responseStatus := $ct.ResponseStatus}}
@@ -54,13 +56,13 @@ import (
 		{{end}}
 	}{{end}}
 
-	{{if lenMap $responseBody}}{{if eq $contentType "application/json"}}//easyjson:json{{else}}//easyjson:skip{{end}}
+	{{if lenMap $responseBody}}{{if eq $responseContentType "application/json"}}//easyjson:json{{else}}//easyjson:skip{{end}}
 		type {{low .Name}}Response {{if or $responseBodyTypeIsSlice $responseBodyTypeIsMap}}{{$responseBodyType}}{{else}} struct {
   			{{if $responseBodyType}}
     			{{$responseBodyType}}
   			{{else}}
 			    {{$respLen := lenMap $responseBody}}	
-			    {{range $name, $tp := $responseBody}}{{if eq $respLen 1}}{{$tp}}{{else}}{{up $name}} {{$tp}}{{end}}{{$tag := index $responseJsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
+			    {{range $name, $tp := $responseBody}}{{if eq $respLen 1}}{{if contains $tp "."}}{{$tp}}{{else}}{{up $name}} {{$tp}}{{end}}{{else}}{{up $name}} {{$tp}}{{end}}{{$tag := index $responseJsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
     			{{end}}
   			{{end}}
 		}{{end}}
@@ -83,6 +85,11 @@ import (
 	func (t *{{low .Name}}Transport) EncodeRequest(ctx context.Context, r *fasthttp.Request, {{$args := popFirst .Args}}{{joinFullVariables $args ","}}) (err error) {
 		r.Header.SetMethod(t.method)
 		{{if len $uriPlaceholders}}r.SetRequestURI(fmt.Sprintf(t.pathTemplate, {{join $uriPlaceholders ","}})){{else}}r.SetRequestURI(t.pathTemplate){{end}}
+		{{if $isTLS}}
+			{{if not $queryPlaceholders}}
+				_ = r.URI()
+			{{end}}
+		{{end}}
 		{{range $from, $to := $queryPlaceholders}}
 			{{if eq $to.IsString true}}
 				{{if eq $to.IsPointer true}}if {{$to.Name}} != nil { {{end}}
@@ -133,6 +140,12 @@ import (
 			writer.Close()
 			r.Header.Set("Content-Type", writer.FormDataContentType())
 			r.SetBody(body.Bytes())
+		{{end}}
+
+		{{if eq $contentType "application/x-www-form-urlencoded"}}r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			{{range $from, $to := $formUrlencodedTags}}
+				r.PostArgs().Add("{{$to}}", {{$from}})
+			{{end}}
 		{{end}}
 		return
 	}

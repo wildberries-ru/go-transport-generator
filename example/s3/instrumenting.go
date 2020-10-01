@@ -49,6 +49,12 @@ func (s *instrumentingMiddleware) DownloadDocument(ctx context.Context, bucket s
 	return s.svc.DownloadDocument(ctx, bucket, key)
 }
 
+// GetToken ...
+func (s *instrumentingMiddleware) GetToken(ctx context.Context, authToken *string, scope string, grantType string) (token string, expiresIn int, err error) {
+	defer s.recordMetrics("GetToken", time.Now(), err)
+	return s.svc.GetToken(ctx, authToken, scope, grantType)
+}
+
 func (s *instrumentingMiddleware) recordMetrics(method string, startTime time.Time, err error) {
 	labels := []string{
 		"method", method,

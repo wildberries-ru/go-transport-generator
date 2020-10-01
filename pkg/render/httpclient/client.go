@@ -98,7 +98,13 @@ import (
 	"testing"
 )
 
+{{$methods := .HTTPMethods}}
 {{range .Iface.Methods}}
+
+{{$ct := index $methods .Name}}
+{{$method := $ct.Method}}
+{{$responseJsonTags := $ct.ResponseJsonTags}}
+
 func Test_client_{{.Name}}(t *testing.T) {
 	{{range $index, $tp := .Args}}
 		{{if ne $index 0}}
@@ -121,7 +127,7 @@ func Test_client_{{.Name}}(t *testing.T) {
 		
 	maxConns := rand.Int() + 1
 	opts := map[interface{}]Option{}
-
+    
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		{{$lenRes := lenVariables .Results}}
 		{{if eq $lenRes 2}}
@@ -131,7 +137,8 @@ func Test_client_{{.Name}}(t *testing.T) {
 			result := struct{
 				{{range $index, $tp := .Results}}
 					{{$isErr := isError $tp.Type}}
-					{{if not $isErr}}{{up $tp.Name}} {{$tp.Type}} ` + "`" + `json:"{{up $tp.Name}}"` + "`" + `{{end}}
+					{{$tag := index $responseJsonTags $tp.Name}}
+					{{if not $isErr}}{{up $tp.Name}} {{$tp.Type}} ` + "`" + `json:"{{if $tag}}{{$tag}}{{else}}{{up $tp.Name}}{{end}}"` + "`" + `{{end}}
 				{{end}}
 			}{
 				{{range $index, $tp := .Results}}

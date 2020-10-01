@@ -5,6 +5,7 @@ package httpserver
 
 import (
 	"bytes"
+	"net/http"
 
 	"github.com/valyala/fasthttp"
 	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
@@ -183,7 +184,7 @@ func NewUploadDocumentTransport() UploadDocumentTransport {
 
 //easyjson:json
 type downloadDocumentResponse struct {
-	Document []byte
+	Document []byte `json:"document"`
 }
 
 // DownloadDocumentTransport transport interface
@@ -232,6 +233,64 @@ func NewDownloadDocumentTransport(
 
 ) DownloadDocumentTransport {
 	return &downloadDocumentTransport{
+
+		encodeJSONErrorCreator: encodeJSONErrorCreator,
+	}
+}
+
+//easyjson:json
+type getTokenResponse struct {
+	ExpiresIn int `json:"expiresIn"`
+
+	Token string `json:"token"`
+}
+
+// GetTokenTransport transport interface
+type GetTokenTransport interface {
+	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (authToken *string, scope string, grantType string, err error)
+	EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, token string, expiresIn int) (err error)
+}
+
+type getTokenTransport struct {
+	encodeJSONErrorCreator errorCreator
+}
+
+// DecodeRequest method for decoding requests on server side
+func (t *getTokenTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (authToken *string, scope string, grantType string, err error) {
+
+	authToken = ptr(r.Header.Peek("Authorization"))
+
+	return
+}
+
+// EncodeResponse method for encoding response on server side
+func (t *getTokenTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, token string, expiresIn int) (err error) {
+
+	r.Header.Set("Content-Type", "application/json")
+	var theResponse getTokenResponse
+
+	theResponse.ExpiresIn = expiresIn
+
+	theResponse.Token = token
+
+	body, err := theResponse.MarshalJSON()
+	if err != nil {
+		err = t.encodeJSONErrorCreator(err)
+		return
+	}
+	r.SetBody(body)
+
+	r.Header.SetStatusCode(http.StatusOK)
+	return
+}
+
+// NewGetTokenTransport the transport creator for http requests
+func NewGetTokenTransport(
+
+	encodeJSONErrorCreator errorCreator,
+
+) GetTokenTransport {
+	return &getTokenTransport{
 
 		encodeJSONErrorCreator: encodeJSONErrorCreator,
 	}

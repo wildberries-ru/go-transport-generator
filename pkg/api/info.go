@@ -45,6 +45,7 @@ type HTTPMethod struct {
 	JsonTags                map[string]string
 	MultipartValueTags      map[string]string
 	MultipartFileTags       map[string]string
+	FormUrlencodedTags      map[string]string
 	Body                    map[string]string
 	BodyPlaceholders        map[string]*Placeholder
 	IsIntBodyPlaceholders   bool

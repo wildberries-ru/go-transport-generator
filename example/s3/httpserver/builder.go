@@ -23,6 +23,8 @@ const (
 	uriPathUploadDocument           = "/api/v1/doc/:bucket/:key"
 	httpMethodDownloadDocument      = "GET"
 	uriPathDownloadDocument         = "/api/v1/doc/:bucket/:key"
+	httpMethodGetToken              = "POST"
+	uriPathGetToken                 = "/token"
 )
 
 type errorProcessor interface {
@@ -54,6 +56,12 @@ func New(router *fasthttprouter.Router, svc service, decodeJSONErrorCreator erro
 		encodeJSONErrorCreator,
 	)
 	router.Handle(httpMethodDownloadDocument, uriPathDownloadDocument, NewDownloadDocument(downloadDocumentTransport, svc, errorProcessor))
+
+	getTokenTransport := NewGetTokenTransport(
+
+		encodeJSONErrorCreator,
+	)
+	router.Handle(httpMethodGetToken, uriPathGetToken, NewGetToken(getTokenTransport, svc, errorProcessor))
 
 	router.Handle("GET", "/debug/pprof/", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Index))
 	router.Handle("GET", "/debug/pprof/profile", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Profile))
