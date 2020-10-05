@@ -14,6 +14,11 @@ paths:
         schema:
           type: string
           nullable: true
+      - in: cookie
+        name: supplierID
+        schema:
+          type: string
+          nullable: true
       responses:
         "200":
           description: ""

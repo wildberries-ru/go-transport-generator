@@ -24,6 +24,7 @@ const (
 	inPath   = "path"
 	inHeader = "header"
 	inQuery  = "query"
+	inCookie = "cookie"
 
 	errStructNotFound = "struct not found %s %s"
 )
@@ -96,6 +97,7 @@ func (s *swagger) Process(info *api.GenerationInfo, iface *api.Interface) (err e
 		params := s.fillParamsFromSlice(iface.RelOutputPath, method.Args, httpMethod.URIPathPlaceholders, inPath, true)
 		params = append(params, s.fillParamsFromMap(iface.RelOutputPath, method.Args, httpMethod.HeaderPlaceholders, inHeader, false)...)
 		params = append(params, s.fillParamsFromMap(iface.RelOutputPath, method.Args, httpMethodQueryPlaceholders, inQuery, false)...)
+		params = append(params, s.fillParamsFromMap(iface.RelOutputPath, method.Args, httpMethod.CookiePlaceholders, inCookie, false)...)
 
 		var req *v1.RequestBody
 		if len(httpMethod.Body) > 0 {

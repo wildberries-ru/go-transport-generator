@@ -380,6 +380,8 @@ func (t *getBranchesTransport) EncodeRequest(ctx context.Context, r *fasthttp.Re
 
 	r.Header.Set("Authorization", *authToken)
 
+	r.Header.SetCookie("x-supplier-id", *supplierID)
+
 	return
 }
 
