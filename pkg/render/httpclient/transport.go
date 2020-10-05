@@ -34,6 +34,7 @@ import (
 	{{$uriPlaceholders := $ct.URIPathPlaceholders}}
 	{{$queryPlaceholders := $ct.QueryPlaceholders}}
 	{{$headerPlaceholders := $ct.HeaderPlaceholders}}
+	{{$cookiePlaceholders := $ct.CookiePlaceholders}}
 	{{$body := $ct.Body}}
 	{{$contentType := $ct.ContentType}}
 	{{$jsonTags := $ct.JsonTags}}
@@ -103,6 +104,9 @@ import (
 		{{end}}
 		{{range $from, $to := $headerPlaceholders}}
 			r.Header.Set("{{$from}}", *{{$to}})
+		{{end}}
+		{{range $from, $to := $cookiePlaceholders}}
+			r.Header.SetCookie("{{$from}}", *{{$to}})
 		{{end}}
 		{{if eq $contentType "application/json"}}r.Header.Set("Content-Type", "application/json")
 			{{if lenMap $body}}var request {{low .Name}}Request

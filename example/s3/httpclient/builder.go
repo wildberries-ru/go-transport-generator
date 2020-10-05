@@ -23,6 +23,8 @@ const (
 	uriPathClientDownloadDocument      = "/api/v1/doc/%s/%s"
 	httpMethodGetToken                 = "POST"
 	uriPathClientGetToken              = "/token"
+	httpMethodGetBranches              = "GET"
+	uriPathClientGetBranches           = "/api/v1/branches"
 )
 
 type errorProcessor interface {
@@ -71,6 +73,11 @@ func New(
 		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetToken,
 		httpMethodGetToken,
 	)
+	transportGetBranches := NewGetBranchesTransport(
+		errorProcessor,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetBranches,
+		httpMethodGetBranches,
+	)
 
 	client = NewClient(
 		&fasthttp.HostClient{
@@ -83,6 +90,7 @@ func New(
 		transportUploadDocument,
 		transportDownloadDocument,
 		transportGetToken,
+		transportGetBranches,
 		options,
 	)
 	return

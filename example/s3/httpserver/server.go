@@ -17,6 +17,7 @@ type service interface {
 	UploadDocument(ctx context.Context, bucket string, key string, document []byte) (err error)
 	DownloadDocument(ctx context.Context, bucket string, key string) (document []byte, err error)
 	GetToken(ctx context.Context, authToken *string, scope string, grantType string) (token string, expiresIn int, err error)
+	GetBranches(ctx context.Context, authToken *string, supplierID *string) (branches []int, err error)
 }
 
 type createMultipartUpload struct {
@@ -271,6 +272,48 @@ func (s *getToken) ServeHTTP(ctx *fasthttp.RequestCtx) {
 // NewGetToken the server creator
 func NewGetToken(transport GetTokenTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
 	ls := getToken{
+		transport:      transport,
+		service:        service,
+		errorProcessor: errorProcessor,
+	}
+	return ls.ServeHTTP
+}
+
+type getBranches struct {
+	transport      GetBranchesTransport
+	service        service
+	errorProcessor errorProcessor
+}
+
+// ServeHTTP implements http.Handler.
+func (s *getBranches) ServeHTTP(ctx *fasthttp.RequestCtx) {
+	var (
+		authToken  *string
+		supplierID *string
+		branches   []int
+		err        error
+	)
+	authToken, supplierID, err = s.transport.DecodeRequest(ctx, &ctx.Request)
+	if err != nil {
+		s.errorProcessor.Encode(ctx, &ctx.Response, err)
+		return
+	}
+
+	branches, err = s.service.GetBranches(ctx, authToken, supplierID)
+	if err != nil {
+		s.errorProcessor.Encode(ctx, &ctx.Response, err)
+		return
+	}
+
+	if err = s.transport.EncodeResponse(ctx, &ctx.Response, branches); err != nil {
+		s.errorProcessor.Encode(ctx, &ctx.Response, err)
+		return
+	}
+}
+
+// NewGetBranches the server creator
+func NewGetBranches(transport GetBranchesTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
+	ls := getBranches{
 		transport:      transport,
 		service:        service,
 		errorProcessor: errorProcessor,

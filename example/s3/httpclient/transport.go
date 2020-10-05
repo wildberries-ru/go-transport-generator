@@ -355,6 +355,66 @@ func NewGetTokenTransport(
 	}
 }
 
+//easyjson:json
+type getBranchesResponse struct {
+	Branches []int `json:"branches"`
+}
+
+// GetBranchesTransport transport interface
+type GetBranchesTransport interface {
+	EncodeRequest(ctx context.Context, r *fasthttp.Request, authToken *string, supplierID *string) (err error)
+	DecodeResponse(ctx context.Context, r *fasthttp.Response) (branches []int, err error)
+}
+
+//easyjson:skip
+type getBranchesTransport struct {
+	errorProcessor errorProcessor
+	pathTemplate   string
+	method         string
+}
+
+// EncodeRequest method for decoding requests on server side
+func (t *getBranchesTransport) EncodeRequest(ctx context.Context, r *fasthttp.Request, authToken *string, supplierID *string) (err error) {
+	r.Header.SetMethod(t.method)
+	r.SetRequestURI(t.pathTemplate)
+
+	r.Header.Set("Authorization", *authToken)
+
+	r.Header.SetCookie("x-supplier-id", *supplierID)
+
+	return
+}
+
+// DecodeResponse method for encoding response on server side
+func (t *getBranchesTransport) DecodeResponse(ctx context.Context, r *fasthttp.Response) (branches []int, err error) {
+	if r.StatusCode() != 200 {
+		err = t.errorProcessor.Decode(r)
+		return
+	}
+
+	var theResponse getBranchesResponse
+	if err = theResponse.UnmarshalJSON(r.Body()); err != nil {
+		return
+	}
+
+	branches = theResponse.Branches
+
+	return
+}
+
+// NewGetBranchesTransport the transport creator for http requests
+func NewGetBranchesTransport(
+	errorProcessor errorProcessor,
+	pathTemplate string,
+	method string,
+) GetBranchesTransport {
+	return &getBranchesTransport{
+		errorProcessor: errorProcessor,
+		pathTemplate:   pathTemplate,
+		method:         method,
+	}
+}
+
 func ptr(in []byte) *string {
 	i := string(in)
 	return &i

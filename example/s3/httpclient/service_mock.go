@@ -50,3 +50,9 @@ func (s *MockService) GetToken(ctx context.Context, authToken *string, scope str
 	args := s.Called(context.Background(), authToken, scope, grantType)
 	return args.Get(0).(string), args.Get(1).(int), args.Error(2)
 }
+
+// GetBranches ...
+func (s *MockService) GetBranches(ctx context.Context, authToken *string, supplierID *string) (branches []int, err error) {
+	args := s.Called(context.Background(), authToken, supplierID)
+	return args.Get(0).([]int), args.Error(1)
+}

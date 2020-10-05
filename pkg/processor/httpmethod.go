@@ -61,6 +61,9 @@ func (s *httpMethod) Process(httpMethod *api.HTTPMethod, iface *api.Interface, m
 	for _, to = range httpMethod.HeaderPlaceholders {
 		delete(diff, to)
 	}
+	for _, to = range httpMethod.CookiePlaceholders {
+		delete(diff, to)
+	}
 	for _, to = range httpMethod.URIPathPlaceholders {
 		delete(diff, to)
 	}

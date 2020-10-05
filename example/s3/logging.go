@@ -115,6 +115,21 @@ func (s *loggingMiddleware) GetToken(ctx context.Context, authToken *string, sco
 	return s.svc.GetToken(ctx, authToken, scope, grantType)
 }
 
+// GetBranches ...
+func (s *loggingMiddleware) GetBranches(ctx context.Context, authToken *string, supplierID *string) (branches []int, err error) {
+	defer func(begin time.Time) {
+		_ = s.wrap(err).Log(
+			"method", "GetBranches",
+			"authToken", authToken,
+			"supplierID", supplierID,
+			"branches", branches,
+			"err", err,
+			"elapsed", time.Since(begin),
+		)
+	}(time.Now())
+	return s.svc.GetBranches(ctx, authToken, supplierID)
+}
+
 func (s *loggingMiddleware) wrap(err error) log.Logger {
 	lvl := level.Debug
 	if err != nil {
