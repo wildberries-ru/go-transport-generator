@@ -32,19 +32,17 @@ type instrumentingMiddleware struct {
 {{range .Iface.Methods -}}
 // {{.Name}} ...
 func (s *instrumentingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFullVariables .Results ","}}) {
-	defer s.recordMetrics("{{.Name}}", time.Now(), err)
+	defer func(startTime time.Time) {
+		labels := []string{
+			"method", "{{.Name}}",
+			"error", strconv.FormatBool(err != nil),
+		}
+		s.reqCount.With(labels...).Add(1)
+		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+	}(time.Now())
 	return s.svc.{{.Name}}({{joinVariableNamesWithEllipsis .Args ","}})
 }
 {{end}}
-
-func (s *instrumentingMiddleware) recordMetrics(method string, startTime time.Time, err error) {
-	labels := []string{
-		"method", method,
-		"error", strconv.FormatBool(err != nil),
-	}
-	s.reqCount.With(labels...).Add(1)
-	s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
-}
 
 // NewInstrumentingMiddleware ...
 func NewInstrumentingMiddleware(reqCount metrics.Counter, reqDuration metrics.Histogram, svc {{ .Iface.Name }}) {{ .Iface.Name }} {
