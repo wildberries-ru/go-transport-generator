@@ -31,6 +31,7 @@ import (
 
 	{{$ct := index $methods .Name}}
 	{{$method := $ct.Method}}
+	{{$bodyPlaceholders := $ct.BodyPlaceholders}}
 	{{$uriPlaceholders := $ct.URIPathPlaceholders}}
 	{{$queryPlaceholders := $ct.QueryPlaceholders}}
 	{{$headerPlaceholders := $ct.HeaderPlaceholders}}
@@ -125,20 +126,41 @@ import (
 			body := &bytes.Buffer{}
 			writer := multipart.NewWriter(body)
 			
-			{{range $from, $to := $multipartValueTags}}
-				writer.WriteField("{{$to}}", {{$from}})
+			{{range $fr, $to := $multipartValueTags}}
+				{{$from := index $bodyPlaceholders $fr}}
+				{{if $from.IsPointer}}
+					if {{$from.Name}}) != nil {
+						{{if $from.IsString}}
+							_{{$from.Name}} := *{{$from.Name}}
+						{{else if $from.IsInt}}
+							_{{$from.Name}} := fmt.Sprintf("%d", *{{$from.Name}})
+						{{end}}
+					}
+				{{else}}
+					{{if $from.IsString}}
+						_{{$from.Name}} := {{$from.Name}}
+					{{else if $from.IsInt}}
+						_{{$from.Name}} := fmt.Sprintf("%d", {{$from.Name}})
+					{{end}}
+				{{end}}
+				writer.WriteField("{{$to}}", _{{$from.Name}})
 			{{end}}
 
-			{{range $from, $to := $multipartFileTags}}
-				for i := range {{$from}} {
-					part, _ := writer.CreateFormFile("{{$to}}", {{$from}}[i].Filename)
-					var file multipart.File
-					file, err = {{$from}}[i].Open()
+			{{range $fr, $to := $multipartFileTags}}
+				{{$from := index $bodyPlaceholders $fr}}
+				{{if isFileHeaderPlaceholder $from.Type}}
+					part{{up $from.Name}}, _ := writer.CreateFormFile("{{$to}}", {{$from.Name}}.Filename)
+					var _{{$from.Name}} multipart.File
+					_{{$from.Name}}, err = {{$from.Name}}.Open()
 					if err != nil {
 						return
 					}
-					io.Copy(part, file)
-				}
+					io.Copy(part{{up $from.Name}}, _{{$from.Name}})
+				{{else if isBytesPlaceholder $from.Type}}
+					// we don't have any name at this time, receiver should know what he receives
+					part{{up $from.Name}}, _ := writer.CreateFormFile("{{$to}}", "{{$from.Name}}") 
+					io.Copy(part{{up $from.Name}}, bytes.NewReader({{$from.Name}}))
+				{{end}}
 			{{end}}
 
 			writer.Close()
