@@ -14,6 +14,11 @@ const uiTpl = `// Package {{.PkgName}} ...
 // DO NOT EDIT
 package {{.PkgName}}
 
+type errorCode interface {
+	Error() string
+	StatusCode() int
+}
+
 type httpError struct {
 	Code    int
 	Message string
@@ -38,7 +43,8 @@ type errorResponse struct {
 
 // ErrorProcessor ...
 type ErrorProcessor struct {
-	errors map[string]string
+	defaultCode int
+	errors      map[string]string
 }
 
 //Encode writes a svc error to the given http.ResponseWriter.
@@ -54,7 +60,11 @@ func (e *ErrorProcessor) Encode(ctx context.Context, r *fasthttp.Response, err e
 		Error:     true,
 		ErrorText: errorText,
 	}
-	r.SetStatusCode(200)
+	if er, ok := err.(errorCode); ok {
+		r.SetStatusCode(er.StatusCode())
+	} else {
+		r.SetStatusCode(e.defaultCode)
+	}
 	r.Header.Set("Content-Type", "application/json")
 	body, err := json.Marshal(res)
 	if err != nil {
@@ -79,6 +89,7 @@ func (e *ErrorProcessor) Decode(r *fasthttp.Response) error {
 // NewErrorProcessor ...
 func NewErrorProcessor(errors map[string]string) *ErrorProcessor {
 	return &ErrorProcessor{
+		defaultCode: http.StatusOK,
 		errors: errors,
 	}
 }
