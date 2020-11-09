@@ -103,12 +103,13 @@ import (
 
 {{$ct := index $methods .Name}}
 {{$method := $ct.Method}}
+{{$responseStatus := $ct.ResponseStatus}}
 {{$responseJsonTags := $ct.ResponseJsonTags}}
 
 func Test_client_{{.Name}}(t *testing.T) {
 	{{range $index, $tp := .Args}}
 		{{if ne $index 0}}
-			{{if isFile $tp.Type}}
+			{{if isFileHeader $tp.Type}}
 				var {{$tp.Name}} {{$tp.Type}}
 			{{else}}	
 				var {{$tp.Name}} {{$tp.Type}}
@@ -150,6 +151,7 @@ func Test_client_{{.Name}}(t *testing.T) {
 			}
 		{{end}}
 		b, _ := json.Marshal(result)
+		w.WriteHeader({{$responseStatus}})
 		w.Write(b)
 	}))
 	defer ts.Close()

@@ -232,8 +232,14 @@ func main() {
 	t.Funcs(template.FuncMap{"isError": func(t types.Type) bool {
 		return strings.EqualFold(t.String(), "error")
 	}})
-	t.Funcs(template.FuncMap{"isFile": func(t types.Type) bool {
+	t.Funcs(template.FuncMap{"isFileHeader": func(t types.Type) bool {
 		return strings.HasSuffix(t.String(), "multipart.FileHeader")
+	}})
+	t.Funcs(template.FuncMap{"isFileHeaderPlaceholder": func(t string) bool {
+		return strings.HasSuffix(t, "multipart.FileHeader")
+	}})
+	t.Funcs(template.FuncMap{"isBytesPlaceholder": func(t string) bool {
+		return strings.HasSuffix(t, "[]byte")
 	}})
 	t.Funcs(template.FuncMap{"notin": func(s []string, f string) bool {
 		for _, v := range s {

@@ -129,6 +129,8 @@ func (s *httpMethod) castBodyPlaceholder(to string, arg types.Variable, argType 
 		httpMethod.BodyPlaceholders[to].IsPointer = true
 		s.castBodyPlaceholder(to, arg, tp.Next, httpMethod)
 		return
+	case types.TArray:
+		httpMethod.BodyPlaceholders[to].Type = tp.String()
 	}
 }
 
