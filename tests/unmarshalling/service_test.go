@@ -2,14 +2,14 @@ package unmarshalling
 
 import (
 	"context"
+	"sync"
+	"testing"
+
 	"github.com/buaazp/fasthttprouter"
 	"github.com/stretchr/testify/assert"
 	"github.com/valyala/fasthttp"
 	"github.com/wildberries-ru/go-transport-generator/tests/unmarshalling/httpclient"
 	"github.com/wildberries-ru/go-transport-generator/tests/unmarshalling/httpserver"
-	"sync"
-	"testing"
-	"time"
 )
 
 func TestEasyJson(t *testing.T) {
@@ -23,30 +23,27 @@ func TestEasyJson(t *testing.T) {
 		Handler: router.Handler,
 	}
 
-	stop := make(chan struct {})
-	poll := make(chan struct {}, 100)
+	stop := make(chan struct{})
 	var wg sync.WaitGroup
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := fasthttpServer.ListenAndServe(":8080" ); err != nil {
+		if err := fasthttpServer.ListenAndServe(":8080"); err != nil {
 			t.Fatalf("%v", err)
 		}
 	}()
 
-	time.Sleep(1 * time.Second)
-
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		<- stop
+		<-stop
 		_ = fasthttpServer.Shutdown()
 		t.Log("fasthttpServer stopped")
 	}()
 
-	client, err := httpclient.New("http://localhost:8080", 100,nil,map[interface{}]httpclient.Option{})
-	assert.Nilf(t,err, "failed to create client")
+	client, err := httpclient.New("http://localhost:8080", 100, nil, map[interface{}]httpclient.Option{})
+	assert.Nilf(t, err, "failed to create client")
 	var wg2 sync.WaitGroup
 
 	var result []struct {
@@ -54,20 +51,13 @@ func TestEasyJson(t *testing.T) {
 		val2 string
 	}
 
-	for i := 0; i < 100; i++ {
-		wg2.Add(1)
-		go func(val int) {
-			poll <- struct{}{}
-			defer wg2.Done()
-			field1 , field2 , err := client.TestEasyJson(context.Background(), val %2)
-			<- poll
-			assert.Nilf(t,err, "TestEasyJson failed")
-			result = append(result, struct {
-				val1 string
-				val2 string
-			}{val1:field1 , val2: field2})
-
-		}(i)
+	for i := 0; i < 10; i++ {
+		field1, field2, err := client.TestEasyJson(context.Background(), i%2)
+		assert.Nilf(t, err, "TestEasyJson failed")
+		result = append(result, struct {
+			val1 string
+			val2 string
+		}{val1: field1, val2: field2})
 	}
 	wg2.Wait()
 
@@ -80,9 +70,7 @@ func TestEasyJson(t *testing.T) {
 		}
 	}
 
-
 	stop <- struct{}{}
 	wg.Done()
 	t.Log("done")
 }
-
