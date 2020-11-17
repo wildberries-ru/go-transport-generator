@@ -61,7 +61,7 @@ func TestEasyJson(t *testing.T) {
 			defer wg2.Done()
 			field1 , field2 , err := client.TestEasyJson(context.Background(), val %2)
 			<- poll
-			assert.Nilf(t,err, "failed to create client")
+			assert.Nilf(t,err, "TestEasyJson failed")
 			result = append(result, struct {
 				val1 string
 				val2 string
