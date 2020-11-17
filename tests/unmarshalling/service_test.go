@@ -44,7 +44,6 @@ func TestEasyJson(t *testing.T) {
 
 	client, err := httpclient.New("http://localhost:8080", 100, nil, map[interface{}]httpclient.Option{})
 	assert.Nilf(t, err, "failed to create client")
-	var wg2 sync.WaitGroup
 
 	var result []struct {
 		val1 string
@@ -59,7 +58,6 @@ func TestEasyJson(t *testing.T) {
 			val2 string
 		}{val1: field1, val2: field2})
 	}
-	wg2.Wait()
 
 	for _, val := range result {
 		if val.val1 != FieldValue1 && val.val1 != FieldValue2 {
