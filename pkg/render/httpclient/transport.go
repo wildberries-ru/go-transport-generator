@@ -46,6 +46,7 @@ import (
 	{{$responseHeaderPlaceholders := $ct.ResponseHeaders}}
 	{{$responseStatus := $ct.ResponseStatus}}
 	{{$responseContentType := $ct.ResponseContentType}}
+	{{$responseFile := $ct.ResponseFile}}
 	{{$responseBody := $ct.ResponseBody}}
 	{{$responseBodyField := $ct.ResponseBodyField}}
 	{{$responseBodyType := index $responseBody $ct.ResponseBodyField}}
@@ -176,7 +177,7 @@ import (
 		return
 	}
 
-	// DecodeResponse method for encoding response on server side
+	// DecodeResponse method for decoding response on server side
 	func (t *{{low .Name}}Transport) DecodeResponse(ctx context.Context, r *fasthttp.Response) ({{$args := popLast .Results}}{{joinFullVariables $args "," "err error"}}) {
 		if r.StatusCode() != {{$responseStatus}} {
 			err = t.errorProcessor.Decode(r)
@@ -199,6 +200,7 @@ import (
 		{{range $to, $from := $responseHeaderPlaceholders}}
 			{{$from}} = ptr(r.Header.Peek("{{$to}}"))
 		{{end}}
+		{{if $responseFile}}{{$responseFile}} = r.Body(){{end}}
 		return
 	}
 
