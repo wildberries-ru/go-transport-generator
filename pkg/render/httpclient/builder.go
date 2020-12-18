@@ -51,8 +51,7 @@ func New(
 	}
 	{{range .Iface.Methods}}transport{{.Name}} := New{{.Name}}Transport(
 		errorProcessor,
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClient{{.Name}},
-		httpMethod{{.Name}},
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClient{{.Name}},		httpMethod{{.Name}},
 	)
 	{{end}}
 	client = NewClient(
@@ -93,7 +92,7 @@ func TestNew(t *testing.T) {
 
 	{{range .Iface.Methods}}transport{{.Name}} := New{{.Name}}Transport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClient{{.Name}},
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClient{{.Name}},
 		httpMethod{{.Name}},
 	)
 	{{end}}

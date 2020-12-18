@@ -165,7 +165,7 @@ func Test_client_{{.Name}}(t *testing.T) {
 
 	transport{{.Name}} := New{{.Name}}Transport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClient{{.Name}},
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClient{{.Name}},
 		httpMethod{{.Name}},
 	)
 
@@ -236,7 +236,7 @@ func TestNewClient(t *testing.T) {
 	{{range .Iface.Methods}}
 		transport{{.Name}} := New{{.Name}}Transport(
 			&testErrorProcessor{},
-			parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClient{{.Name}},
+			parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClient{{.Name}},
 			httpMethod{{.Name}},
 		)
 	{{end}}
