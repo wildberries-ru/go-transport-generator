@@ -51,7 +51,7 @@ func New(
 	}
 	{{range .Iface.Methods}}transport{{.Name}} := New{{.Name}}Transport(
 		errorProcessor,
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClient{{.Name}},		
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClient{{.Name}},
 		httpMethod{{.Name}},
 	)
 	{{end}}
