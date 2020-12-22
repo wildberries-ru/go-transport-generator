@@ -116,11 +116,12 @@ import (
 			r.Header.SetCookie("{{$from}}", *{{$to}})
 		{{end}}
 		{{if eq $contentType "application/json"}}r.Header.Set("Content-Type", "application/json")
-			{{if lenMap $body}}var request {{low .Name}}Request
+		    {{$requestName := low .Name}}
+			{{if lenMap $body}}var request {{$requestName}}Request
 				{{$bodyLen := lenMap $body}}
 				{{if eq $bodyLen 1}}
 					{{range $name, $tp := $body}}
-						request = {{$name}}
+						request = {{$requestName}}Request({{$name}})
 					{{end}}
 				{{else}}
 					{{range $name, $tp := $body}}
