@@ -24,6 +24,7 @@ type Interface struct {
 	RelOutputPath string
 	Iface         types.Interface
 	IsTLSClient   bool
+	IsInsecureTLS bool
 	HTTPMethods   map[string]HTTPMethod
 
 	SwaggerInfo
