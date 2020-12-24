@@ -59,7 +59,8 @@ func New(
 		&fasthttp.HostClient{
 			Addr:     parsedServerURL.Host,
 			MaxConns: maxConns,
-			{{if .IsTLSClient}}IsTLS:    true,{{end}}
+			{{if .IsTLSClient}}IsTLS:    true,{{if .IsInsecureTLS}}
+			TLSConfig: &tls.Config{InsecureSkipVerify: true},{{end}}{{end}}
 		},
 		{{range .Iface.Methods}}transport{{.Name}},
 		{{end}}options,
@@ -102,7 +103,8 @@ func TestNew(t *testing.T) {
 		&fasthttp.HostClient{
 			Addr:     parsedServerURL.Host,
 			MaxConns: maxConns,
-			{{if .IsTLSClient}}IsTLS:    true,{{end}}
+			{{if .IsTLSClient}}IsTLS:    true,{{if .IsInsecureTLS}}
+			TLSConfig: &tls.Config{InsecureSkipVerify: true},{{end}}{{end}}
 		},
 		{{range .Iface.Methods}}transport{{.Name}},
 		{{end}}opts,

@@ -8,6 +8,7 @@ import (
 
 type httpClient struct {
 	isTLS           bool
+	isInsecureTLS   bool
 	clientRender    httpRender
 	transportRender httpRender
 	builderRender   httpRender
@@ -15,6 +16,7 @@ type httpClient struct {
 
 func (s *httpClient) Process(_ *api.GenerationInfo, iface *api.Interface) (err error) {
 	iface.IsTLSClient = s.isTLS
+	iface.IsInsecureTLS = s.isInsecureTLS
 	err = s.builderRender.Generate(*iface)
 	if err != nil {
 		err = errors.Wrap(err, "[httpClient]s.builderRender.Generate error")
@@ -36,12 +38,14 @@ func (s *httpClient) Process(_ *api.GenerationInfo, iface *api.Interface) (err e
 // NewHTTPClient ...
 func NewHTTPClient(
 	isTLS bool,
+	isInsecureTLS bool,
 	clientRender httpRender,
 	transportRender httpRender,
 	builderRender httpRender,
 ) Processor {
 	return &httpClient{
 		isTLS:           isTLS,
+		isInsecureTLS:   isInsecureTLS,
 		clientRender:    clientRender,
 		transportRender: transportRender,
 		builderRender:   builderRender,

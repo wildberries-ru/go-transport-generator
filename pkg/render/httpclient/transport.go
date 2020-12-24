@@ -54,10 +54,15 @@ import (
 	{{$responseBodyTypeIsMap := isMapType $responseBodyType}}
 
 	{{if lenMap $body}}{{if eq $contentType "application/json"}}//easyjson:json{{else}}//easyjson:skip{{end}}
-	type {{low .Name}}Request struct {
-		{{range $name, $tp := $body}}{{up $name}} {{$tp}}{{$tag := index $jsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
+		{{$bodyLen := lenMap $body}}{{$n := .Name}}{{if eq $bodyLen 1}}{{range $name, $tp := $body}}type {{low $n}}Request {{$tp}}
+			{{end}}
+		{{else}}
+			type {{low .Name}}Request struct {
+				{{range $name, $tp := $body}}{{up $name}} {{$tp}}{{$tag := index $jsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
+				{{end}}
+			}
 		{{end}}
-	}{{end}}
+	{{end}}
 
 	{{if lenMap $responseBody}}{{if eq $responseContentType "application/json"}}//easyjson:json{{else}}//easyjson:skip{{end}}
 		type {{low .Name}}Response {{if or $responseBodyTypeIsSlice $responseBodyTypeIsMap}}{{$responseBodyType}}{{else}} struct {
@@ -112,8 +117,15 @@ import (
 		{{end}}
 		{{if eq $contentType "application/json"}}r.Header.Set("Content-Type", "application/json")
 			{{if lenMap $body}}var request {{low .Name}}Request
-				{{range $name, $tp := $body}}
-					request.{{up $name}} = {{$name}}
+				{{$bodyLen := lenMap $body}}
+				{{if eq $bodyLen 1}}
+					{{range $name, $tp := $body}}
+						request = {{$name}}
+					{{end}}
+				{{else}}
+					{{range $name, $tp := $body}}
+						request.{{up $name}} = {{$name}}
+					{{end}}
 				{{end}}
 				body, err := request.MarshalJSON()
 				if err != nil {

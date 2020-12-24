@@ -31,6 +31,7 @@ const (
 	httpServer           = "http-server"
 	httpClient           = "http-client"
 	httpsClient          = "https-client"
+	httpsClientInsecure  = "https-client-insecure"
 	httpErrors           = "http-errors"
 	instrumentingService = "metrics"
 	logService           = "log"
@@ -277,11 +278,20 @@ func main() {
 		),
 		httpClient: processor.NewHTTPClient(
 			false,
+			false,
 			httpClientRender,
 			httpClientTransportRender,
 			httpClientBuilderRender,
 		),
 		httpsClient: processor.NewHTTPClient(
+			true,
+			false,
+			httpClientRender,
+			httpClientTransportRender,
+			httpClientBuilderRender,
+		),
+		httpsClientInsecure: processor.NewHTTPClient(
+			true,
 			true,
 			httpClientRender,
 			httpClientTransportRender,
