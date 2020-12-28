@@ -59,11 +59,16 @@ var (
 
 	{{if eq $contentType "application/json"}}
 		{{if lenMap $body}}
-			type {{low .Name}}Request struct {
-				{{range $name, $tp := $body}}
-					{{up $name}} {{$tp}}{{$tag := index $jsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
-				{{end}}
-			}
+			{{$bodyLen := lenMap $body}}{{$n := .Name}}{{if eq $bodyLen 1}}{{range $name, $tp := $body}}//easyjson:json
+			type {{low $n}}Request {{$tp}}{{end}}
+			{{else}}
+				//easyjson:json
+				type {{low .Name}}Request struct {
+					{{range $name, $tp := $body}}
+						{{up $name}} {{$tp}}{{$tag := index $jsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
+					{{end}}
+				}
+			{{end}}
 		{{end}}
 	{{end}}
 
@@ -149,13 +154,21 @@ var (
 			{{$to}} = ptr(r.Header.Cookie("{{$from}}"))
 		{{end}}
 		{{if eq $contentType "application/json"}}
+			{{$requestName := low .Name}}
 			{{if lenMap $body}}var request {{low .Name}}Request
 				if err = request.UnmarshalJSON(r.Body()); err != nil {
 					err = t.decodeJSONErrorCreator(err)
 					return
 				}
-				{{range $name, $tp := $body}}
-					{{$name}} = request.{{up $name}}
+				{{$bodyLen := lenMap $body}}
+				{{if eq $bodyLen 1}}
+					{{range $name, $tp := $body}}
+						{{$name}} = {{$tp}}(request) //{{$requestName}}Request({{$name}})
+					{{end}}
+				{{else}}
+					{{range $name, $tp := $body}}
+						{{$name}} = request.{{up $name}}
+					{{end}}
 				{{end}}
 			{{end}}
 		{{else if eq $contentType "multipart/form-data"}}
