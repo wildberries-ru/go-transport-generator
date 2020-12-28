@@ -163,7 +163,7 @@ var (
 				{{$bodyLen := lenMap $body}}
 				{{if eq $bodyLen 1}}
 					{{range $name, $tp := $body}}
-						{{$name}} = {{$tp}}(request) //{{$requestName}}Request({{$name}})
+						{{$name}} = {{$tp}}(request)
 					{{end}}
 				{{else}}
 					{{range $name, $tp := $body}}
