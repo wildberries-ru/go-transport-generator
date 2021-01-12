@@ -39,6 +39,7 @@ import (
 	{{$body := $ct.Body}}
 	{{$contentType := $ct.ContentType}}
 	{{$jsonTags := $ct.JsonTags}}
+	{{$plainObject := $ct.PlainObject}}
 	{{$multipartValueTags := $ct.MultipartValueTags}}
 	{{$multipartFileTags := $ct.MultipartFileTags}}
 	{{$formUrlencodedTags := $ct.FormUrlencodedTags}}
@@ -54,7 +55,7 @@ import (
 	{{$responseBodyTypeIsMap := isMapType $responseBodyType}}
 
 	{{if lenMap $body}}{{if eq $contentType "application/json"}}//easyjson:json{{else}}//easyjson:skip{{end}}
-		{{$bodyLen := lenMap $body}}{{$n := .Name}}{{if eq $bodyLen 1}}{{range $name, $tp := $body}}type {{low $n}}Request {{$tp}}
+		{{$bodyLen := lenMap $body}}{{$n := .Name}}{{if $plainObject}}{{range $name, $tp := $body}}type {{low $n}}Request {{$tp}}
 			{{end}}
 		{{else}}
 			type {{low .Name}}Request struct {
@@ -119,7 +120,7 @@ import (
 		    {{$requestName := low .Name}}
 			{{if lenMap $body}}var request {{$requestName}}Request
 				{{$bodyLen := lenMap $body}}
-				{{if eq $bodyLen 1}}
+				{{if $plainObject}}
 					{{range $name, $tp := $body}}
 						request = {{$requestName}}Request({{$name}})
 					{{end}}

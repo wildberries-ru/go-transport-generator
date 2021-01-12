@@ -20,6 +20,9 @@ type jsonTag struct {
 func (t *jsonTag) Parse(info *api.HTTPMethod, firstTag string, tags ...string) (err error) {
 	if strings.HasPrefix(firstTag, t.prefix) && strings.HasSuffix(firstTag, t.suffix) {
 		if len(tags) == 2 {
+			if info.PlainObject != "" {
+				return errors.New(errJSONTagPlainObjectIncompatible)
+			}
 			if info.JsonTags == nil {
 				info.JsonTags = make(map[string]string)
 			}

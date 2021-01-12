@@ -42,6 +42,7 @@ var (
 	{{$isIntBodyPlaceholders := $ct.IsIntBodyPlaceholders}}
 	{{$contentType := $ct.ContentType}}
 	{{$jsonTags := $ct.JsonTags}}
+	{{$plainObject := $ct.PlainObject}}
 	{{$multipartValueTags := $ct.MultipartValueTags}}
 	{{$multipartFileTags := $ct.MultipartFileTags}}
 	{{$responseHeaderPlaceholders := $ct.ResponseHeaders}}
@@ -59,7 +60,7 @@ var (
 
 	{{if eq $contentType "application/json"}}
 		{{if lenMap $body}}
-			{{$bodyLen := lenMap $body}}{{$n := .Name}}{{if eq $bodyLen 1}}{{range $name, $tp := $body}}//easyjson:json
+			{{$bodyLen := lenMap $body}}{{$n := .Name}}{{if $plainObject}}{{range $name, $tp := $body}}//easyjson:json
 			type {{low $n}}Request {{$tp}}{{end}}
 			{{else}}
 				//easyjson:json
@@ -161,7 +162,7 @@ var (
 					return
 				}
 				{{$bodyLen := lenMap $body}}
-				{{if eq $bodyLen 1}}
+				{{if $plainObject}}
 					{{range $name, $tp := $body}}
 						{{$name}} = {{$tp}}(request)
 					{{end}}

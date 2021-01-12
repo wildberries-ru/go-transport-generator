@@ -45,6 +45,7 @@ type HTTPMethod struct {
 	CookiePlaceholders      map[string]string
 	ContentType             string
 	JsonTags                map[string]string
+	PlainObject             string
 	MultipartValueTags      map[string]string
 	MultipartFileTags       map[string]string
 	FormUrlencodedTags      map[string]string

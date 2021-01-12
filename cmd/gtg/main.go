@@ -43,7 +43,8 @@ const (
 	requestMultipartValueTagSuffix = "value-tag"
 	requestMultipartFileTagSuffix  = "file-tag"
 	requestFormUrlencodedTagSuffix = "form-urlencoded"
-	requestJsonTagSuffix           = "json-tag"
+	requestJSONTagSuffix           = "json-tag"
+	requestPlainObjectSuffix       = "plain-object"
 	requestHeaderSuffix            = "header"
 	requestCookieSuffix            = "cookie"
 	requestMethodSuffix            = "method"
@@ -52,7 +53,7 @@ const (
 	requestErrorsSuffix            = "errors"
 	responseContentTypeSuffix      = "response-content-type"
 	responseContentEncodingSuffix  = "response-content-encoding"
-	responseJsonTagSuffix          = "response-json-tag"
+	responseJSONTagSuffix          = "response-json-tag"
 	responseBodySuffix             = "response-body"
 	responseHeaderSuffix           = "response-header"
 	responseFileSuffix             = "response-file"
@@ -141,14 +142,15 @@ func main() {
 							request.NewContentType(httpServer, requestContentTypeSuffix,
 								request.NewMultipartFileTag(httpServer, requestMultipartFileTagSuffix,
 									request.NewMultipartValueTag(httpServer, requestMultipartValueTagSuffix,
-										request.NewJsonTag(httpServer, requestJsonTagSuffix,
-											request.NewAPIPath(httpServer, requestAPIPathSuffix,
-												request.NewFormUrlencodedTag(httpServer, requestFormUrlencodedTagSuffix, &request2.Term{}))))))))))))
+										request.NewJsonTag(httpServer, requestJSONTagSuffix,
+											request.NewPlainObjectTag(httpServer, requestPlainObjectSuffix,
+												request.NewAPIPath(httpServer, requestAPIPathSuffix,
+													request.NewFormUrlencodedTag(httpServer, requestFormUrlencodedTagSuffix, &request2.Term{})))))))))))))
 	tagsParser = response.NewStatus(httpServer, responseStatusSuffix,
 		response.NewHeader(httpServer, responseHeaderSuffix,
 			response.NewContentType(httpServer, responseContentTypeSuffix,
 				response.NewEncodingType(httpServer, responseContentEncodingSuffix,
-					response.NewJsonTag(httpServer, responseJsonTagSuffix,
+					response.NewJsonTag(httpServer, responseJSONTagSuffix,
 						response.NewFile(httpServer, responseFileSuffix,
 							response.NewBody(httpServer, responseBodySuffix, tagsParser)))))))
 	tagsParser = log.NewLogIgnore(logService, ignoreSuffix, tagsParser)
