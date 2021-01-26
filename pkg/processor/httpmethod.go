@@ -12,6 +12,7 @@ import (
 
 const (
 	errHTTPMethodGETCouldNotHaveRequestBody = "http method GET could not have request body in %s interface %s method %s"
+	errHTTPMethodCouldNoAssociatedVariable  = "http method no associated variable with %s variable %s, available variables %s"
 )
 
 // HTTPMethod ...
@@ -51,6 +52,9 @@ func (s *httpMethod) Process(httpMethod *api.HTTPMethod, iface *api.Interface, m
 		diff[arg.Name] = arg.Type.String()
 	}
 	for from, toPlaceholder = range httpMethod.QueryPlaceholders {
+		if _, ok := diff[toPlaceholder.Name]; !ok {
+			return fmt.Errorf(errHTTPMethodCouldNoAssociatedVariable, "query", toPlaceholder.Name, keys2String(diff))
+		}
 		delete(diff, toPlaceholder.Name)
 		for _, arg = range args {
 			if arg.Name == toPlaceholder.Name {
@@ -59,12 +63,18 @@ func (s *httpMethod) Process(httpMethod *api.HTTPMethod, iface *api.Interface, m
 		}
 	}
 	for _, to = range httpMethod.HeaderPlaceholders {
+		if _, ok := diff[to]; !ok {
+			return fmt.Errorf(errHTTPMethodCouldNoAssociatedVariable, "header", to, keys2String(diff))
+		}
 		delete(diff, to)
 	}
 	for _, to = range httpMethod.CookiePlaceholders {
 		delete(diff, to)
 	}
 	for _, to = range httpMethod.URIPathPlaceholders {
+		if _, ok := diff[to]; !ok {
+			return fmt.Errorf(errHTTPMethodCouldNoAssociatedVariable, "URI path", to, keys2String(diff))
+		}
 		delete(diff, to)
 	}
 	if httpMethod.Method == http.MethodGet && len(diff) > 0 {
