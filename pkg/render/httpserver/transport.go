@@ -266,6 +266,7 @@ var (
 			{{end}}
 		{{end}}
 		{{if eq $responseContentType "application/octet-stream"}}
+		    r.Header.Set("Content-Type", "application/octet-stream{{if $responseContentEncoding}}; charset={{$responseContentEncoding}}{{end}}")
 			{{range $name, $tp := $responseBody}}
 				r.SetBody({{$name}})
 			{{end}}
