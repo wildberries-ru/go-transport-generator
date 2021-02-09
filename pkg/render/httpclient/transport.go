@@ -119,7 +119,6 @@ import (
 		{{if eq $contentType "application/json"}}r.Header.Set("Content-Type", "application/json")
 		    {{$requestName := low .Name}}
 			{{if lenMap $body}}var request {{$requestName}}Request
-				{{$bodyLen := lenMap $body}}
 				{{if $plainObject}}
 					{{range $name, $tp := $body}}
 						request = {{$requestName}}Request({{$name}})
@@ -188,6 +187,16 @@ import (
 				r.PostArgs().Add("{{$to}}", {{$from}})
 			{{end}}
 		{{end}}
+
+		{{if eq $contentType "application/octet-stream"}}
+			r.Header.Set("Content-Type", "application/octet-stream")
+			{{if lenMap $body}}
+				{{range $name, $tp := $body}}
+					r.SetBody({{$name}})
+				{{end}}
+			{{end}}
+		{{end}}
+
 		return
 	}
 

@@ -12,7 +12,7 @@ import (
 
 const (
 	errHTTPMethodGETCouldNotHaveRequestBody = "http method GET could not have request body in %s interface %s method %s"
-	errTooManyReturnOctetParams             = "http method with application/octet-stream content type expects 1 return parameter, but got %v in %s interface %s method %s"
+	errTooManyReturnOctetParams             = "http method with application/octet-stream content type expects 1 bosy or return parameter, but got %v in %s interface %s method %s"
 )
 
 // HTTPMethod ...
@@ -86,7 +86,11 @@ func (s *httpMethod) Process(httpMethod *api.HTTPMethod, iface *api.Interface, m
 
 	results = method.Results[:len(method.Results)-1]
 
-	if httpMethod.ContentType == "application/octet-stream" && len(results) != 1 {
+	if httpMethod.ContentType == "application/octet-stream" && len(httpMethod.BodyPlaceholders) != 1 {
+		return fmt.Errorf(errTooManyReturnOctetParams, len(results), iface.RelOutputPath, iface.Iface.Name, method.Name)
+	}
+
+	if httpMethod.ResponseContentType == "application/octet-stream" && len(results) != 1 {
 		return fmt.Errorf(errTooManyReturnOctetParams, len(results), iface.RelOutputPath, iface.Iface.Name, method.Name)
 	}
 
