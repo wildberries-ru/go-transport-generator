@@ -90,6 +90,8 @@ import (
 	"encoding/json"
 	"github.com/bxcodec/faker/v3"
 	"github.com/valyala/fasthttp"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -213,8 +215,8 @@ func Test_client_{{.Name}}(t *testing.T) {
 			{{range $index, $tp := .Results}}
 				{{$isErr := isError $tp.Type}}
 				{{if not $isErr}}
-					if !reflect.DeepEqual(got{{up $tp.Name}}, tt.want{{up $tp.Name}}) {
-						t.Errorf("client.{{.Name}}() = %v, want %v", got{{up $tp.Name}}, tt.want{{up $tp.Name}})
+					if !cmp.Equal(got{{up $tp.Name}}, tt.want{{up $tp.Name}}, cmpopts.EquateApproxTime(1*time.Second)) {
+						t.Errorf("client.{{.Name}}() = %s", cmp.Diff(got{{up $tp.Name}}, tt.want{{up $tp.Name}}))
 					}
 				{{end}}
 			{{end}}
