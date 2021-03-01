@@ -25,7 +25,7 @@ func (t *plainObjectTag) Parse(info *api.HTTPMethod, firstTag string, tags ...st
 			if info.PlainObject != "" {
 				return errors.New(errPlainObjectSingle)
 			}
-			if len(info.JsonTags) != 0 {
+			if len(info.JSONTags) != 0 {
 				return errors.New(errJSONTagPlainObjectIncompatible)
 			}
 			info.PlainObject = tags[0]

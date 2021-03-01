@@ -9,7 +9,6 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
-	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -139,7 +138,7 @@ func (s *swagger) Process(info *api.GenerationInfo, iface *api.Interface) (err e
 						err = errors.Wrap(err, "[swagger.resSchema]s.makeType error")
 						return
 					}
-					resSchema.Properties[httpMethod.ResponseJsonTags[arg.Name]] = prop
+					resSchema.Properties[httpMethod.ResponseJSONTags[arg.Name]] = prop
 				}
 			}
 		}
@@ -650,24 +649,24 @@ func (s *swagger) isBuiltin(t types.Type) bool {
 	}
 }
 
-func (s *swagger) value(v types.Variable, str string) (value interface{}) {
-	if v.Type.String() == "bool" {
-		value, _ = strconv.ParseBool(str)
-		return
-	}
-	if strings.HasPrefix(v.Type.String(), "int") {
-		value, _ = strconv.ParseInt(str, 10, 64)
-		return
-	}
-	if strings.HasPrefix(v.Type.String(), "float") {
-		value, _ = strconv.ParseFloat(str, 64)
-		return
-	}
-	if str == "" || str == "null" {
-		return nil
-	}
-	return str
-}
+// func (s *swagger) value(v types.Variable, str string) (value interface{}) {
+// 	if v.Type.String() == "bool" {
+// 		value, _ = strconv.ParseBool(str)
+// 		return
+// 	}
+// 	if strings.HasPrefix(v.Type.String(), "int") {
+// 		value, _ = strconv.ParseInt(str, 10, 64)
+// 		return
+// 	}
+// 	if strings.HasPrefix(v.Type.String(), "float") {
+// 		value, _ = strconv.ParseFloat(str, 64)
+// 		return
+// 	}
+// 	if str == "" || str == "null" {
+// 		return nil
+// 	}
+// 	return str
+// }
 
 // NewSwagger ...
 func NewSwagger(

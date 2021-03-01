@@ -101,7 +101,7 @@ func main() {
 	inFile := flag.String("in", "./pkg/service", "relative path to dir with services")
 	swaggerFile := flag.String("swagger", ".", "relative path to swagger file generate")
 
-	info.SwaggerToJson = flag.Bool("json", false, "use json swagger output file")
+	info.SwaggerToJSON = flag.Bool("json", false, "use json swagger output file")
 	info.SwaggerToYaml = flag.Bool("yaml", false, "use yaml swagger output file")
 	info.SwaggerInfo.Description = flag.String("desc", "", "swagger description")
 	info.SwaggerInfo.Title = flag.String("title", "", "swagger title")
@@ -129,7 +129,7 @@ func main() {
 		}
 	}
 
-	if *info.SwaggerToJson == false && *info.SwaggerToYaml == false {
+	if !*info.SwaggerToJSON && !*info.SwaggerToYaml {
 		info.SwaggerToYaml = &yaml
 	}
 
@@ -142,7 +142,7 @@ func main() {
 							request.NewContentType(httpServer, requestContentTypeSuffix,
 								request.NewMultipartFileTag(httpServer, requestMultipartFileTagSuffix,
 									request.NewMultipartValueTag(httpServer, requestMultipartValueTagSuffix,
-										request.NewJsonTag(httpServer, requestJSONTagSuffix,
+										request.NewJSONTag(httpServer, requestJSONTagSuffix,
 											request.NewPlainObjectTag(httpServer, requestPlainObjectSuffix,
 												request.NewAPIPath(httpServer, requestAPIPathSuffix,
 													request.NewFormUrlencodedTag(httpServer, requestFormUrlencodedTagSuffix, &request2.Term{})))))))))))))
@@ -150,7 +150,7 @@ func main() {
 		response.NewHeader(httpServer, responseHeaderSuffix,
 			response.NewContentType(httpServer, responseContentTypeSuffix,
 				response.NewEncodingType(httpServer, responseContentEncodingSuffix,
-					response.NewJsonTag(httpServer, responseJSONTagSuffix,
+					response.NewJSONTag(httpServer, responseJSONTagSuffix,
 						response.NewFile(httpServer, responseFileSuffix,
 							response.NewBody(httpServer, responseBodySuffix, tagsParser)))))))
 	tagsParser = log.NewLogIgnore(logService, ignoreSuffix, tagsParser)
