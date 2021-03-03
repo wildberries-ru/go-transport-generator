@@ -119,7 +119,6 @@ import (
 		{{if eq $contentType "application/json"}}r.Header.Set("Content-Type", "application/json")
 		    {{$requestName := low .Name}}
 			{{if lenMap $body}}var request {{$requestName}}Request
-				{{$bodyLen := lenMap $body}}
 				{{if $plainObject}}
 					{{range $name, $tp := $body}}
 						request = {{$requestName}}Request({{$name}})
@@ -188,6 +187,16 @@ import (
 				r.PostArgs().Add("{{$to}}", {{$from}})
 			{{end}}
 		{{end}}
+
+		{{if eq $contentType "application/octet-stream"}}
+			r.Header.Set("Content-Type", "application/octet-stream")
+			{{if lenMap $body}}
+				{{range $name, $tp := $body}}
+					r.SetBody({{$name}})
+				{{end}}
+			{{end}}
+		{{end}}
+
 		return
 	}
 
@@ -202,12 +211,21 @@ import (
 				if err = theResponse.UnmarshalJSON(r.Body()); err != nil {
 					return
 				}
-				{{if $responseBodyType }}
+				{{if $responseBodyType}}
 					{{$responseBodyField}} = theResponse{{if or $responseBodyTypeIsSlice $responseBodyTypeIsMap}}{{else}}.{{stripType $responseBodyType}}{{end}}
 				{{else}}
 					{{range $name, $tp := $responseBody}}
 						{{$name}} = theResponse.{{up $name}}
 					{{end}}
+				{{end}}
+			{{end}}
+		{{end}}
+		{{if eq $responseContentType "application/octet-stream"}}
+			{{if lenMap $responseBody}}
+				b := r.Body()
+				// fasthttp reuses body memory, we have to copy a response
+				{{range $name, $tp := $responseBody}}{{$name}} = make([]byte, len(b))
+					copy({{$name}}, b)
 				{{end}}
 			{{end}}
 		{{end}}

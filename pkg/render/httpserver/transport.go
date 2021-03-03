@@ -250,7 +250,7 @@ var (
 		{{if eq $responseContentType "application/json"}}
 			r.Header.Set("Content-Type", "application/json{{if $responseContentEncoding}}; charset={{$responseContentEncoding}}{{end}}")
 			{{if lenMap $responseBody}}var theResponse {{low .Name}}Response
-				{{if $responseBodyType }}
+				{{if $responseBodyType}}
 					theResponse{{if or $responseBodyTypeIsSlice $responseBodyTypeIsMap}}{{else}}.{{stripType $responseBodyType}}{{end}} = {{$responseBodyField}}
 				{{else}}
 					{{range $name, $tp := $responseBody}}
@@ -263,6 +263,12 @@ var (
 					return
 				}
 				r.SetBody(body)
+			{{end}}
+		{{end}}
+		{{if eq $responseContentType "application/octet-stream"}}
+		    r.Header.Set("Content-Type", "application/octet-stream{{if $responseContentEncoding}}; charset={{$responseContentEncoding}}{{end}}")
+			{{range $name, $tp := $responseBody}}
+				r.SetBody({{$name}})
 			{{end}}
 		{{end}}
 		{{range $to, $from := $responseHeaderPlaceholders}}
