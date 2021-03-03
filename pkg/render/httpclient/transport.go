@@ -2,7 +2,6 @@ package httpclient
 
 import (
 	"os"
-	"os/exec"
 	"path"
 	"strings"
 	"text/template"
@@ -23,10 +22,11 @@ import (
 	"net/http"
 	"strconv"
 	"mime/multipart"
+	"encoding/json"
 
 	"github.com/valyala/fasthttp"
 )
- 
+
 {{range .Iface.Methods}}
 
 	{{$ct := index $methods .Name}}
@@ -38,12 +38,12 @@ import (
 	{{$cookiePlaceholders := $ct.CookiePlaceholders}}
 	{{$body := $ct.Body}}
 	{{$contentType := $ct.ContentType}}
-	{{$jsonTags := $ct.JsonTags}}
+	{{$jsonTags := $ct.JSONTags}}
 	{{$plainObject := $ct.PlainObject}}
 	{{$multipartValueTags := $ct.MultipartValueTags}}
 	{{$multipartFileTags := $ct.MultipartFileTags}}
 	{{$formUrlencodedTags := $ct.FormUrlencodedTags}}
-	{{$responseJsonTags := $ct.ResponseJsonTags}}
+	{{$responseJSONTags := $ct.ResponseJSONTags}}
 	{{$responseHeaderPlaceholders := $ct.ResponseHeaders}}
 	{{$responseStatus := $ct.ResponseStatus}}
 	{{$responseContentType := $ct.ResponseContentType}}
@@ -54,7 +54,7 @@ import (
 	{{$responseBodyTypeIsSlice := isSliceType $responseBodyType}}
 	{{$responseBodyTypeIsMap := isMapType $responseBodyType}}
 
-	{{if lenMap $body}}{{if eq $contentType "application/json"}}//easyjson:json{{else}}//easyjson:skip{{end}}
+	{{if lenMap $body}}
 		{{$bodyLen := lenMap $body}}{{$n := .Name}}{{if $plainObject}}{{range $name, $tp := $body}}type {{low $n}}Request {{$tp}}
 			{{end}}
 		{{else}}
@@ -65,13 +65,13 @@ import (
 		{{end}}
 	{{end}}
 
-	{{if lenMap $responseBody}}{{if eq $responseContentType "application/json"}}//easyjson:json{{else}}//easyjson:skip{{end}}
+	{{if lenMap $responseBody}}
 		type {{low .Name}}Response {{if or $responseBodyTypeIsSlice $responseBodyTypeIsMap}}{{$responseBodyType}}{{else}} struct {
   			{{if $responseBodyType}}
     			{{$responseBodyType}}
   			{{else}}
-			    {{$respLen := lenMap $responseBody}}	
-			    {{range $name, $tp := $responseBody}}{{if eq $respLen 1}}{{if contains $tp "."}}{{$tp}}{{else}}{{up $name}} {{$tp}}{{end}}{{else}}{{up $name}} {{$tp}}{{end}}{{$tag := index $responseJsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
+			    {{$respLen := lenMap $responseBody}}
+			    {{range $name, $tp := $responseBody}}{{if eq $respLen 1}}{{if contains $tp "."}}{{$tp}}{{else}}{{up $name}} {{$tp}}{{end}}{{else}}{{up $name}} {{$tp}}{{end}}{{$tag := index $responseJSONTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
     			{{end}}
   			{{end}}
 		}{{end}}
@@ -83,7 +83,6 @@ import (
 		DecodeResponse(ctx context.Context, r *fasthttp.Response) ({{$args := popLast .Results}}{{joinFullVariables $args "," "err error"}})
 	}
 
-	{{if ne $contentType "application/json"}}//easyjson:skip{{end}}
 	type {{low .Name}}Transport struct {
 		errorProcessor errorProcessor
 		pathTemplate   string
@@ -128,18 +127,18 @@ import (
 						request.{{up $name}} = {{$name}}
 					{{end}}
 				{{end}}
-				body, err := request.MarshalJSON()
+				body, err := json.Marshal(request)
 				if err != nil {
 					return
 				}
 				r.SetBody(body)
 			{{end}}
 		{{end}}
-		
+
 		{{if eq $contentType "multipart/form-data"}}r.Header.Set("Content-Type", "multipart/form-data")
 			body := &bytes.Buffer{}
 			writer := multipart.NewWriter(body)
-			
+
 			{{range $fr, $to := $multipartValueTags}}
 				{{$from := index $bodyPlaceholders $fr}}
 				{{if $from.IsPointer}}
@@ -172,7 +171,7 @@ import (
 					io.Copy(part{{up $from.Name}}, _{{$from.Name}})
 				{{else if isBytesPlaceholder $from.Type}}
 					// we don't have any name at this time, receiver should know what he receives
-					part{{up $from.Name}}, _ := writer.CreateFormFile("{{$to}}", "{{$from.Name}}") 
+					part{{up $from.Name}}, _ := writer.CreateFormFile("{{$to}}", "{{$from.Name}}")
 					io.Copy(part{{up $from.Name}}, bytes.NewReader({{$from.Name}}))
 				{{end}}
 			{{end}}
@@ -208,7 +207,7 @@ import (
 		}
 		{{if eq $responseContentType "application/json"}}
 			{{if lenMap $responseBody}}var theResponse {{low .Name}}Response
-				if err = theResponse.UnmarshalJSON(r.Body()); err != nil {
+				if err = json.Unmarshal(r.Body(), &theResponse); err != nil {
 					return
 				}
 				{{if $responseBodyType}}
@@ -284,12 +283,7 @@ func (s *Transport) Generate(info api.Interface) (err error) {
 		return
 	}
 	err = s.imports.GoImports(info.AbsOutputPath)
-	// easyJSON generator
-	cmd := exec.Command("/bin/sh", "-c", "easyjson -all "+info.AbsOutputPath)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		err = errors.Wrapf(err, "[httpclient.Transport]cmd.Output error\nCMD: %s\noutput: %s\n", cmd.String(), string(output))
-	}
+
 	return
 }
 

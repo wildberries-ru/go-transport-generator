@@ -2,7 +2,6 @@ package httpserver
 
 import (
 	"os"
-	"os/exec"
 	"path"
 	"strings"
 	"text/template"
@@ -21,6 +20,7 @@ import (
 	"bytes"
 	"net/http"
 	"strconv"
+	"encoding/json"
 
 	"github.com/pkg/errors"
 	"github.com/valyala/fasthttp"
@@ -29,7 +29,7 @@ import (
 var (
 	emptyBytes = []byte("")
 )
- 
+
 {{range .Iface.Methods}}
 	{{$ct := index $methods .Name}}
 	{{$uriPlaceholders := $ct.URIPathPlaceholders}}
@@ -41,7 +41,7 @@ var (
 	{{$bodyPlaceholders := $ct.BodyPlaceholders}}
 	{{$isIntBodyPlaceholders := $ct.IsIntBodyPlaceholders}}
 	{{$contentType := $ct.ContentType}}
-	{{$jsonTags := $ct.JsonTags}}
+	{{$jsonTags := $ct.JSONTags}}
 	{{$plainObject := $ct.PlainObject}}
 	{{$multipartValueTags := $ct.MultipartValueTags}}
 	{{$multipartFileTags := $ct.MultipartFileTags}}
@@ -49,7 +49,7 @@ var (
 	{{$responseStatus := $ct.ResponseStatus}}
 	{{$responseContentType := $ct.ResponseContentType}}
 	{{$responseContentEncoding := $ct.ResponseContentEncoding}}
-	{{$responseJsonTags := $ct.ResponseJsonTags}}
+	{{$responseJSONTags := $ct.ResponseJSONTags}}
 	{{$responseFile := $ct.ResponseFile}}
 	{{$responseFileName := $ct.ResponseFileName}}
 	{{$responseBody := $ct.ResponseBody}}
@@ -60,10 +60,9 @@ var (
 
 	{{if eq $contentType "application/json"}}
 		{{if lenMap $body}}
-			{{$bodyLen := lenMap $body}}{{$n := .Name}}{{if $plainObject}}{{range $name, $tp := $body}}//easyjson:json
+			{{$bodyLen := lenMap $body}}{{$n := .Name}}{{if $plainObject}}{{range $name, $tp := $body}}
 			type {{low $n}}Request {{$tp}}{{end}}
 			{{else}}
-				//easyjson:json
 				type {{low .Name}}Request struct {
 					{{range $name, $tp := $body}}
 						{{up $name}} {{$tp}}{{$tag := index $jsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
@@ -75,13 +74,12 @@ var (
 
 	{{if eq $responseContentType "application/json"}}
 		{{if lenMap $responseBody}}
-			//easyjson:json
 			type {{low .Name}}Response {{if or $responseBodyTypeIsSlice $responseBodyTypeIsMap}}{{$responseBodyType}}{{else}} struct {
   				{{if $responseBodyType}}
     				{{$responseBodyType}}
 	  			{{else}}
     				{{range $name, $tp := $responseBody}}
-						{{up $name}} {{$tp}}{{$tag := index $responseJsonTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
+						{{up $name}} {{$tp}}{{$tag := index $responseJSONTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
 					{{end}}
 	  			{{end}}
 			}
@@ -126,14 +124,14 @@ var (
 						{{if eq $to.Type "int"}}
 							{{$to.Name}} = &i
 						{{else}}
-							ii := {{$to.Type}}(i) 
+							ii := {{$to.Type}}(i)
 							{{$to.Name}} = &ii
 						{{end}}
 					}
 				{{else}}
 					_{{$to.Name}} := ctx.QueryArgs().Peek("{{$from}}")
 					if !bytes.Equal(_{{$to.Name}}, emptyBytes) {
-						var i int	
+						var i int
 						i, err = strconv.Atoi(string(_{{$to.Name}}))
 						if err != nil {
 							err = t.decodeTypeIntErrorCreator(err)
@@ -141,7 +139,7 @@ var (
 						}
 						{{if eq $to.Type "int"}}
 							{{$to.Name}} = i
-						{{else}} 
+						{{else}}
 							{{$to.Name}} = {{$to.Type}}(i)
 						{{end}}
 					}
@@ -157,7 +155,7 @@ var (
 		{{if eq $contentType "application/json"}}
 			{{$requestName := low .Name}}
 			{{if lenMap $body}}var request {{low .Name}}Request
-				if err = request.UnmarshalJSON(r.Body()); err != nil {
+				if err = json.Unmarshal(r.Body(), &request); err != nil {
 					err = t.decodeJSONErrorCreator(err)
 					return
 				}
@@ -198,7 +196,7 @@ var (
 								{{if eq $to.Type "int"}}
 									{{$to.Name}} = &i
 								{{else}}
-									ii := {{$to.Type}}(i) 
+									ii := {{$to.Type}}(i)
 									{{$to.Name}} = &ii
 								{{end}}
 							}
@@ -222,7 +220,7 @@ var (
 							}
 							{{if eq $to.Type "int"}}
 								{{$to.Name}} = i
-							{{else}} 
+							{{else}}
 								{{$to.Name}} = {{$to.Type}}(i)
 							{{end}}
 						}
@@ -257,7 +255,7 @@ var (
 						theResponse.{{up $name}} = {{$name}}
 					{{end}}
 				{{end}}
-				body, err := theResponse.MarshalJSON()
+				body, err := json.Marshal(theResponse)
 				if err != nil {
 					err = t.encodeJSONErrorCreator(err)
 					return
@@ -342,12 +340,6 @@ func (s *Transport) Generate(info api.Interface) (err error) {
 		return
 	}
 	err = s.imports.GoImports(info.AbsOutputPath)
-	// easyJSON generator
-	cmd := exec.Command("/bin/sh", "-c", "easyjson -all "+info.AbsOutputPath)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		err = errors.Wrapf(err, "[httpserver.Transport]cmd.Output error\nCMD: %s\noutput: %s\n", cmd.String(), string(output))
-	}
 
 	return
 }

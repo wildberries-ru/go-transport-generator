@@ -23,10 +23,10 @@ func (t *jsonTag) Parse(info *api.HTTPMethod, firstTag string, tags ...string) (
 			if info.PlainObject != "" {
 				return errors.New(errJSONTagPlainObjectIncompatible)
 			}
-			if info.JsonTags == nil {
-				info.JsonTags = make(map[string]string)
+			if info.JSONTags == nil {
+				info.JSONTags = make(map[string]string)
 			}
-			info.JsonTags[tags[0]] = tags[1]
+			info.JSONTags[tags[0]] = tags[1]
 			return
 		}
 		return errors.New(errHTTPJsonTagDidNotSet)
@@ -34,8 +34,8 @@ func (t *jsonTag) Parse(info *api.HTTPMethod, firstTag string, tags ...string) (
 	return t.next.Parse(info, firstTag, tags...)
 }
 
-// NewJsonTag ...
-func NewJsonTag(prefix string, suffix string, next Parser) Parser {
+// NewJSONTag ...
+func NewJSONTag(prefix string, suffix string, next Parser) Parser {
 	return &jsonTag{
 		prefix: prefix,
 		suffix: suffix,

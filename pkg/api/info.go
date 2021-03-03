@@ -12,7 +12,7 @@ type GenerationInfo struct {
 
 	SwaggerInfo
 	Swagger              *v1.Swagger
-	SwaggerToJson        *bool
+	SwaggerToJSON        *bool
 	SwaggerToYaml        *bool
 	SwaggerAbsOutputPath string
 }
@@ -44,7 +44,7 @@ type HTTPMethod struct {
 	HeaderPlaceholders      map[string]string
 	CookiePlaceholders      map[string]string
 	ContentType             string
-	JsonTags                map[string]string
+	JSONTags                map[string]string
 	PlainObject             string
 	MultipartValueTags      map[string]string
 	MultipartFileTags       map[string]string
@@ -56,7 +56,7 @@ type HTTPMethod struct {
 	ResponseStatus          string
 	ResponseContentType     string
 	ResponseContentEncoding string
-	ResponseJsonTags        map[string]string
+	ResponseJSONTags        map[string]string
 	ResponseBody            map[string]string
 	ResponseFile            string
 	ResponseFileName        string

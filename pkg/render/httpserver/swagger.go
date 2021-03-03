@@ -29,13 +29,13 @@ func (s *Swagger) Generate(info api.GenerationInfo) (err error) {
 		return
 	}
 	fileName := path.Join(info.SwaggerAbsOutputPath, s.fileName)
-	if info.SwaggerToJson != nil && *info.SwaggerToJson == true {
+	if info.SwaggerToJSON != nil && *info.SwaggerToJSON {
 		fileName += jsonExt
 		if data, err = json.Marshal(info.Swagger); err != nil {
 			return
 		}
 	}
-	if info.SwaggerToYaml != nil && *info.SwaggerToYaml == true {
+	if info.SwaggerToYaml != nil && *info.SwaggerToYaml {
 		fileName += yamlExt
 		if data, err = yaml.Marshal(info.Swagger); err != nil {
 			return
