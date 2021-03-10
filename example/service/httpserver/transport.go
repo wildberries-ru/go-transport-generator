@@ -5,6 +5,7 @@ package httpserver
 
 import (
 	"bytes"
+	"encoding/json"
 	"mime/multipart"
 	"net/http"
 	"strconv"
@@ -140,7 +141,6 @@ func NewUploadDocumentTransport(
 	}
 }
 
-//easyjson:json
 type getWarehousesResponse map[string]v1.Detail
 
 // GetWarehousesTransport transport interface
@@ -167,7 +167,7 @@ func (t *getWarehousesTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fas
 
 	theResponse = pets
 
-	body, err := theResponse.MarshalJSON()
+	body, err := json.Marshal(theResponse)
 	if err != nil {
 		err = t.encodeJSONErrorCreator(err)
 		return
@@ -190,7 +190,6 @@ func NewGetWarehousesTransport(
 	}
 }
 
-//easyjson:json
 type getDetailsResponse struct {
 	Det v1.Detail
 
@@ -257,7 +256,7 @@ func (t *getDetailsTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fastht
 
 	theResponse.Ns = ns
 
-	body, err := theResponse.MarshalJSON()
+	body, err := json.Marshal(theResponse)
 	if err != nil {
 		err = t.encodeJSONErrorCreator(err)
 		return
@@ -285,7 +284,6 @@ func NewGetDetailsTransport(
 	}
 }
 
-//easyjson:json
 type getDetailsEmbedStructResponse struct {
 	v1.GetDetailsEmbedStructResponse
 }
@@ -318,7 +316,7 @@ func (t *getDetailsEmbedStructTransport) EncodeResponse(ctx *fasthttp.RequestCtx
 
 	theResponse.GetDetailsEmbedStructResponse = response
 
-	body, err := theResponse.MarshalJSON()
+	body, err := json.Marshal(theResponse)
 	if err != nil {
 		err = t.encodeJSONErrorCreator(err)
 		return
@@ -341,7 +339,6 @@ func NewGetDetailsEmbedStructTransport(
 	}
 }
 
-//easyjson:json
 type getDetailsListEmbedStructResponse []v1.Detail
 
 // GetDetailsListEmbedStructTransport transport interface
@@ -372,7 +369,7 @@ func (t *getDetailsListEmbedStructTransport) EncodeResponse(ctx *fasthttp.Reques
 
 	theResponse = details
 
-	body, err := theResponse.MarshalJSON()
+	body, err := json.Marshal(theResponse)
 	if err != nil {
 		err = t.encodeJSONErrorCreator(err)
 		return
@@ -401,7 +398,6 @@ type putDetailsRequest struct {
 	Yang v1.Namespace
 }
 
-//easyjson:json
 type putDetailsResponse struct {
 	Cool v1.Detail
 
@@ -433,7 +429,7 @@ func (t *putDetailsTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthtt
 	token = ptr(r.Header.Peek("X-Auth-Token"))
 
 	var request putDetailsRequest
-	if err = request.UnmarshalJSON(r.Body()); err != nil {
+	if err = json.Unmarshal(r.Body(), &request); err != nil {
 		err = t.decodeJSONErrorCreator(err)
 		return
 	}
@@ -455,7 +451,7 @@ func (t *putDetailsTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fastht
 
 	theResponse.Nothing = nothing
 
-	body, err := theResponse.MarshalJSON()
+	body, err := json.Marshal(theResponse)
 	if err != nil {
 		err = t.encodeJSONErrorCreator(err)
 		return
@@ -484,7 +480,6 @@ func NewPutDetailsTransport(
 	}
 }
 
-//easyjson:json
 type getSomeElseDataUtf8Response struct {
 	Cool v1.Detail `json:"cool"`
 
@@ -521,7 +516,7 @@ func (t *getSomeElseDataUtf8Transport) EncodeResponse(ctx *fasthttp.RequestCtx, 
 
 	theResponse.Nothing = nothing
 
-	body, err := theResponse.MarshalJSON()
+	body, err := json.Marshal(theResponse)
 	if err != nil {
 		err = t.encodeJSONErrorCreator(err)
 		return

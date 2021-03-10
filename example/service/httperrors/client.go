@@ -21,10 +21,10 @@ type ClientErrorProcessor struct {
 func (e *ClientErrorProcessor) Encode(ctx context.Context, r *fasthttp.Response, err error) {
 	code := e.defaultCode
 	message := e.defaultMessage
-	if err, ok := err.(*httpError); ok {
-		if err.Code != e.defaultCode {
-			code = err.Code
-			message = err.Message
+	if err, ok := err.(errorCode); ok {
+		if err.StatusCode() != e.defaultCode {
+			code = err.StatusCode()
+			message = err.Error()
 		}
 	}
 	r.SetStatusCode(code)

@@ -3,6 +3,7 @@ package service
 import (
 	"os"
 	"path"
+	"runtime"
 	"strings"
 	"text/template"
 
@@ -77,6 +78,9 @@ type Logging struct {
 
 // Generate ...
 func (s *Logging) Generate(info api.Interface) (err error) {
+	if runtime.GOOS == "windows" {
+		info.AbsOutputPath = strings.Replace(info.AbsOutputPath, `\`, "/", -1)
+	}
 	info.PkgName = path.Base(info.AbsOutputPath)
 	info.AbsOutputPath = strings.Join(append(strings.Split(info.AbsOutputPath, "/"), s.filePath...), "/")
 	dir, _ := path.Split(info.AbsOutputPath)
