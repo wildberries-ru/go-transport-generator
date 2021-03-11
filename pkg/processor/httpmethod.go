@@ -14,6 +14,7 @@ const (
 	errHTTPMethodGETCouldNotHaveRequestBody = "http method GET could not have request body in %s interface %s method %s"
 	errTooManyReturnOctetParams             = "http method with application/octet-stream content type expects 1 bosy or return parameter, but got %v in %s interface %s method %s"
 	errPointerToMetrics                     = "only strings and ints are allowed as addition metrics labels: method: %s %s variable: %s"
+	errParameterDoNotExist                  = "parameter %s does not exist in method %s"
 )
 
 // HTTPMethod ...
@@ -52,22 +53,26 @@ func (s *httpMethod) Process(httpMethod *api.HTTPMethod, iface *api.Interface, m
 	for _, arg = range args {
 		diff[arg.Name] = arg.Type.String()
 	}
-	for from, toPlaceholder = range httpMethod.QueryPlaceholders {
-		delete(diff, toPlaceholder.Name)
-		for _, arg = range args {
-			if arg.Name == toPlaceholder.Name {
-				s.castQueryPlaceholder(from, arg, arg.Type, httpMethod)
-			}
-		}
-	}
 
 	for from, toMetricsPlaceholder := range httpMethod.AdditionalMetricsLabels {
 		for _, arg = range args {
+			if _, ok := diff[from]; !ok {
+				return fmt.Errorf(errParameterDoNotExist, from, method.Name)
+			}
 			if arg.Name == toMetricsPlaceholder.Name {
 				err := s.castMetricsLabelPlaceholder(from, arg.Type, httpMethod)
 				if err != nil {
 					return err
 				}
+			}
+		}
+	}
+
+	for from, toPlaceholder = range httpMethod.QueryPlaceholders {
+		delete(diff, toPlaceholder.Name)
+		for _, arg = range args {
+			if arg.Name == toPlaceholder.Name {
+				s.castQueryPlaceholder(from, arg, arg.Type, httpMethod)
 			}
 		}
 	}

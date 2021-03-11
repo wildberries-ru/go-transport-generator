@@ -64,6 +64,12 @@ for example `file={fileID}&some={someID}`
 
 fill from query string to variables `fileID` and `someID`
 
+**metrics-additional-labels** Add income parameters to metrics
+
+for example @gtg metrics-additional-labels namespace, detail
+
+Support only strings and ints(int, int32. int64, etc). Pointers not allowed 
+
 **http-server-header** Header string with placeholders
 
 for example `X-Auth-Token {token}`
