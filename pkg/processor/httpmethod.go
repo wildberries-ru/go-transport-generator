@@ -13,6 +13,8 @@ import (
 const (
 	errHTTPMethodGETCouldNotHaveRequestBody = "http method GET could not have request body in %s interface %s method %s"
 	errTooManyReturnOctetParams             = "http method with application/octet-stream content type expects 1 bosy or return parameter, but got %v in %s interface %s method %s"
+	errPointerToMetrics                     = "only strings and ints are allowed as addition metrics labels: method: %s %s variable: %s"
+	errParameterDoNotExist                  = "parameter %s does not exist in method %s"
 )
 
 // HTTPMethod ...
@@ -51,6 +53,21 @@ func (s *httpMethod) Process(httpMethod *api.HTTPMethod, iface *api.Interface, m
 	for _, arg = range args {
 		diff[arg.Name] = arg.Type.String()
 	}
+
+	for from, toMetricsPlaceholder := range httpMethod.AdditionalMetricsLabels {
+		for _, arg = range args {
+			if _, ok := diff[from]; !ok {
+				return fmt.Errorf(errParameterDoNotExist, from, method.Name)
+			}
+			if arg.Name == toMetricsPlaceholder.Name {
+				err := s.castMetricsLabelPlaceholder(from, arg.Type, httpMethod)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
 	for from, toPlaceholder = range httpMethod.QueryPlaceholders {
 		delete(diff, toPlaceholder.Name)
 		for _, arg = range args {
@@ -59,6 +76,7 @@ func (s *httpMethod) Process(httpMethod *api.HTTPMethod, iface *api.Interface, m
 			}
 		}
 	}
+
 	for _, to = range httpMethod.HeaderPlaceholders {
 		delete(diff, to)
 	}
@@ -121,6 +139,21 @@ func (s *httpMethod) castQueryPlaceholder(from string, arg types.Variable, argTy
 		s.castQueryPlaceholder(from, arg, tp.Next, httpMethod)
 		return
 	}
+}
+
+func (s *httpMethod) castMetricsLabelPlaceholder(from string, argType types.Type, httpMethod *api.HTTPMethod) (err error) {
+	switch tp := argType.(type) {
+	case types.TName:
+		if s.isInt(tp) {
+			httpMethod.AdditionalMetricsLabels[from].IsInt = true
+		} else if s.isString(tp) {
+			httpMethod.AdditionalMetricsLabels[from].IsString = true
+		}
+	default:
+		return fmt.Errorf(errPointerToMetrics, httpMethod.Method, httpMethod.URIPath, from)
+	}
+
+	return
 }
 
 func (s *httpMethod) castBodyPlaceholder(to string, arg types.Variable, argType types.Type, httpMethod *api.HTTPMethod) {

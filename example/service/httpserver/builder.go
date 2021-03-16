@@ -86,6 +86,13 @@ func New(router *fasthttprouter.Router, svc service, decodeJSONErrorCreator erro
 	getFileTransport := NewGetFileTransport()
 	router.Handle(httpMethodGetFile, uriPathGetFile, NewGetFile(getFileTransport, svc, errorProcessor))
 
-	router.Handle("GET", "/debug/pprof/", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Index))
+	router.Handle("GET", "/debug/pprof", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Index))
 	router.Handle("GET", "/debug/pprof/profile", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Profile))
+	router.Handle("GET", "/debug/pprof/cmdline", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Cmdline))
+	router.Handle("GET", "/debug/pprof/symbol", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Symbol))
+	router.Handle("GET", "/debug/pprof/trace", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Trace))
+	router.Handle("GET", "/debug/pprof/goroutine", fasthttpadaptor.NewFastHTTPHandler(pprof.Handler("goroutine")))
+	router.Handle("GET", "/debug/pprof/heap", fasthttpadaptor.NewFastHTTPHandler(pprof.Handler("heap")))
+	router.Handle("GET", "/debug/pprof/threadcreate", fasthttpadaptor.NewFastHTTPHandler(pprof.Handler("threadcreate")))
+	router.Handle("GET", "/debug/pprof/block", fasthttpadaptor.NewFastHTTPHandler(pprof.Handler("block")))
 }

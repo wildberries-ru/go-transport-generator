@@ -62,8 +62,16 @@ type HTTPMethod struct {
 	ResponseFileName        string
 	ResponseBodyField       string
 	LogIgnores              []string
+	AdditionalMetricsLabels map[string]*MetricsPlaceholder
 
 	SwaggerInfo
+}
+
+// MetricsPlaceholder ...
+type MetricsPlaceholder struct {
+	IsString bool
+	IsInt    bool
+	Name     string
 }
 
 // Placeholder ...

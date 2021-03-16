@@ -38,6 +38,7 @@ type SomeService interface {
 	// @gtg http-server-header X-Auth-Token {token}
 	// @gtg http-server-content-type application/json
 	// @gtg log-ignore namespace, detail
+	// @gtg metrics-additional-labels namespace, detail, fileID
 	// @gtg http-server-response-header X-Auth-ID {id}
 	// @gtg http-server-response-status http.StatusOK
 	// @gtg http-server-response-content-type application/json

@@ -3,6 +3,7 @@ package service
 import (
 	"os"
 	"path"
+	"runtime"
 	"strings"
 	"text/template"
 
@@ -29,13 +30,26 @@ type instrumentingMiddleware struct {
 	svc         {{ .Iface.Name }}
 }
 
+{{$methods := .HTTPMethods}}
 {{range .Iface.Methods -}}
+{{$method := index $methods .Name}}
+{{$metricsPlaceholders := $method.AdditionalMetricsLabels}}
 // {{.Name}} ...
 func (s *instrumentingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFullVariables .Results ","}}) {
 	defer func(startTime time.Time) {
 		labels := []string{
 			"method", "{{.Name}}",
 			"error", strconv.FormatBool(err != nil),
+            	{{range $from, $to := $metricsPlaceholders}}
+					{{if in $method.AdditionalMetricsLabels $to.Name}}
+						{{if $to.IsString}}
+							"{{$to.Name}}", {{$to.Name}},
+						{{end}}
+						{{if $to.IsInt}}
+							"{{$to.Name}}", strconv.Itoa(int({{$to.Name}})),
+						{{end}}
+					{{end}}
+				{{end}}
 		}
 		s.reqCount.With(labels...).Add(1)
 		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
@@ -67,6 +81,9 @@ type Instrumenting struct {
 
 // Generate ...
 func (s *Instrumenting) Generate(info api.Interface) (err error) {
+	if runtime.GOOS == "windows" {
+		info.AbsOutputPath = strings.Replace(info.AbsOutputPath, `\`, "/", -1)
+	}
 	info.PkgName = path.Base(info.AbsOutputPath)
 	info.AbsOutputPath = strings.Join(append(strings.Split(info.AbsOutputPath, "/"), s.filePath...), "/")
 	dir, _ := path.Split(info.AbsOutputPath)

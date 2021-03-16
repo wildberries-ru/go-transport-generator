@@ -22,59 +22,112 @@ type instrumentingMiddleware struct {
 
 // UploadDocument ...
 func (s *instrumentingMiddleware) UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader) (err error) {
-	defer s.recordMetrics("UploadDocument", time.Now(), err)
+	defer func(startTime time.Time) {
+		labels := []string{
+			"method", "UploadDocument",
+			"error", strconv.FormatBool(err != nil),
+		}
+		s.reqCount.With(labels...).Add(1)
+		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+	}(time.Now())
 	return s.svc.UploadDocument(ctx, token, name, extension, categoryID, supplierID, contractID, data)
 }
 
 // GetWarehouses ...
 func (s *instrumentingMiddleware) GetWarehouses(ctx context.Context) (pets map[string]v1.Detail, err error) {
-	defer s.recordMetrics("GetWarehouses", time.Now(), err)
+	defer func(startTime time.Time) {
+		labels := []string{
+			"method", "GetWarehouses",
+			"error", strconv.FormatBool(err != nil),
+		}
+		s.reqCount.With(labels...).Add(1)
+		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+	}(time.Now())
 	return s.svc.GetWarehouses(ctx)
 }
 
 // GetDetails ...
 func (s *instrumentingMiddleware) GetDetails(ctx context.Context, namespace string, detail string, fileID uint32, someID *uint64, token *string) (det v1.Detail, ns v1.Namespace, id *string, err error) {
-	defer s.recordMetrics("GetDetails", time.Now(), err)
+	defer func(startTime time.Time) {
+		labels := []string{
+			"method", "GetDetails",
+			"error", strconv.FormatBool(err != nil),
+
+			"detail", detail,
+
+			"fileID", strconv.Itoa(int(fileID)),
+
+			"namespace", namespace,
+		}
+		s.reqCount.With(labels...).Add(1)
+		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+	}(time.Now())
 	return s.svc.GetDetails(ctx, namespace, detail, fileID, someID, token)
 }
 
 // GetDetailsEmbedStruct ...
 func (s *instrumentingMiddleware) GetDetailsEmbedStruct(ctx context.Context, namespace string, detail string) (response v1.GetDetailsEmbedStructResponse, err error) {
-	defer s.recordMetrics("GetDetailsEmbedStruct", time.Now(), err)
+	defer func(startTime time.Time) {
+		labels := []string{
+			"method", "GetDetailsEmbedStruct",
+			"error", strconv.FormatBool(err != nil),
+		}
+		s.reqCount.With(labels...).Add(1)
+		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+	}(time.Now())
 	return s.svc.GetDetailsEmbedStruct(ctx, namespace, detail)
 }
 
 // GetDetailsListEmbedStruct ...
 func (s *instrumentingMiddleware) GetDetailsListEmbedStruct(ctx context.Context, namespace string, detail string) (details []v1.Detail, err error) {
-	defer s.recordMetrics("GetDetailsListEmbedStruct", time.Now(), err)
+	defer func(startTime time.Time) {
+		labels := []string{
+			"method", "GetDetailsListEmbedStruct",
+			"error", strconv.FormatBool(err != nil),
+		}
+		s.reqCount.With(labels...).Add(1)
+		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+	}(time.Now())
 	return s.svc.GetDetailsListEmbedStruct(ctx, namespace, detail)
 }
 
 // PutDetails ...
 func (s *instrumentingMiddleware) PutDetails(ctx context.Context, namespace string, detail string, testID string, blaID *string, token *string, pretty v1.Detail, yang v1.Namespace) (cool v1.Detail, nothing v1.Namespace, id *string, err error) {
-	defer s.recordMetrics("PutDetails", time.Now(), err)
+	defer func(startTime time.Time) {
+		labels := []string{
+			"method", "PutDetails",
+			"error", strconv.FormatBool(err != nil),
+		}
+		s.reqCount.With(labels...).Add(1)
+		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+	}(time.Now())
 	return s.svc.PutDetails(ctx, namespace, detail, testID, blaID, token, pretty, yang)
 }
 
 // GetSomeElseDataUtf8 ...
 func (s *instrumentingMiddleware) GetSomeElseDataUtf8(ctx context.Context) (cool v1.Detail, nothing v1.Namespace, id *string, err error) {
-	defer s.recordMetrics("GetSomeElseDataUtf8", time.Now(), err)
+	defer func(startTime time.Time) {
+		labels := []string{
+			"method", "GetSomeElseDataUtf8",
+			"error", strconv.FormatBool(err != nil),
+		}
+		s.reqCount.With(labels...).Add(1)
+		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+	}(time.Now())
 	return s.svc.GetSomeElseDataUtf8(ctx)
 }
 
 // GetFile ...
 func (s *instrumentingMiddleware) GetFile(ctx context.Context) (data []byte, fileName string, err error) {
-	defer s.recordMetrics("GetFile", time.Now(), err)
+	defer func(startTime time.Time) {
+		labels := []string{
+			"method", "GetFile",
+			"error", strconv.FormatBool(err != nil),
+		}
+		s.reqCount.With(labels...).Add(1)
+		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+	}(time.Now())
 	return s.svc.GetFile(ctx)
-}
-
-func (s *instrumentingMiddleware) recordMetrics(method string, startTime time.Time, err error) {
-	labels := []string{
-		"method", method,
-		"error", strconv.FormatBool(err != nil),
-	}
-	s.reqCount.With(labels...).Add(1)
-	s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
 }
 
 // NewInstrumentingMiddleware ...
