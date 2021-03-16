@@ -43,7 +43,7 @@ Interface definition requirements:
 
 **https-client** Generates https client
  
-**logs** Generates log wrapper for service
+**logs** Generates log wrapper for service. It uses interface `Logger` from this repository and has adapters for common loggers in `log/adapters` directory. You can use any logging package.
  
 **metrics** Generates metrics wrapper for service
  
