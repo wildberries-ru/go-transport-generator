@@ -18,13 +18,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/wildberries-ru/go-transport-generator/log/logger"
 )
 
 // loggingMiddleware wraps Service and logs request information to the provided logger
 type loggingMiddleware struct {
-	logger log.Logger
+	logger logger.Logger
 	svc    {{ .Iface.Name }}
 }
 {{$methods := .HTTPMethods}}
@@ -33,34 +32,31 @@ type loggingMiddleware struct {
 	// {{.Name}} ...
 	func (s *loggingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFullVariables .Results ","}}) {
 		defer func(begin time.Time) {
-			_ = s.wrap(err).Log(
-				"method", "{{.Name}}",
-				{{$args := popFirst .Args -}}
-				{{range $arg := $args -}}
-					{{if notin $method.LogIgnores $arg.Name}}"{{$arg.Name}}", {{$arg.Name}},{{end}} 
-				{{end -}}
-				{{$args := popLast .Results -}}
-				{{range $arg := $args -}}
-					{{if notin $method.LogIgnores $arg.Name}}"{{$arg.Name}}", {{$arg.Name}},{{end}}
-				{{end -}}
-				"err", err,
-				"elapsed", time.Since(begin),
+			lg := s.logger.WithError(err).WithFields(
+				map[string]interface{} {
+					{{$args := popFirst .Args -}}
+					{{range $arg := $args -}}
+						{{if notin $method.LogIgnores $arg.Name}}"{{$arg.Name}}": {{$arg.Name}},{{end}} 
+					{{end -}}
+					{{$args := popLast .Results -}}
+					{{range $arg := $args -}}
+						{{if notin $method.LogIgnores $arg.Name}}"{{$arg.Name}}": {{$arg.Name}},{{end}}
+					{{end -}}
+					"elapsed": time.Since(begin),
+				},
 			)
+			if err != nil {
+				lg.Debug("{{.Name}}")
+			} else {
+				lg.Error("{{.Name}}")
+			}
 		}(time.Now())
 		return s.svc.{{.Name}}({{joinVariableNamesWithEllipsis .Args ","}})
 	}
 {{end}}
 
-func (s *loggingMiddleware) wrap(err error) log.Logger {
-	lvl := level.Debug
-	if err != nil {
-		lvl = level.Error
-	}
-	return lvl(s.logger)
-}
-
 // NewLoggingMiddleware ...
-func NewLoggingMiddleware(logger log.Logger, svc {{ .Iface.Name }}) {{ .Iface.Name }} {
+func NewLoggingMiddleware(logger logger.Logger, svc {{ .Iface.Name }}) {{ .Iface.Name }} {
 	return &loggingMiddleware{
 		logger: logger,
 		svc:    svc,
