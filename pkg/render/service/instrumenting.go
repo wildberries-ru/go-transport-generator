@@ -37,16 +37,37 @@ type instrumentingMiddleware struct {
 // {{.Name}} ...
 func (s *instrumentingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFullVariables .Results ","}}) {
 	defer func(startTime time.Time) {
+{{range $from, $to := $metricsPlaceholders}}
+	{{if in $method.AdditionalMetricsLabels $to.Name}}
+		{{if $to.IsPointer}}
+					var _{{$to.Name}} string
+					if {{$to.Name}} != nil {
+						{{if $to.IsString}}
+							_{{$to.Name}} = *{{$to.Name}}
+						{{end}}
+						{{if $to.IsInt}}
+							_{{$to.Name}} = strconv.Itoa(int(*{{$to.Name}}))
+						{{end}}
+					} else {
+							_{{$to.Name}} = ""
+					}
+		{{end}}
+	{{end}}
+{{end}}
 		labels := []string{
 			"method", "{{.Name}}",
 			"error", strconv.FormatBool(err != nil),
             	{{range $from, $to := $metricsPlaceholders}}
 					{{if in $method.AdditionalMetricsLabels $to.Name}}
-						{{if $to.IsString}}
-							"{{$to.Name}}", {{$to.Name}},
-						{{end}}
-						{{if $to.IsInt}}
-							"{{$to.Name}}", strconv.Itoa(int({{$to.Name}})),
+						{{if $to.IsPointer}}
+							"{{$to.Name}}", _{{$to.Name}},
+						{{else}}
+							{{if $to.IsString}}
+								"{{$to.Name}}", {{$to.Name}},
+							{{end}}
+							{{if $to.IsInt}}
+								"{{$to.Name}}", strconv.Itoa(int({{$to.Name}})),
+							{{end}}
 						{{end}}
 					{{end}}
 				{{end}}

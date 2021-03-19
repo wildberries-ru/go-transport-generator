@@ -13,7 +13,7 @@ import (
 const (
 	errHTTPMethodGETCouldNotHaveRequestBody = "http method GET could not have request body in %s interface %s method %s"
 	errTooManyReturnOctetParams             = "http method with application/octet-stream content type expects 1 bosy or return parameter, but got %v in %s interface %s method %s"
-	errPointerToMetrics                     = "only strings and ints are allowed as addition metrics labels: method: %s %s variable: %s"
+	errTypeToMetrics                        = "only strings, ints and pointers on them are allowed as addition metrics labels: method: %s %s variable: %s"
 	errParameterDoNotExist                  = "parameter %s does not exist in method %s"
 )
 
@@ -149,8 +149,15 @@ func (s *httpMethod) castMetricsLabelPlaceholder(from string, argType types.Type
 		} else if s.isString(tp) {
 			httpMethod.AdditionalMetricsLabels[from].IsString = true
 		}
+	case types.TPointer:
+		httpMethod.AdditionalMetricsLabels[from].IsPointer = true
+		if s.isInt(tp.Next) {
+			httpMethod.AdditionalMetricsLabels[from].IsInt = true
+		} else if s.isString(tp.Next) {
+			httpMethod.AdditionalMetricsLabels[from].IsString = true
+		}
 	default:
-		return fmt.Errorf(errPointerToMetrics, httpMethod.Method, httpMethod.URIPath, from)
+		return fmt.Errorf(errTypeToMetrics, httpMethod.Method, httpMethod.URIPath, from)
 	}
 
 	return

@@ -68,7 +68,7 @@ fill from query string to variables `fileID` and `someID`
 
 for example @gtg metrics-additional-labels namespace, detail
 
-Support only strings and ints(int, int32. int64, etc). Pointers not allowed 
+Support only strings, ints(int, int32. int64, etc) and pointers on them  
 
 **http-server-header** Header string with placeholders
 
