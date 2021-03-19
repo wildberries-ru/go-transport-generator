@@ -49,7 +49,7 @@ func (s *instrumentingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{
 							_{{$to.Name}} = strconv.Itoa(int(*{{$to.Name}}))
 						{{end}}
 					} else {
-							_{{$to.Name}} = ""
+							_{{$to.Name}} = "empty"
 					}
 		{{end}}
 	{{end}}

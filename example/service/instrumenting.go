@@ -58,7 +58,7 @@ func (s *instrumentingMiddleware) GetDetails(ctx context.Context, namespace stri
 			_someID = strconv.Itoa(int(*someID))
 
 		} else {
-			_someID = ""
+			_someID = "empty"
 		}
 
 		var _token string
@@ -67,7 +67,7 @@ func (s *instrumentingMiddleware) GetDetails(ctx context.Context, namespace stri
 			_token = *token
 
 		} else {
-			_token = ""
+			_token = "empty"
 		}
 
 		labels := []string{
