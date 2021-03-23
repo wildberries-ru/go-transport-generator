@@ -22,7 +22,6 @@ import (
 
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/go-kit/kit/metrics"
 )
 

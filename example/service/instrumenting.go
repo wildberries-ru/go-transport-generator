@@ -9,11 +9,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/go-kit/kit/metrics"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	"github.com/prometheus/client_golang/prometheus"
 	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
-
-	"github.com/go-kit/kit/metrics"
 )
 
 // instrumentingMiddleware wraps Service and enables request metrics
