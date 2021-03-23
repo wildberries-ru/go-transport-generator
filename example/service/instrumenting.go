@@ -9,15 +9,40 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/go-kit/kit/metrics"
+	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
+	"github.com/prometheus/client_golang/prometheus"
 	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
+
+	"github.com/go-kit/kit/metrics"
 )
 
 // instrumentingMiddleware wraps Service and enables request metrics
 type instrumentingMiddleware struct {
-	reqCount    metrics.Counter
-	reqDuration metrics.Histogram
-	svc         SomeService
+	reqCountUploadDocument    metrics.Counter
+	reqDurationUploadDocument metrics.Histogram
+
+	reqCountGetWarehouses    metrics.Counter
+	reqDurationGetWarehouses metrics.Histogram
+
+	reqCountGetDetails    metrics.Counter
+	reqDurationGetDetails metrics.Histogram
+
+	reqCountGetDetailsEmbedStruct    metrics.Counter
+	reqDurationGetDetailsEmbedStruct metrics.Histogram
+
+	reqCountGetDetailsListEmbedStruct    metrics.Counter
+	reqDurationGetDetailsListEmbedStruct metrics.Histogram
+
+	reqCountPutDetails    metrics.Counter
+	reqDurationPutDetails metrics.Histogram
+
+	reqCountGetSomeElseDataUtf8    metrics.Counter
+	reqDurationGetSomeElseDataUtf8 metrics.Histogram
+
+	reqCountGetFile    metrics.Counter
+	reqDurationGetFile metrics.Histogram
+
+	svc SomeService
 }
 
 // UploadDocument ...
@@ -28,8 +53,8 @@ func (s *instrumentingMiddleware) UploadDocument(ctx context.Context, token *str
 			"method", "UploadDocument",
 			"error", strconv.FormatBool(err != nil),
 		}
-		s.reqCount.With(labels...).Add(1)
-		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+		s.reqCountUploadDocument.With(labels...).Add(1)
+		s.reqDurationUploadDocument.With(labels...).Observe(time.Since(startTime).Seconds())
 	}(time.Now())
 	return s.svc.UploadDocument(ctx, token, name, extension, categoryID, supplierID, contractID, data)
 }
@@ -42,8 +67,8 @@ func (s *instrumentingMiddleware) GetWarehouses(ctx context.Context) (pets map[s
 			"method", "GetWarehouses",
 			"error", strconv.FormatBool(err != nil),
 		}
-		s.reqCount.With(labels...).Add(1)
-		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+		s.reqCountGetWarehouses.With(labels...).Add(1)
+		s.reqDurationGetWarehouses.With(labels...).Observe(time.Since(startTime).Seconds())
 	}(time.Now())
 	return s.svc.GetWarehouses(ctx)
 }
@@ -84,8 +109,8 @@ func (s *instrumentingMiddleware) GetDetails(ctx context.Context, namespace stri
 
 			"token", _token,
 		}
-		s.reqCount.With(labels...).Add(1)
-		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+		s.reqCountGetDetails.With(labels...).Add(1)
+		s.reqDurationGetDetails.With(labels...).Observe(time.Since(startTime).Seconds())
 	}(time.Now())
 	return s.svc.GetDetails(ctx, namespace, detail, fileID, someID, token)
 }
@@ -98,8 +123,8 @@ func (s *instrumentingMiddleware) GetDetailsEmbedStruct(ctx context.Context, nam
 			"method", "GetDetailsEmbedStruct",
 			"error", strconv.FormatBool(err != nil),
 		}
-		s.reqCount.With(labels...).Add(1)
-		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+		s.reqCountGetDetailsEmbedStruct.With(labels...).Add(1)
+		s.reqDurationGetDetailsEmbedStruct.With(labels...).Observe(time.Since(startTime).Seconds())
 	}(time.Now())
 	return s.svc.GetDetailsEmbedStruct(ctx, namespace, detail)
 }
@@ -112,8 +137,8 @@ func (s *instrumentingMiddleware) GetDetailsListEmbedStruct(ctx context.Context,
 			"method", "GetDetailsListEmbedStruct",
 			"error", strconv.FormatBool(err != nil),
 		}
-		s.reqCount.With(labels...).Add(1)
-		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+		s.reqCountGetDetailsListEmbedStruct.With(labels...).Add(1)
+		s.reqDurationGetDetailsListEmbedStruct.With(labels...).Observe(time.Since(startTime).Seconds())
 	}(time.Now())
 	return s.svc.GetDetailsListEmbedStruct(ctx, namespace, detail)
 }
@@ -126,8 +151,8 @@ func (s *instrumentingMiddleware) PutDetails(ctx context.Context, namespace stri
 			"method", "PutDetails",
 			"error", strconv.FormatBool(err != nil),
 		}
-		s.reqCount.With(labels...).Add(1)
-		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+		s.reqCountPutDetails.With(labels...).Add(1)
+		s.reqDurationPutDetails.With(labels...).Observe(time.Since(startTime).Seconds())
 	}(time.Now())
 	return s.svc.PutDetails(ctx, namespace, detail, testID, blaID, token, pretty, yang)
 }
@@ -140,8 +165,8 @@ func (s *instrumentingMiddleware) GetSomeElseDataUtf8(ctx context.Context) (cool
 			"method", "GetSomeElseDataUtf8",
 			"error", strconv.FormatBool(err != nil),
 		}
-		s.reqCount.With(labels...).Add(1)
-		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+		s.reqCountGetSomeElseDataUtf8.With(labels...).Add(1)
+		s.reqDurationGetSomeElseDataUtf8.With(labels...).Observe(time.Since(startTime).Seconds())
 	}(time.Now())
 	return s.svc.GetSomeElseDataUtf8(ctx)
 }
@@ -154,17 +179,213 @@ func (s *instrumentingMiddleware) GetFile(ctx context.Context) (data []byte, fil
 			"method", "GetFile",
 			"error", strconv.FormatBool(err != nil),
 		}
-		s.reqCount.With(labels...).Add(1)
-		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+		s.reqCountGetFile.With(labels...).Add(1)
+		s.reqDurationGetFile.With(labels...).Observe(time.Since(startTime).Seconds())
 	}(time.Now())
 	return s.svc.GetFile(ctx)
 }
 
 // NewInstrumentingMiddleware ...
-func NewInstrumentingMiddleware(reqCount metrics.Counter, reqDuration metrics.Histogram, svc SomeService) SomeService {
+func NewInstrumentingMiddleware(
+	metricsNamespace string,
+	metricsSubsystem string,
+	metricsNameCount string,
+	metricsNameCountHelp string,
+	metricsNameDuration string,
+	metricsNameDurationHelp string,
+	svc SomeService,
+) SomeService {
+
+	reqCountUploadDocument := kitprometheus.NewCounterFrom(prometheus.CounterOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameCount,
+		Help:      metricsNameCountHelp,
+	}, []string{
+		"method",
+		"error",
+	})
+	reqDurationUploadDocument := kitprometheus.NewSummaryFrom(prometheus.SummaryOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameDuration,
+		Help:      metricsNameDurationHelp,
+	}, []string{
+		"method",
+		"error",
+	})
+
+	reqCountGetWarehouses := kitprometheus.NewCounterFrom(prometheus.CounterOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameCount,
+		Help:      metricsNameCountHelp,
+	}, []string{
+		"method",
+		"error",
+	})
+	reqDurationGetWarehouses := kitprometheus.NewSummaryFrom(prometheus.SummaryOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameDuration,
+		Help:      metricsNameDurationHelp,
+	}, []string{
+		"method",
+		"error",
+	})
+
+	reqCountGetDetails := kitprometheus.NewCounterFrom(prometheus.CounterOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameCount,
+		Help:      metricsNameCountHelp,
+	}, []string{
+		"method",
+		"error",
+
+		"detail",
+		"fileID",
+		"namespace",
+		"someID",
+		"token",
+	})
+	reqDurationGetDetails := kitprometheus.NewSummaryFrom(prometheus.SummaryOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameDuration,
+		Help:      metricsNameDurationHelp,
+	}, []string{
+		"method",
+		"error",
+
+		"detail",
+		"fileID",
+		"namespace",
+		"someID",
+		"token",
+	})
+
+	reqCountGetDetailsEmbedStruct := kitprometheus.NewCounterFrom(prometheus.CounterOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameCount,
+		Help:      metricsNameCountHelp,
+	}, []string{
+		"method",
+		"error",
+	})
+	reqDurationGetDetailsEmbedStruct := kitprometheus.NewSummaryFrom(prometheus.SummaryOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameDuration,
+		Help:      metricsNameDurationHelp,
+	}, []string{
+		"method",
+		"error",
+	})
+
+	reqCountGetDetailsListEmbedStruct := kitprometheus.NewCounterFrom(prometheus.CounterOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameCount,
+		Help:      metricsNameCountHelp,
+	}, []string{
+		"method",
+		"error",
+	})
+	reqDurationGetDetailsListEmbedStruct := kitprometheus.NewSummaryFrom(prometheus.SummaryOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameDuration,
+		Help:      metricsNameDurationHelp,
+	}, []string{
+		"method",
+		"error",
+	})
+
+	reqCountPutDetails := kitprometheus.NewCounterFrom(prometheus.CounterOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameCount,
+		Help:      metricsNameCountHelp,
+	}, []string{
+		"method",
+		"error",
+	})
+	reqDurationPutDetails := kitprometheus.NewSummaryFrom(prometheus.SummaryOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameDuration,
+		Help:      metricsNameDurationHelp,
+	}, []string{
+		"method",
+		"error",
+	})
+
+	reqCountGetSomeElseDataUtf8 := kitprometheus.NewCounterFrom(prometheus.CounterOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameCount,
+		Help:      metricsNameCountHelp,
+	}, []string{
+		"method",
+		"error",
+	})
+	reqDurationGetSomeElseDataUtf8 := kitprometheus.NewSummaryFrom(prometheus.SummaryOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameDuration,
+		Help:      metricsNameDurationHelp,
+	}, []string{
+		"method",
+		"error",
+	})
+
+	reqCountGetFile := kitprometheus.NewCounterFrom(prometheus.CounterOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameCount,
+		Help:      metricsNameCountHelp,
+	}, []string{
+		"method",
+		"error",
+	})
+	reqDurationGetFile := kitprometheus.NewSummaryFrom(prometheus.SummaryOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameDuration,
+		Help:      metricsNameDurationHelp,
+	}, []string{
+		"method",
+		"error",
+	})
+
 	return &instrumentingMiddleware{
-		reqCount:    reqCount,
-		reqDuration: reqDuration,
-		svc:         svc,
+
+		reqCountUploadDocument:    reqCountUploadDocument,
+		reqDurationUploadDocument: reqDurationUploadDocument,
+
+		reqCountGetWarehouses:    reqCountGetWarehouses,
+		reqDurationGetWarehouses: reqDurationGetWarehouses,
+
+		reqCountGetDetails:    reqCountGetDetails,
+		reqDurationGetDetails: reqDurationGetDetails,
+
+		reqCountGetDetailsEmbedStruct:    reqCountGetDetailsEmbedStruct,
+		reqDurationGetDetailsEmbedStruct: reqDurationGetDetailsEmbedStruct,
+
+		reqCountGetDetailsListEmbedStruct:    reqCountGetDetailsListEmbedStruct,
+		reqDurationGetDetailsListEmbedStruct: reqDurationGetDetailsListEmbedStruct,
+
+		reqCountPutDetails:    reqCountPutDetails,
+		reqDurationPutDetails: reqDurationPutDetails,
+
+		reqCountGetSomeElseDataUtf8:    reqCountGetSomeElseDataUtf8,
+		reqDurationGetSomeElseDataUtf8: reqDurationGetSomeElseDataUtf8,
+
+		reqCountGetFile:    reqCountGetFile,
+		reqDurationGetFile: reqDurationGetFile,
+
+		svc: svc,
 	}
 }

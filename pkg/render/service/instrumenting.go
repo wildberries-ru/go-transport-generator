@@ -20,13 +20,20 @@ import (
 	"strconv"
 	"time"
 
+	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/go-kit/kit/metrics"
 )
 
 // instrumentingMiddleware wraps Service and enables request metrics
 type instrumentingMiddleware struct {
-	reqCount    metrics.Counter
-	reqDuration metrics.Histogram
+{{$methods := .HTTPMethods}}
+{{range .Iface.Methods -}}
+{{$method := index $methods .Name}}
+	reqCount{{.Name}}    metrics.Counter
+	reqDuration{{.Name}} metrics.Histogram
+{{end}}
 	svc         {{ .Iface.Name }}
 }
 
@@ -72,18 +79,57 @@ func (s *instrumentingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{
 					{{end}}
 				{{end}}
 		}
-		s.reqCount.With(labels...).Add(1)
-		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
+		s.reqCount{{.Name}}.With(labels...).Add(1)
+		s.reqDuration{{.Name}}.With(labels...).Observe(time.Since(startTime).Seconds())
 	}(time.Now())
 	return s.svc.{{.Name}}({{joinVariableNamesWithEllipsis .Args ","}})
 }
 {{end}}
 
 // NewInstrumentingMiddleware ...
-func NewInstrumentingMiddleware(reqCount metrics.Counter, reqDuration metrics.Histogram, svc {{ .Iface.Name }}) {{ .Iface.Name }} {
+func NewInstrumentingMiddleware(
+	metricsNamespace string,
+	metricsSubsystem string,
+	metricsNameCount string,
+	metricsNameCountHelp string,
+	metricsNameDuration string,
+	metricsNameDurationHelp string,
+	svc {{ .Iface.Name }},
+) {{ .Iface.Name }} {
+{{$methods := .HTTPMethods}}
+{{range .Iface.Methods -}}
+{{$method := index $methods .Name}}
+{{$metricsPlaceholders := $method.AdditionalMetricsLabels}}
+		reqCount{{.Name}} := kitprometheus.NewCounterFrom(prometheus.CounterOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameCount,
+		Help:      metricsNameCountHelp,
+	}, []string{
+		"method", 
+		"error",
+{{range $from, $to := $metricsPlaceholders}}
+		"{{$to.Name}}",{{end}}
+	})
+	reqDuration{{.Name}} := kitprometheus.NewSummaryFrom(prometheus.SummaryOpts{
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystem,
+		Name:      metricsNameDuration,
+		Help:      metricsNameDurationHelp,
+	}, []string{
+		"method",
+		"error",
+{{range $from, $to := $metricsPlaceholders}}
+		"{{$to.Name}}", {{end}}
+	})
+{{end}}
 	return &instrumentingMiddleware{
-		reqCount:    reqCount,
-		reqDuration: reqDuration,
+{{$methods := .HTTPMethods}}
+{{range .Iface.Methods -}}
+{{$method := index $methods .Name}}
+	reqCount{{.Name}} :   reqCount{{.Name}},
+	reqDuration{{.Name}} : reqDuration{{.Name}},
+{{end}}
 		svc:         svc,
 	}
 }
