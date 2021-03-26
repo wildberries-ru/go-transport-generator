@@ -46,7 +46,7 @@ type loggingMiddleware struct {
 					"elapsed": time.Since(begin),
 				},
 			)
-			if err != nil {
+			if err == nil {
 				lg.Debug("{{.Name}}")
 			} else {
 				lg.Error("{{.Name}}")
