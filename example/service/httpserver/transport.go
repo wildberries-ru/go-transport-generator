@@ -145,7 +145,7 @@ type getWarehousesResponse map[string]v1.Detail
 
 // GetWarehousesTransport transport interface
 type GetWarehousesTransport interface {
-	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (err error)
+	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, err error)
 	EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, pets map[string]v1.Detail) (err error)
 }
 
@@ -154,7 +154,9 @@ type getWarehousesTransport struct {
 }
 
 // DecodeRequest method for decoding requests on server side
-func (t *getWarehousesTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (err error) {
+func (t *getWarehousesTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, err error) {
+
+	token = ptr(r.Header.Peek("Authorization"))
 
 	return
 }
@@ -290,7 +292,7 @@ type getDetailsEmbedStructResponse struct {
 
 // GetDetailsEmbedStructTransport transport interface
 type GetDetailsEmbedStructTransport interface {
-	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (namespace string, detail string, err error)
+	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (namespace string, detail string, token *string, err error)
 	EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, response v1.GetDetailsEmbedStructResponse) (err error)
 }
 
@@ -299,11 +301,13 @@ type getDetailsEmbedStructTransport struct {
 }
 
 // DecodeRequest method for decoding requests on server side
-func (t *getDetailsEmbedStructTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (namespace string, detail string, err error) {
+func (t *getDetailsEmbedStructTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (namespace string, detail string, token *string, err error) {
 
 	namespace = ctx.UserValue("namespace").(string)
 
 	detail = ctx.UserValue("detail").(string)
+
+	token = ptr(r.Header.Peek("Authorization"))
 
 	return
 }
@@ -343,7 +347,7 @@ type getDetailsListEmbedStructResponse []v1.Detail
 
 // GetDetailsListEmbedStructTransport transport interface
 type GetDetailsListEmbedStructTransport interface {
-	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (namespace string, detail string, err error)
+	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (namespace string, detail string, token *string, err error)
 	EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, details []v1.Detail) (err error)
 }
 
@@ -352,11 +356,13 @@ type getDetailsListEmbedStructTransport struct {
 }
 
 // DecodeRequest method for decoding requests on server side
-func (t *getDetailsListEmbedStructTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (namespace string, detail string, err error) {
+func (t *getDetailsListEmbedStructTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (namespace string, detail string, token *string, err error) {
 
 	namespace = ctx.UserValue("namespace").(string)
 
 	detail = ctx.UserValue("detail").(string)
+
+	token = ptr(r.Header.Peek("Authorization"))
 
 	return
 }
@@ -490,7 +496,7 @@ type getSomeElseDataUtf8Response struct {
 
 // GetSomeElseDataUtf8Transport transport interface
 type GetSomeElseDataUtf8Transport interface {
-	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (err error)
+	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, err error)
 	EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, cool v1.Detail, nothing v1.Namespace, id *string) (err error)
 }
 
@@ -499,7 +505,9 @@ type getSomeElseDataUtf8Transport struct {
 }
 
 // DecodeRequest method for decoding requests on server side
-func (t *getSomeElseDataUtf8Transport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (err error) {
+func (t *getSomeElseDataUtf8Transport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, err error) {
+
+	token = ptr(r.Header.Peek("Authorization"))
 
 	return
 }
@@ -541,7 +549,7 @@ func NewGetSomeElseDataUtf8Transport(
 
 // GetFileTransport transport interface
 type GetFileTransport interface {
-	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (err error)
+	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, err error)
 	EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, data []byte, fileName string) (err error)
 }
 
@@ -549,7 +557,9 @@ type getFileTransport struct {
 }
 
 // DecodeRequest method for decoding requests on server side
-func (t *getFileTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (err error) {
+func (t *getFileTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, err error) {
+
+	token = ptr(r.Header.Peek("Authorization"))
 
 	return
 }

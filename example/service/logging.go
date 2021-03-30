@@ -43,10 +43,11 @@ func (s *loggingMiddleware) UploadDocument(ctx context.Context, token *string, n
 }
 
 // GetWarehouses ...
-func (s *loggingMiddleware) GetWarehouses(ctx context.Context) (pets map[string]v1.Detail, err error) {
+func (s *loggingMiddleware) GetWarehouses(ctx context.Context, token *string) (pets map[string]v1.Detail, err error) {
 	defer func(begin time.Time) {
 		lg := s.logger.WithError(err).WithFields(
 			map[string]interface{}{
+				"token": token,
 
 				"elapsed": time.Since(begin),
 			},
@@ -57,7 +58,7 @@ func (s *loggingMiddleware) GetWarehouses(ctx context.Context) (pets map[string]
 			lg.Error("GetWarehouses")
 		}
 	}(time.Now())
-	return s.svc.GetWarehouses(ctx)
+	return s.svc.GetWarehouses(ctx, token)
 }
 
 // GetDetails ...
@@ -85,12 +86,13 @@ func (s *loggingMiddleware) GetDetails(ctx context.Context, namespace string, de
 }
 
 // GetDetailsEmbedStruct ...
-func (s *loggingMiddleware) GetDetailsEmbedStruct(ctx context.Context, namespace string, detail string) (response v1.GetDetailsEmbedStructResponse, err error) {
+func (s *loggingMiddleware) GetDetailsEmbedStruct(ctx context.Context, namespace string, detail string, token *string) (response v1.GetDetailsEmbedStructResponse, err error) {
 	defer func(begin time.Time) {
 		lg := s.logger.WithError(err).WithFields(
 			map[string]interface{}{
 				"namespace": namespace,
 				"detail":    detail,
+				"token":     token,
 				"response":  response,
 				"elapsed":   time.Since(begin),
 			},
@@ -101,16 +103,17 @@ func (s *loggingMiddleware) GetDetailsEmbedStruct(ctx context.Context, namespace
 			lg.Error("GetDetailsEmbedStruct")
 		}
 	}(time.Now())
-	return s.svc.GetDetailsEmbedStruct(ctx, namespace, detail)
+	return s.svc.GetDetailsEmbedStruct(ctx, namespace, detail, token)
 }
 
 // GetDetailsListEmbedStruct ...
-func (s *loggingMiddleware) GetDetailsListEmbedStruct(ctx context.Context, namespace string, detail string) (details []v1.Detail, err error) {
+func (s *loggingMiddleware) GetDetailsListEmbedStruct(ctx context.Context, namespace string, detail string, token *string) (details []v1.Detail, err error) {
 	defer func(begin time.Time) {
 		lg := s.logger.WithError(err).WithFields(
 			map[string]interface{}{
 				"namespace": namespace,
 				"detail":    detail,
+				"token":     token,
 				"details":   details,
 				"elapsed":   time.Since(begin),
 			},
@@ -121,7 +124,7 @@ func (s *loggingMiddleware) GetDetailsListEmbedStruct(ctx context.Context, names
 			lg.Error("GetDetailsListEmbedStruct")
 		}
 	}(time.Now())
-	return s.svc.GetDetailsListEmbedStruct(ctx, namespace, detail)
+	return s.svc.GetDetailsListEmbedStruct(ctx, namespace, detail, token)
 }
 
 // PutDetails ...
@@ -152,10 +155,11 @@ func (s *loggingMiddleware) PutDetails(ctx context.Context, namespace string, de
 }
 
 // GetSomeElseDataUtf8 ...
-func (s *loggingMiddleware) GetSomeElseDataUtf8(ctx context.Context) (cool v1.Detail, nothing v1.Namespace, id *string, err error) {
+func (s *loggingMiddleware) GetSomeElseDataUtf8(ctx context.Context, token *string) (cool v1.Detail, nothing v1.Namespace, id *string, err error) {
 	defer func(begin time.Time) {
 		lg := s.logger.WithError(err).WithFields(
 			map[string]interface{}{
+				"token":   token,
 				"cool":    cool,
 				"nothing": nothing,
 				"id":      id,
@@ -168,14 +172,15 @@ func (s *loggingMiddleware) GetSomeElseDataUtf8(ctx context.Context) (cool v1.De
 			lg.Error("GetSomeElseDataUtf8")
 		}
 	}(time.Now())
-	return s.svc.GetSomeElseDataUtf8(ctx)
+	return s.svc.GetSomeElseDataUtf8(ctx, token)
 }
 
 // GetFile ...
-func (s *loggingMiddleware) GetFile(ctx context.Context) (data []byte, fileName string, err error) {
+func (s *loggingMiddleware) GetFile(ctx context.Context, token *string) (data []byte, fileName string, err error) {
 	defer func(begin time.Time) {
 		lg := s.logger.WithError(err).WithFields(
 			map[string]interface{}{
+				"token":    token,
 				"data":     data,
 				"fileName": fileName,
 				"elapsed":  time.Since(begin),
@@ -187,7 +192,7 @@ func (s *loggingMiddleware) GetFile(ctx context.Context) (data []byte, fileName 
 			lg.Error("GetFile")
 		}
 	}(time.Now())
-	return s.svc.GetFile(ctx)
+	return s.svc.GetFile(ctx, token)
 }
 
 // NewLoggingMiddleware ...

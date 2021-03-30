@@ -27,12 +27,8 @@ import (
 
 // instrumentingMiddleware wraps Service and enables request metrics
 type instrumentingMiddleware struct {
-{{$methods := .HTTPMethods}}
-{{range .Iface.Methods -}}
-{{$method := index $methods .Name}}
-	reqCount{{.Name}}    metrics.Counter
-	reqDuration{{.Name}} metrics.Histogram
-{{end}}
+	reqCount    metrics.Counter
+	reqDuration metrics.Histogram
 	svc         {{ .Iface.Name }}
 }
 
@@ -78,8 +74,8 @@ func (s *instrumentingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{
 					{{end}}
 				{{end}}
 		}
-		s.reqCount{{.Name}}.With(labels...).Add(1)
-		s.reqDuration{{.Name}}.With(labels...).Observe(time.Since(startTime).Seconds())
+		s.reqCount.With(labels...).Add(1)
+		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
 	}(time.Now())
 	return s.svc.{{.Name}}({{joinVariableNamesWithEllipsis .Args ","}})
 }
@@ -93,42 +89,30 @@ func NewInstrumentingMiddleware(
 	metricsNameCountHelp string,
 	metricsNameDuration string,
 	metricsNameDurationHelp string,
+	labels []string,
 	svc {{ .Iface.Name }},
 ) {{ .Iface.Name }} {
-{{$methods := .HTTPMethods}}
-{{range .Iface.Methods -}}
-{{$method := index $methods .Name}}
-{{$metricsPlaceholders := $method.AdditionalMetricsLabels}}
-		reqCount{{.Name}} := kitprometheus.NewCounterFrom(prometheus.CounterOpts{
-		Namespace: metricsNamespace,
-		Subsystem: metricsSubsystem,
-		Name:      metricsNameCount,
-		Help:      metricsNameCountHelp,
-	}, []string{
-		"method", 
-		"error",
-{{range $from, $to := $metricsPlaceholders}}
-		"{{$to.Name}}",{{end}}
-	})
-	reqDuration{{.Name}} := kitprometheus.NewSummaryFrom(prometheus.SummaryOpts{
-		Namespace: metricsNamespace,
-		Subsystem: metricsSubsystem,
-		Name:      metricsNameDuration,
-		Help:      metricsNameDurationHelp,
-	}, []string{
-		"method",
-		"error",
-{{range $from, $to := $metricsPlaceholders}}
-		"{{$to.Name}}", {{end}}
-	})
-{{end}}
+	reqCount := kitprometheus.NewCounterFrom(
+		prometheus.CounterOpts{
+			Namespace: metricsNamespace,
+			Subsystem: metricsSubsystem,
+			Name:      metricsNameCount,
+			Help:      metricsNameCountHelp,
+		},
+		labels,
+	)
+	reqDuration := kitprometheus.NewSummaryFrom(
+		prometheus.SummaryOpts{
+			Namespace: metricsNamespace,
+			Subsystem: metricsSubsystem,
+			Name:      metricsNameDuration,
+			Help:      metricsNameDurationHelp,
+		},
+		labels,
+	)
 	return &instrumentingMiddleware{
-{{$methods := .HTTPMethods}}
-{{range .Iface.Methods -}}
-{{$method := index $methods .Name}}
-	reqCount{{.Name}} :   reqCount{{.Name}},
-	reqDuration{{.Name}} : reqDuration{{.Name}},
-{{end}}
+		reqCount:    reqCount,
+		reqDuration: reqDuration,
 		svc:         svc,
 	}
 }

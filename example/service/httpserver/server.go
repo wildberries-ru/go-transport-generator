@@ -13,13 +13,13 @@ import (
 
 type service interface {
 	UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader) (err error)
-	GetWarehouses(ctx context.Context) (pets map[string]v1.Detail, err error)
+	GetWarehouses(ctx context.Context, token *string) (pets map[string]v1.Detail, err error)
 	GetDetails(ctx context.Context, namespace string, detail string, fileID uint32, someID *uint64, token *string) (det v1.Detail, ns v1.Namespace, id *string, err error)
-	GetDetailsEmbedStruct(ctx context.Context, namespace string, detail string) (response v1.GetDetailsEmbedStructResponse, err error)
-	GetDetailsListEmbedStruct(ctx context.Context, namespace string, detail string) (details []v1.Detail, err error)
+	GetDetailsEmbedStruct(ctx context.Context, namespace string, detail string, token *string) (response v1.GetDetailsEmbedStructResponse, err error)
+	GetDetailsListEmbedStruct(ctx context.Context, namespace string, detail string, token *string) (details []v1.Detail, err error)
 	PutDetails(ctx context.Context, namespace string, detail string, testID string, blaID *string, token *string, pretty v1.Detail, yang v1.Namespace) (cool v1.Detail, nothing v1.Namespace, id *string, err error)
-	GetSomeElseDataUtf8(ctx context.Context) (cool v1.Detail, nothing v1.Namespace, id *string, err error)
-	GetFile(ctx context.Context) (data []byte, fileName string, err error)
+	GetSomeElseDataUtf8(ctx context.Context, token *string) (cool v1.Detail, nothing v1.Namespace, id *string, err error)
+	GetFile(ctx context.Context, token *string) (data []byte, fileName string, err error)
 }
 
 type uploadDocument struct {
@@ -77,16 +77,17 @@ type getWarehouses struct {
 // ServeHTTP implements http.Handler.
 func (s *getWarehouses) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
-		pets map[string]v1.Detail
-		err  error
+		token *string
+		pets  map[string]v1.Detail
+		err   error
 	)
-	err = s.transport.DecodeRequest(ctx, &ctx.Request)
+	token, err = s.transport.DecodeRequest(ctx, &ctx.Request)
 	if err != nil {
 		s.errorProcessor.Encode(ctx, &ctx.Response, err)
 		return
 	}
 
-	pets, err = s.service.GetWarehouses(ctx)
+	pets, err = s.service.GetWarehouses(ctx, token)
 	if err != nil {
 		s.errorProcessor.Encode(ctx, &ctx.Response, err)
 		return
@@ -166,16 +167,17 @@ func (s *getDetailsEmbedStruct) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
 		namespace string
 		detail    string
+		token     *string
 		response  v1.GetDetailsEmbedStructResponse
 		err       error
 	)
-	namespace, detail, err = s.transport.DecodeRequest(ctx, &ctx.Request)
+	namespace, detail, token, err = s.transport.DecodeRequest(ctx, &ctx.Request)
 	if err != nil {
 		s.errorProcessor.Encode(ctx, &ctx.Response, err)
 		return
 	}
 
-	response, err = s.service.GetDetailsEmbedStruct(ctx, namespace, detail)
+	response, err = s.service.GetDetailsEmbedStruct(ctx, namespace, detail, token)
 	if err != nil {
 		s.errorProcessor.Encode(ctx, &ctx.Response, err)
 		return
@@ -208,16 +210,17 @@ func (s *getDetailsListEmbedStruct) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
 		namespace string
 		detail    string
+		token     *string
 		details   []v1.Detail
 		err       error
 	)
-	namespace, detail, err = s.transport.DecodeRequest(ctx, &ctx.Request)
+	namespace, detail, token, err = s.transport.DecodeRequest(ctx, &ctx.Request)
 	if err != nil {
 		s.errorProcessor.Encode(ctx, &ctx.Response, err)
 		return
 	}
 
-	details, err = s.service.GetDetailsListEmbedStruct(ctx, namespace, detail)
+	details, err = s.service.GetDetailsListEmbedStruct(ctx, namespace, detail, token)
 	if err != nil {
 		s.errorProcessor.Encode(ctx, &ctx.Response, err)
 		return
@@ -297,18 +300,19 @@ type getSomeElseDataUtf8 struct {
 // ServeHTTP implements http.Handler.
 func (s *getSomeElseDataUtf8) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
+		token   *string
 		cool    v1.Detail
 		nothing v1.Namespace
 		id      *string
 		err     error
 	)
-	err = s.transport.DecodeRequest(ctx, &ctx.Request)
+	token, err = s.transport.DecodeRequest(ctx, &ctx.Request)
 	if err != nil {
 		s.errorProcessor.Encode(ctx, &ctx.Response, err)
 		return
 	}
 
-	cool, nothing, id, err = s.service.GetSomeElseDataUtf8(ctx)
+	cool, nothing, id, err = s.service.GetSomeElseDataUtf8(ctx, token)
 	if err != nil {
 		s.errorProcessor.Encode(ctx, &ctx.Response, err)
 		return
@@ -339,17 +343,18 @@ type getFile struct {
 // ServeHTTP implements http.Handler.
 func (s *getFile) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
+		token    *string
 		data     []byte
 		fileName string
 		err      error
 	)
-	err = s.transport.DecodeRequest(ctx, &ctx.Request)
+	token, err = s.transport.DecodeRequest(ctx, &ctx.Request)
 	if err != nil {
 		s.errorProcessor.Encode(ctx, &ctx.Response, err)
 		return
 	}
 
-	data, fileName, err = s.service.GetFile(ctx)
+	data, fileName, err = s.service.GetFile(ctx, token)
 	if err != nil {
 		s.errorProcessor.Encode(ctx, &ctx.Response, err)
 		return

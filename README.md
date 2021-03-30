@@ -46,7 +46,13 @@ Interface definition requirements:
 **logs** Generates log wrapper for service. It uses interface `Logger` from this repository and has adapters for common loggers in `log/adapters` directory. You can use any logging package.
  
 **metrics** Generates metrics wrapper for service
- 
+
+By default, only method name and error are presented in metrics. You can add additional parameters to metrics:
+
+metrics(fistParameter,secondParameter)
+
+This parameters must be in all yours methods. Support only strings, ints(int, int32. int64, etc) and pointers on them.
+
 **swagger** Generates swagger for http server
 
 #### Service methods Tags
@@ -63,12 +69,6 @@ fill from URI path to variables `namespace` and `detail` (should be strings)
 for example `file={fileID}&some={someID}`
 
 fill from query string to variables `fileID` and `someID`
-
-**metrics-additional-labels** Add income parameters to metrics
-
-for example @gtg metrics-additional-labels namespace, detail
-
-Support only strings, ints(int, int32. int64, etc) and pointers on them  
 
 **http-server-header** Header string with placeholders
 
