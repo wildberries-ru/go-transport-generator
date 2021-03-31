@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -25,22 +26,25 @@ func (s *Services) Process(info *api.GenerationInfo, astra *types.File, outPath 
 			doc = strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(doc), "//"))
 			if strings.HasPrefix(doc, s.tagMark) {
 
+				fmt.Println(doc)
 				var additionalMetricsLabels []string
 				tags := strings.Split(strings.TrimSpace(doc[len(s.tagMark):]), " ")
-				doc = s.tagMark + " "
+				var str strings.Builder
+				str.WriteString(s.tagMark + " ")
 				for _, tag := range tags {
 					if strings.Contains(tag, s.metricsTag) {
 						if strings.Contains(tag, "(") {
 							metricsLabels := strings.Split(tag[:len(tag)-1], "(")
-							doc += metricsLabels[0] + " "
+							str.WriteString(metricsLabels[0] + " ")
 							additionalMetricsLabels = strings.Split(metricsLabels[1], ",")
 							continue
 						}
-						doc += tag + " "
+						str.WriteString(tag + " ")
 						continue
 					}
-					doc += tag + " "
+					str.WriteString(tag + " ")
 				}
+				doc = str.String()
 
 				iface := api.Interface{
 					Iface: i,
