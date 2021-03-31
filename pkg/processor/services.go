@@ -1,7 +1,6 @@
 package processor
 
 import (
-	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -26,7 +25,6 @@ func (s *Services) Process(info *api.GenerationInfo, astra *types.File, outPath 
 			doc = strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(doc), "//"))
 			if strings.HasPrefix(doc, s.tagMark) {
 
-				fmt.Println(doc)
 				var additionalMetricsLabels []string
 				tags := strings.Split(strings.TrimSpace(doc[len(s.tagMark):]), " ")
 				var str strings.Builder

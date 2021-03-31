@@ -230,14 +230,14 @@ paths:
           type: string
           nullable: true
       - in: query
-        name: testID
-        schema:
-          type: string
-      - in: query
         name: blaID
         schema:
           type: string
           nullable: true
+      - in: query
+        name: testID
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
