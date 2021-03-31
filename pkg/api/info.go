@@ -69,9 +69,10 @@ type HTTPMethod struct {
 
 // MetricsPlaceholder ...
 type MetricsPlaceholder struct {
-	IsString bool
-	IsInt    bool
-	Name     string
+	IsString  bool
+	IsInt     bool
+	IsPointer bool
+	Name      string
 }
 
 // Placeholder ...

@@ -20,6 +20,8 @@ import (
 	"strconv"
 	"time"
 
+	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/go-kit/kit/metrics"
 )
 
@@ -37,16 +39,37 @@ type instrumentingMiddleware struct {
 // {{.Name}} ...
 func (s *instrumentingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFullVariables .Results ","}}) {
 	defer func(startTime time.Time) {
+{{range $from, $to := $metricsPlaceholders}}
+	{{if in $method.AdditionalMetricsLabels $to.Name}}
+		{{if $to.IsPointer}}
+					var _{{$to.Name}} string
+					if {{$to.Name}} != nil {
+						{{if $to.IsString}}
+							_{{$to.Name}} = *{{$to.Name}}
+						{{end}}
+						{{if $to.IsInt}}
+							_{{$to.Name}} = strconv.Itoa(int(*{{$to.Name}}))
+						{{end}}
+					} else {
+							_{{$to.Name}} = "empty"
+					}
+		{{end}}
+	{{end}}
+{{end}}
 		labels := []string{
 			"method", "{{.Name}}",
 			"error", strconv.FormatBool(err != nil),
             	{{range $from, $to := $metricsPlaceholders}}
 					{{if in $method.AdditionalMetricsLabels $to.Name}}
-						{{if $to.IsString}}
-							"{{$to.Name}}", {{$to.Name}},
-						{{end}}
-						{{if $to.IsInt}}
-							"{{$to.Name}}", strconv.Itoa(int({{$to.Name}})),
+						{{if $to.IsPointer}}
+							"{{$to.Name}}", _{{$to.Name}},
+						{{else}}
+							{{if $to.IsString}}
+								"{{$to.Name}}", {{$to.Name}},
+							{{end}}
+							{{if $to.IsInt}}
+								"{{$to.Name}}", strconv.Itoa(int({{$to.Name}})),
+							{{end}}
 						{{end}}
 					{{end}}
 				{{end}}
@@ -59,7 +82,34 @@ func (s *instrumentingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{
 {{end}}
 
 // NewInstrumentingMiddleware ...
-func NewInstrumentingMiddleware(reqCount metrics.Counter, reqDuration metrics.Histogram, svc {{ .Iface.Name }}) {{ .Iface.Name }} {
+func NewInstrumentingMiddleware(
+	metricsNamespace string,
+	metricsSubsystem string,
+	metricsNameCount string,
+	metricsNameCountHelp string,
+	metricsNameDuration string,
+	metricsNameDurationHelp string,
+	labels []string,
+	svc {{ .Iface.Name }},
+) {{ .Iface.Name }} {
+	reqCount := kitprometheus.NewCounterFrom(
+		prometheus.CounterOpts{
+			Namespace: metricsNamespace,
+			Subsystem: metricsSubsystem,
+			Name:      metricsNameCount,
+			Help:      metricsNameCountHelp,
+		},
+		labels,
+	)
+	reqDuration := kitprometheus.NewSummaryFrom(
+		prometheus.SummaryOpts{
+			Namespace: metricsNamespace,
+			Subsystem: metricsSubsystem,
+			Name:      metricsNameDuration,
+			Help:      metricsNameDurationHelp,
+		},
+		labels,
+	)
 	return &instrumentingMiddleware{
 		reqCount:    reqCount,
 		reqDuration: reqDuration,

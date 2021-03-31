@@ -23,8 +23,8 @@ func (s *MockService) UploadDocument(ctx context.Context, token *string, name st
 }
 
 // GetWarehouses ...
-func (s *MockService) GetWarehouses(ctx context.Context) (pets map[string]v1.Detail, err error) {
-	args := s.Called(context.Background())
+func (s *MockService) GetWarehouses(ctx context.Context, token *string) (pets map[string]v1.Detail, err error) {
+	args := s.Called(context.Background(), token)
 	return args.Get(0).(map[string]v1.Detail), args.Error(1)
 }
 
@@ -35,14 +35,14 @@ func (s *MockService) GetDetails(ctx context.Context, namespace string, detail s
 }
 
 // GetDetailsEmbedStruct ...
-func (s *MockService) GetDetailsEmbedStruct(ctx context.Context, namespace string, detail string) (response v1.GetDetailsEmbedStructResponse, err error) {
-	args := s.Called(context.Background(), namespace, detail)
+func (s *MockService) GetDetailsEmbedStruct(ctx context.Context, namespace string, detail string, token *string) (response v1.GetDetailsEmbedStructResponse, err error) {
+	args := s.Called(context.Background(), namespace, detail, token)
 	return args.Get(0).(v1.GetDetailsEmbedStructResponse), args.Error(1)
 }
 
 // GetDetailsListEmbedStruct ...
-func (s *MockService) GetDetailsListEmbedStruct(ctx context.Context, namespace string, detail string) (details []v1.Detail, err error) {
-	args := s.Called(context.Background(), namespace, detail)
+func (s *MockService) GetDetailsListEmbedStruct(ctx context.Context, namespace string, detail string, token *string) (details []v1.Detail, err error) {
+	args := s.Called(context.Background(), namespace, detail, token)
 	return args.Get(0).([]v1.Detail), args.Error(1)
 }
 
@@ -53,13 +53,13 @@ func (s *MockService) PutDetails(ctx context.Context, namespace string, detail s
 }
 
 // GetSomeElseDataUtf8 ...
-func (s *MockService) GetSomeElseDataUtf8(ctx context.Context) (cool v1.Detail, nothing v1.Namespace, id *string, err error) {
-	args := s.Called(context.Background())
+func (s *MockService) GetSomeElseDataUtf8(ctx context.Context, token *string) (cool v1.Detail, nothing v1.Namespace, id *string, err error) {
+	args := s.Called(context.Background(), token)
 	return args.Get(0).(v1.Detail), args.Get(1).(v1.Namespace), args.Get(2).(*string), args.Error(3)
 }
 
 // GetFile ...
-func (s *MockService) GetFile(ctx context.Context) (data []byte, fileName string, err error) {
-	args := s.Called(context.Background())
+func (s *MockService) GetFile(ctx context.Context, token *string) (data []byte, fileName string, err error) {
+	args := s.Called(context.Background(), token)
 	return args.Get(0).([]byte), args.Get(1).(string), args.Error(2)
 }

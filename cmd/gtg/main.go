@@ -16,7 +16,6 @@ import (
 	"github.com/wildberries-ru/go-transport-generator/pkg/mod"
 	request2 "github.com/wildberries-ru/go-transport-generator/pkg/parser"
 	"github.com/wildberries-ru/go-transport-generator/pkg/parser/httpserver/log"
-	"github.com/wildberries-ru/go-transport-generator/pkg/parser/httpserver/metrics"
 	"github.com/wildberries-ru/go-transport-generator/pkg/parser/httpserver/request"
 	"github.com/wildberries-ru/go-transport-generator/pkg/parser/httpserver/response"
 	swagger2 "github.com/wildberries-ru/go-transport-generator/pkg/parser/swagger"
@@ -65,7 +64,6 @@ const (
 	swaggerTitleSuffix             = "title"
 	swaggerVersionSuffix           = "version"
 	ignoreSuffix                   = "ignore"
-	additionalLabels               = "additional-labels"
 
 	httpServerPkgName = "httpserver"
 	httpClientPkgName = "httpclient"
@@ -156,7 +154,6 @@ func main() {
 						response.NewFile(httpServer, responseFileSuffix,
 							response.NewBody(httpServer, responseBodySuffix, tagsParser)))))))
 	tagsParser = log.NewLogIgnore(logService, ignoreSuffix, tagsParser)
-	tagsParser = metrics.NewAdditionalMetricsLabels(instrumentingService, additionalLabels, tagsParser)
 	swaggerMethodTagParser := swagger2.NewVersion(swagger, swaggerVersionSuffix,
 		swagger2.NewTitle(swagger, swaggerTitleSuffix,
 			swagger2.NewSummary(swagger, swaggerSummarySuffix,
@@ -317,7 +314,7 @@ func main() {
 		swagger:              processor.NewSwagger(tagMark, httpMethodProcessor, swaggerMethodTagParser, mod.NewMod(), goGeneratedAutomaticallyPrefix),
 	}
 
-	servicesProcessor := processor.NewServices(tagMark, processors, httpMethodProcessor)
+	servicesProcessor := processor.NewServices(tagMark, processors, httpMethodProcessor, instrumentingService)
 	servicePreProcessor := preprocessor.NewService(servicesProcessor, goGeneratedAutomaticallyPrefix, swaggerRender)
 
 	info.SwaggerAbsOutputPath = *swaggerFile
