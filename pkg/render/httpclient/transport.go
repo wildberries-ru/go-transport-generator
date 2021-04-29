@@ -71,7 +71,11 @@ import (
     			{{$responseBodyType}}
   			{{else}}
 			    {{$respLen := lenMap $responseBody}}
-			    {{range $name, $tp := $responseBody}}{{if eq $respLen 1}}{{if contains $tp "."}}{{$tp}}{{else}}{{up $name}} {{$tp}}{{end}}{{else}}{{up $name}} {{$tp}}{{end}}{{$tag := index $responseJSONTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
+			    {{range $name, $tp := $responseBody}}
+					{{$isSlice := contains $tp "["}}
+					{{$isNotSlice := not $isSlice}}
+					{{$isStruct := contains $tp "."}}
+					{{if eq $respLen 1}}{{if and $isStruct $isNotSlice }}{{$tp}}{{else}}{{up $name}} {{$tp}}{{end}}{{else}}{{up $name}} {{$tp}}{{end}}{{$tag := index $responseJSONTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
     			{{end}}
   			{{end}}
 		}{{end}}
