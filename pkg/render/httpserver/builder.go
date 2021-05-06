@@ -54,6 +54,10 @@ func New(router *fasthttprouter.Router, svc service, decodeJSONErrorCreator erro
 		)
 		router.Handle(httpMethod{{.Name}}, uriPath{{.Name}}, New{{.Name}}({{low .Name}}Transport, svc, errorProcessor))
 	{{end}}
+}
+
+// NewPprofWrapper wraps router in pprof
+func NewPprofWrapper(router *fasthttprouter.Router) {
 	router.Handle("GET", "/debug/pprof", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Index))
 	router.Handle("GET", "/debug/pprof/profile", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Profile))
 	router.Handle("GET", "/debug/pprof/cmdline", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Cmdline))
