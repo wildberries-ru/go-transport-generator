@@ -24,37 +24,37 @@ func TestNew(t *testing.T) {
 
 	transportCreateMultipartUpload := NewCreateMultipartUploadTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientCreateMultipartUpload,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientCreateMultipartUpload,
 		httpMethodCreateMultipartUpload,
 	)
 	transportUploadPartDocument := NewUploadPartDocumentTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientUploadPartDocument,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientUploadPartDocument,
 		httpMethodUploadPartDocument,
 	)
 	transportCompleteUpload := NewCompleteUploadTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientCompleteUpload,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientCompleteUpload,
 		httpMethodCompleteUpload,
 	)
 	transportUploadDocument := NewUploadDocumentTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientUploadDocument,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientUploadDocument,
 		httpMethodUploadDocument,
 	)
 	transportDownloadDocument := NewDownloadDocumentTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientDownloadDocument,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientDownloadDocument,
 		httpMethodDownloadDocument,
 	)
 	transportGetToken := NewGetTokenTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetToken,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientGetToken,
 		httpMethodGetToken,
 	)
 	transportGetBranches := NewGetBranchesTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetBranches,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientGetBranches,
 		httpMethodGetBranches,
 	)
 

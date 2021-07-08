@@ -5,6 +5,7 @@ package httpserver
 
 import (
 	"bytes"
+	"encoding/json"
 	"net/http"
 
 	"github.com/valyala/fasthttp"
@@ -15,7 +16,6 @@ var (
 	emptyBytes = []byte("")
 )
 
-//easyjson:json
 type createMultipartUploadResponse struct {
 	AdditionalErrors *v1.AdditionalErrors `json:"additionalErrors"`
 
@@ -60,7 +60,7 @@ func (t *createMultipartUploadTransport) EncodeResponse(ctx *fasthttp.RequestCtx
 
 	theResponse.ErrorText = errorText
 
-	body, err := theResponse.MarshalJSON()
+	body, err := json.Marshal(theResponse)
 	if err != nil {
 		err = t.encodeJSONErrorCreator(err)
 		return
@@ -182,7 +182,6 @@ func NewUploadDocumentTransport() UploadDocumentTransport {
 	return &uploadDocumentTransport{}
 }
 
-//easyjson:json
 type downloadDocumentResponse struct {
 	Document []byte `json:"document"`
 }
@@ -215,7 +214,7 @@ func (t *downloadDocumentTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *
 
 	theResponse.Document = document
 
-	body, err := theResponse.MarshalJSON()
+	body, err := json.Marshal(theResponse)
 	if err != nil {
 		err = t.encodeJSONErrorCreator(err)
 		return
@@ -238,7 +237,6 @@ func NewDownloadDocumentTransport(
 	}
 }
 
-//easyjson:json
 type getTokenResponse struct {
 	ExpiresIn int `json:"expiresIn"`
 
@@ -273,7 +271,7 @@ func (t *getTokenTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp
 
 	theResponse.Token = token
 
-	body, err := theResponse.MarshalJSON()
+	body, err := json.Marshal(theResponse)
 	if err != nil {
 		err = t.encodeJSONErrorCreator(err)
 		return
@@ -296,7 +294,6 @@ func NewGetTokenTransport(
 	}
 }
 
-//easyjson:json
 type getBranchesResponse struct {
 	Branches []int `json:"branches"`
 }
@@ -329,7 +326,7 @@ func (t *getBranchesTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasth
 
 	theResponse.Branches = branches
 
-	body, err := theResponse.MarshalJSON()
+	body, err := json.Marshal(theResponse)
 	if err != nil {
 		err = t.encodeJSONErrorCreator(err)
 		return

@@ -71,7 +71,7 @@ import (
     			{{$responseBodyType}}
   			{{else}}
 			    {{$respLen := lenMap $responseBody}}
-			    {{range $name, $tp := $responseBody}}{{if eq $respLen 1}}{{if contains $tp "."}}{{$tp}}{{else}}{{up $name}} {{$tp}}{{end}}{{else}}{{up $name}} {{$tp}}{{end}}{{$tag := index $responseJSONTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
+			    {{range $name, $tp := $responseBody}}{{up $name}} {{$tp}}{{$tag := index $responseJSONTags $name}}{{if $tag}} ` + "`" + `json:"{{$tag}}"` + "`" + `{{end}}
     			{{end}}
   			{{end}}
 		}{{end}}
@@ -277,13 +277,20 @@ func (s *Transport) Generate(info api.Interface) (err error) {
 	defer func() {
 		_ = serverFile.Close()
 	}()
-	t := template.Must(s.Parse(clientTransportTpl))
+	t, err := s.Parse(clientTransportTpl)
+	if err != nil {
+		err = errors.Wrap(err, "[httpclient.Transport]t.Parse error")
+		return
+	}
+	t = template.Must(t, err)
 	if err = t.Execute(serverFile, info); err != nil {
 		err = errors.Wrap(err, "[httpclient.Transport]t.Execute error")
 		return
 	}
 	err = s.imports.GoImports(info.AbsOutputPath)
-
+	if err != nil {
+		err = errors.Wrap(err, "[httpclient.Transport]t.Go imports error")
+	}
 	return
 }
 
