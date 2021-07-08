@@ -5,6 +5,7 @@ package httpclient
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -12,7 +13,6 @@ import (
 	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
 )
 
-//easyjson:json
 type createMultipartUploadResponse struct {
 	AdditionalErrors *v1.AdditionalErrors         `json:"additionalErrors"`
 	Data             v1.CreateMultipartUploadData `json:"data"`
@@ -26,7 +26,6 @@ type CreateMultipartUploadTransport interface {
 	DecodeResponse(ctx context.Context, r *fasthttp.Response) (data v1.CreateMultipartUploadData, errorFlag bool, errorText string, additionalErrors *v1.AdditionalErrors, err error)
 }
 
-//easyjson:skip
 type createMultipartUploadTransport struct {
 	errorProcessor errorProcessor
 	pathTemplate   string
@@ -41,7 +40,7 @@ func (t *createMultipartUploadTransport) EncodeRequest(ctx context.Context, r *f
 	return
 }
 
-// DecodeResponse method for encoding response on server side
+// DecodeResponse method for decoding response on server side
 func (t *createMultipartUploadTransport) DecodeResponse(ctx context.Context, r *fasthttp.Response) (data v1.CreateMultipartUploadData, errorFlag bool, errorText string, additionalErrors *v1.AdditionalErrors, err error) {
 	if r.StatusCode() != 201 {
 		err = t.errorProcessor.Decode(r)
@@ -49,7 +48,7 @@ func (t *createMultipartUploadTransport) DecodeResponse(ctx context.Context, r *
 	}
 
 	var theResponse createMultipartUploadResponse
-	if err = theResponse.UnmarshalJSON(r.Body()); err != nil {
+	if err = json.Unmarshal(r.Body(), &theResponse); err != nil {
 		return
 	}
 
@@ -77,7 +76,6 @@ func NewCreateMultipartUploadTransport(
 	}
 }
 
-//easyjson:skip
 type uploadPartDocumentRequest struct {
 	Document   []byte
 	PartNumber int64
@@ -90,7 +88,6 @@ type UploadPartDocumentTransport interface {
 	DecodeResponse(ctx context.Context, r *fasthttp.Response) (err error)
 }
 
-//easyjson:skip
 type uploadPartDocumentTransport struct {
 	errorProcessor errorProcessor
 	pathTemplate   string
@@ -105,7 +102,7 @@ func (t *uploadPartDocumentTransport) EncodeRequest(ctx context.Context, r *fast
 	return
 }
 
-// DecodeResponse method for encoding response on server side
+// DecodeResponse method for decoding response on server side
 func (t *uploadPartDocumentTransport) DecodeResponse(ctx context.Context, r *fasthttp.Response) (err error) {
 	if r.StatusCode() != 200 {
 		err = t.errorProcessor.Decode(r)
@@ -128,7 +125,6 @@ func NewUploadPartDocumentTransport(
 	}
 }
 
-//easyjson:skip
 type completeUploadRequest struct {
 	UploadID string
 }
@@ -139,7 +135,6 @@ type CompleteUploadTransport interface {
 	DecodeResponse(ctx context.Context, r *fasthttp.Response) (err error)
 }
 
-//easyjson:skip
 type completeUploadTransport struct {
 	errorProcessor errorProcessor
 	pathTemplate   string
@@ -154,7 +149,7 @@ func (t *completeUploadTransport) EncodeRequest(ctx context.Context, r *fasthttp
 	return
 }
 
-// DecodeResponse method for encoding response on server side
+// DecodeResponse method for decoding response on server side
 func (t *completeUploadTransport) DecodeResponse(ctx context.Context, r *fasthttp.Response) (err error) {
 	if r.StatusCode() != 200 {
 		err = t.errorProcessor.Decode(r)
@@ -177,7 +172,6 @@ func NewCompleteUploadTransport(
 	}
 }
 
-//easyjson:skip
 type uploadDocumentRequest struct {
 	Document []byte
 }
@@ -188,7 +182,6 @@ type UploadDocumentTransport interface {
 	DecodeResponse(ctx context.Context, r *fasthttp.Response) (err error)
 }
 
-//easyjson:skip
 type uploadDocumentTransport struct {
 	errorProcessor errorProcessor
 	pathTemplate   string
@@ -203,7 +196,7 @@ func (t *uploadDocumentTransport) EncodeRequest(ctx context.Context, r *fasthttp
 	return
 }
 
-// DecodeResponse method for encoding response on server side
+// DecodeResponse method for decoding response on server side
 func (t *uploadDocumentTransport) DecodeResponse(ctx context.Context, r *fasthttp.Response) (err error) {
 	if r.StatusCode() != 201 {
 		err = t.errorProcessor.Decode(r)
@@ -226,7 +219,6 @@ func NewUploadDocumentTransport(
 	}
 }
 
-//easyjson:json
 type downloadDocumentResponse struct {
 	Document []byte `json:"document"`
 }
@@ -237,7 +229,6 @@ type DownloadDocumentTransport interface {
 	DecodeResponse(ctx context.Context, r *fasthttp.Response) (document []byte, err error)
 }
 
-//easyjson:skip
 type downloadDocumentTransport struct {
 	errorProcessor errorProcessor
 	pathTemplate   string
@@ -252,7 +243,7 @@ func (t *downloadDocumentTransport) EncodeRequest(ctx context.Context, r *fastht
 	return
 }
 
-// DecodeResponse method for encoding response on server side
+// DecodeResponse method for decoding response on server side
 func (t *downloadDocumentTransport) DecodeResponse(ctx context.Context, r *fasthttp.Response) (document []byte, err error) {
 	if r.StatusCode() != 200 {
 		err = t.errorProcessor.Decode(r)
@@ -260,7 +251,7 @@ func (t *downloadDocumentTransport) DecodeResponse(ctx context.Context, r *fasth
 	}
 
 	var theResponse downloadDocumentResponse
-	if err = theResponse.UnmarshalJSON(r.Body()); err != nil {
+	if err = json.Unmarshal(r.Body(), &theResponse); err != nil {
 		return
 	}
 
@@ -282,13 +273,11 @@ func NewDownloadDocumentTransport(
 	}
 }
 
-//easyjson:skip
 type getTokenRequest struct {
 	GrantType string
 	Scope     string
 }
 
-//easyjson:json
 type getTokenResponse struct {
 	ExpiresIn int    `json:"expiresIn"`
 	Token     string `json:"token"`
@@ -300,7 +289,6 @@ type GetTokenTransport interface {
 	DecodeResponse(ctx context.Context, r *fasthttp.Response) (token string, expiresIn int, err error)
 }
 
-//easyjson:skip
 type getTokenTransport struct {
 	errorProcessor errorProcessor
 	pathTemplate   string
@@ -323,7 +311,7 @@ func (t *getTokenTransport) EncodeRequest(ctx context.Context, r *fasthttp.Reque
 	return
 }
 
-// DecodeResponse method for encoding response on server side
+// DecodeResponse method for decoding response on server side
 func (t *getTokenTransport) DecodeResponse(ctx context.Context, r *fasthttp.Response) (token string, expiresIn int, err error) {
 	if r.StatusCode() != http.StatusOK {
 		err = t.errorProcessor.Decode(r)
@@ -331,7 +319,7 @@ func (t *getTokenTransport) DecodeResponse(ctx context.Context, r *fasthttp.Resp
 	}
 
 	var theResponse getTokenResponse
-	if err = theResponse.UnmarshalJSON(r.Body()); err != nil {
+	if err = json.Unmarshal(r.Body(), &theResponse); err != nil {
 		return
 	}
 
@@ -355,7 +343,6 @@ func NewGetTokenTransport(
 	}
 }
 
-//easyjson:json
 type getBranchesResponse struct {
 	Branches []int `json:"branches"`
 }
@@ -366,7 +353,6 @@ type GetBranchesTransport interface {
 	DecodeResponse(ctx context.Context, r *fasthttp.Response) (branches []int, err error)
 }
 
-//easyjson:skip
 type getBranchesTransport struct {
 	errorProcessor errorProcessor
 	pathTemplate   string
@@ -385,7 +371,7 @@ func (t *getBranchesTransport) EncodeRequest(ctx context.Context, r *fasthttp.Re
 	return
 }
 
-// DecodeResponse method for encoding response on server side
+// DecodeResponse method for decoding response on server side
 func (t *getBranchesTransport) DecodeResponse(ctx context.Context, r *fasthttp.Response) (branches []int, err error) {
 	if r.StatusCode() != 200 {
 		err = t.errorProcessor.Decode(r)
@@ -393,7 +379,7 @@ func (t *getBranchesTransport) DecodeResponse(ctx context.Context, r *fasthttp.R
 	}
 
 	var theResponse getBranchesResponse
-	if err = theResponse.UnmarshalJSON(r.Body()); err != nil {
+	if err = json.Unmarshal(r.Body(), &theResponse); err != nil {
 		return
 	}
 

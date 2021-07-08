@@ -45,37 +45,37 @@ func New(
 	}
 	transportCreateMultipartUpload := NewCreateMultipartUploadTransport(
 		errorProcessor,
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientCreateMultipartUpload,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientCreateMultipartUpload,
 		httpMethodCreateMultipartUpload,
 	)
 	transportUploadPartDocument := NewUploadPartDocumentTransport(
 		errorProcessor,
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientUploadPartDocument,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientUploadPartDocument,
 		httpMethodUploadPartDocument,
 	)
 	transportCompleteUpload := NewCompleteUploadTransport(
 		errorProcessor,
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientCompleteUpload,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientCompleteUpload,
 		httpMethodCompleteUpload,
 	)
 	transportUploadDocument := NewUploadDocumentTransport(
 		errorProcessor,
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientUploadDocument,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientUploadDocument,
 		httpMethodUploadDocument,
 	)
 	transportDownloadDocument := NewDownloadDocumentTransport(
 		errorProcessor,
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientDownloadDocument,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientDownloadDocument,
 		httpMethodDownloadDocument,
 	)
 	transportGetToken := NewGetTokenTransport(
 		errorProcessor,
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetToken,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientGetToken,
 		httpMethodGetToken,
 	)
 	transportGetBranches := NewGetBranchesTransport(
 		errorProcessor,
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetBranches,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientGetBranches,
 		httpMethodGetBranches,
 	)
 

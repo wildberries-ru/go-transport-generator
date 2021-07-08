@@ -16,6 +16,8 @@ import (
 	"time"
 
 	"github.com/bxcodec/faker/v3"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/valyala/fasthttp"
 	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
 )
@@ -65,6 +67,7 @@ func Test_client_CreateMultipartUpload(t *testing.T) {
 		}
 
 		b, _ := json.Marshal(result)
+		w.WriteHeader(201)
 		w.Write(b)
 	}))
 	defer ts.Close()
@@ -78,7 +81,7 @@ func Test_client_CreateMultipartUpload(t *testing.T) {
 
 	transportCreateMultipartUpload := NewCreateMultipartUploadTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientCreateMultipartUpload,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientCreateMultipartUpload,
 		httpMethodCreateMultipartUpload,
 	)
 
@@ -131,20 +134,20 @@ func Test_client_CreateMultipartUpload(t *testing.T) {
 				return
 			}
 
-			if !reflect.DeepEqual(gotData, tt.wantData) {
-				t.Errorf("client.data() = %v, want %v", gotData, tt.wantData)
+			if !cmp.Equal(gotData, tt.wantData, cmpopts.EquateApproxTime(1*time.Second)) {
+				t.Errorf("client.data() = %s", cmp.Diff(gotData, tt.wantData))
 			}
 
-			if !reflect.DeepEqual(gotErrorFlag, tt.wantErrorFlag) {
-				t.Errorf("client.errorFlag() = %v, want %v", gotErrorFlag, tt.wantErrorFlag)
+			if !cmp.Equal(gotErrorFlag, tt.wantErrorFlag, cmpopts.EquateApproxTime(1*time.Second)) {
+				t.Errorf("client.errorFlag() = %s", cmp.Diff(gotErrorFlag, tt.wantErrorFlag))
 			}
 
-			if !reflect.DeepEqual(gotErrorText, tt.wantErrorText) {
-				t.Errorf("client.errorText() = %v, want %v", gotErrorText, tt.wantErrorText)
+			if !cmp.Equal(gotErrorText, tt.wantErrorText, cmpopts.EquateApproxTime(1*time.Second)) {
+				t.Errorf("client.errorText() = %s", cmp.Diff(gotErrorText, tt.wantErrorText))
 			}
 
-			if !reflect.DeepEqual(gotAdditionalErrors, tt.wantAdditionalErrors) {
-				t.Errorf("client.additionalErrors() = %v, want %v", gotAdditionalErrors, tt.wantAdditionalErrors)
+			if !cmp.Equal(gotAdditionalErrors, tt.wantAdditionalErrors, cmpopts.EquateApproxTime(1*time.Second)) {
+				t.Errorf("client.additionalErrors() = %s", cmp.Diff(gotAdditionalErrors, tt.wantAdditionalErrors))
 			}
 
 		})
@@ -177,6 +180,7 @@ func Test_client_UploadPartDocument(t *testing.T) {
 		}{}
 
 		b, _ := json.Marshal(result)
+		w.WriteHeader(200)
 		w.Write(b)
 	}))
 	defer ts.Close()
@@ -190,7 +194,7 @@ func Test_client_UploadPartDocument(t *testing.T) {
 
 	transportUploadPartDocument := NewUploadPartDocumentTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientUploadPartDocument,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientUploadPartDocument,
 		httpMethodUploadPartDocument,
 	)
 
@@ -258,6 +262,7 @@ func Test_client_CompleteUpload(t *testing.T) {
 		}{}
 
 		b, _ := json.Marshal(result)
+		w.WriteHeader(200)
 		w.Write(b)
 	}))
 	defer ts.Close()
@@ -271,7 +276,7 @@ func Test_client_CompleteUpload(t *testing.T) {
 
 	transportCompleteUpload := NewCompleteUploadTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientCompleteUpload,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientCompleteUpload,
 		httpMethodCompleteUpload,
 	)
 
@@ -337,6 +342,7 @@ func Test_client_UploadDocument(t *testing.T) {
 		}{}
 
 		b, _ := json.Marshal(result)
+		w.WriteHeader(201)
 		w.Write(b)
 	}))
 	defer ts.Close()
@@ -350,7 +356,7 @@ func Test_client_UploadDocument(t *testing.T) {
 
 	transportUploadDocument := NewUploadDocumentTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientUploadDocument,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientUploadDocument,
 		httpMethodUploadDocument,
 	)
 
@@ -415,6 +421,7 @@ func Test_client_DownloadDocument(t *testing.T) {
 		result := document
 
 		b, _ := json.Marshal(result)
+		w.WriteHeader(200)
 		w.Write(b)
 	}))
 	defer ts.Close()
@@ -428,7 +435,7 @@ func Test_client_DownloadDocument(t *testing.T) {
 
 	transportDownloadDocument := NewDownloadDocumentTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientDownloadDocument,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientDownloadDocument,
 		httpMethodDownloadDocument,
 	)
 
@@ -472,8 +479,8 @@ func Test_client_DownloadDocument(t *testing.T) {
 				return
 			}
 
-			if !reflect.DeepEqual(gotDocument, tt.wantDocument) {
-				t.Errorf("client.document() = %v, want %v", gotDocument, tt.wantDocument)
+			if !cmp.Equal(gotDocument, tt.wantDocument, cmpopts.EquateApproxTime(1*time.Second)) {
+				t.Errorf("client.document() = %s", cmp.Diff(gotDocument, tt.wantDocument))
 			}
 
 		})
@@ -514,6 +521,7 @@ func Test_client_GetToken(t *testing.T) {
 		}
 
 		b, _ := json.Marshal(result)
+		w.WriteHeader(http.StatusOK)
 		w.Write(b)
 	}))
 	defer ts.Close()
@@ -527,7 +535,7 @@ func Test_client_GetToken(t *testing.T) {
 
 	transportGetToken := NewGetTokenTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetToken,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientGetToken,
 		httpMethodGetToken,
 	)
 
@@ -575,12 +583,12 @@ func Test_client_GetToken(t *testing.T) {
 				return
 			}
 
-			if !reflect.DeepEqual(gotToken, tt.wantToken) {
-				t.Errorf("client.token() = %v, want %v", gotToken, tt.wantToken)
+			if !cmp.Equal(gotToken, tt.wantToken, cmpopts.EquateApproxTime(1*time.Second)) {
+				t.Errorf("client.token() = %s", cmp.Diff(gotToken, tt.wantToken))
 			}
 
-			if !reflect.DeepEqual(gotExpiresIn, tt.wantExpiresIn) {
-				t.Errorf("client.expiresIn() = %v, want %v", gotExpiresIn, tt.wantExpiresIn)
+			if !cmp.Equal(gotExpiresIn, tt.wantExpiresIn, cmpopts.EquateApproxTime(1*time.Second)) {
+				t.Errorf("client.expiresIn() = %s", cmp.Diff(gotExpiresIn, tt.wantExpiresIn))
 			}
 
 		})
@@ -606,6 +614,7 @@ func Test_client_GetBranches(t *testing.T) {
 		result := branches
 
 		b, _ := json.Marshal(result)
+		w.WriteHeader(200)
 		w.Write(b)
 	}))
 	defer ts.Close()
@@ -619,7 +628,7 @@ func Test_client_GetBranches(t *testing.T) {
 
 	transportGetBranches := NewGetBranchesTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetBranches,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientGetBranches,
 		httpMethodGetBranches,
 	)
 
@@ -663,8 +672,8 @@ func Test_client_GetBranches(t *testing.T) {
 				return
 			}
 
-			if !reflect.DeepEqual(gotBranches, tt.wantBranches) {
-				t.Errorf("client.branches() = %v, want %v", gotBranches, tt.wantBranches)
+			if !cmp.Equal(gotBranches, tt.wantBranches, cmpopts.EquateApproxTime(1*time.Second)) {
+				t.Errorf("client.branches() = %s", cmp.Diff(gotBranches, tt.wantBranches))
 			}
 
 		})
@@ -682,43 +691,43 @@ func TestNewClient(t *testing.T) {
 
 	transportCreateMultipartUpload := NewCreateMultipartUploadTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientCreateMultipartUpload,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientCreateMultipartUpload,
 		httpMethodCreateMultipartUpload,
 	)
 
 	transportUploadPartDocument := NewUploadPartDocumentTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientUploadPartDocument,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientUploadPartDocument,
 		httpMethodUploadPartDocument,
 	)
 
 	transportCompleteUpload := NewCompleteUploadTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientCompleteUpload,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientCompleteUpload,
 		httpMethodCompleteUpload,
 	)
 
 	transportUploadDocument := NewUploadDocumentTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientUploadDocument,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientUploadDocument,
 		httpMethodUploadDocument,
 	)
 
 	transportDownloadDocument := NewDownloadDocumentTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientDownloadDocument,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientDownloadDocument,
 		httpMethodDownloadDocument,
 	)
 
 	transportGetToken := NewGetTokenTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetToken,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientGetToken,
 		httpMethodGetToken,
 	)
 
 	transportGetBranches := NewGetBranchesTransport(
 		&testErrorProcessor{},
-		parsedServerURL.Scheme+"://"+parsedServerURL.Host+uriPathClientGetBranches,
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClientGetBranches,
 		httpMethodGetBranches,
 	)
 

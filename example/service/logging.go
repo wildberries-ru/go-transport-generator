@@ -33,7 +33,7 @@ func (s *loggingMiddleware) UploadDocument(ctx context.Context, token *string, n
 				"elapsed":    time.Since(begin),
 			},
 		)
-		if err != nil {
+		if err == nil {
 			lg.Debug("UploadDocument")
 		} else {
 			lg.Error("UploadDocument")
@@ -52,7 +52,7 @@ func (s *loggingMiddleware) GetWarehouses(ctx context.Context, token *string) (p
 				"elapsed": time.Since(begin),
 			},
 		)
-		if err != nil {
+		if err == nil {
 			lg.Debug("GetWarehouses")
 		} else {
 			lg.Error("GetWarehouses")
@@ -76,7 +76,7 @@ func (s *loggingMiddleware) GetDetails(ctx context.Context, namespace string, de
 				"elapsed": time.Since(begin),
 			},
 		)
-		if err != nil {
+		if err == nil {
 			lg.Debug("GetDetails")
 		} else {
 			lg.Error("GetDetails")
@@ -97,7 +97,7 @@ func (s *loggingMiddleware) GetDetailsEmbedStruct(ctx context.Context, namespace
 				"elapsed":   time.Since(begin),
 			},
 		)
-		if err != nil {
+		if err == nil {
 			lg.Debug("GetDetailsEmbedStruct")
 		} else {
 			lg.Error("GetDetailsEmbedStruct")
@@ -118,7 +118,7 @@ func (s *loggingMiddleware) GetDetailsListEmbedStruct(ctx context.Context, names
 				"elapsed":   time.Since(begin),
 			},
 		)
-		if err != nil {
+		if err == nil {
 			lg.Debug("GetDetailsListEmbedStruct")
 		} else {
 			lg.Error("GetDetailsListEmbedStruct")
@@ -145,7 +145,7 @@ func (s *loggingMiddleware) PutDetails(ctx context.Context, namespace string, de
 				"elapsed":   time.Since(begin),
 			},
 		)
-		if err != nil {
+		if err == nil {
 			lg.Debug("PutDetails")
 		} else {
 			lg.Error("PutDetails")
@@ -166,7 +166,7 @@ func (s *loggingMiddleware) GetSomeElseDataUtf8(ctx context.Context, token *stri
 				"elapsed": time.Since(begin),
 			},
 		)
-		if err != nil {
+		if err == nil {
 			lg.Debug("GetSomeElseDataUtf8")
 		} else {
 			lg.Error("GetSomeElseDataUtf8")
@@ -186,7 +186,7 @@ func (s *loggingMiddleware) GetFile(ctx context.Context, token *string) (data []
 				"elapsed":  time.Since(begin),
 			},
 		)
-		if err != nil {
+		if err == nil {
 			lg.Debug("GetFile")
 		} else {
 			lg.Error("GetFile")
