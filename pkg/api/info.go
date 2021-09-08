@@ -52,6 +52,7 @@ type HTTPMethod struct {
 	Body                    map[string]string
 	BodyPlaceholders        map[string]*Placeholder
 	IsIntBodyPlaceholders   bool
+	ResponseCookies         map[string]string
 	ResponseHeaders         map[string]string
 	ResponseStatus          string
 	ResponseContentType     string
@@ -80,6 +81,8 @@ type Placeholder struct {
 	IsPointer bool
 	IsString  bool
 	IsInt     bool
+	IsBool    bool
+	IsSlice   bool
 	Type      string
 	Name      string
 }

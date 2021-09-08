@@ -259,7 +259,7 @@ func TestNewClient(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want Service
+		want {{ .Iface.Name }}
 	}{
 		{"test new client", args{hostClient, {{range .Iface.Methods}}transport{{.Name}},{{end}} opts}, cl},
 	}

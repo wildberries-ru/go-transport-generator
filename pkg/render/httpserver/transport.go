@@ -28,6 +28,8 @@ import (
 
 var (
 	emptyBytes = []byte("")
+	boolFalse = false
+	boolTrue = true
 )
 
 {{range .Iface.Methods}}
@@ -178,8 +180,8 @@ var (
 			}
 			{{range $t, $from := $multipartValueTags}}
 				{{$to := index $bodyPlaceholders $t}}
-				_{{$to.Name}} := form.Value["{{$from}}"]
 				{{if $to.IsPointer}}
+					_{{$to.Name}} := form.Value["{{$from}}"]
 					if len(_{{$to.Name}}) == 1 {
 						{{if $to.IsString}}
 							_{{up $to.Name}} := _{{$to.Name}}[0]
@@ -200,9 +202,36 @@ var (
 									{{$to.Name}} = &ii
 								{{end}}
 							}
+						{{else if $to.IsBool}}
+							_{{up $to.Name}} := _{{$to.Name}}[0]
+							if _{{up $to.Name}} == "0" {
+								{{$to.Name}} = &boolFalse
+							} else if _{{up $to.Name}} == "1" {
+								{{$to.Name}} = &boolTrue
+							}
 						{{end}}
 					}
+				{{else if $to.IsSlice}}
+					{{if $to.IsString}}
+						{{$to.Name}} = form.Value["{{$from}}"]	
+					{{else if $to.IsInt}}
+						_{{$to.Name}} := form.Value["{{$from}}"]
+						for _, v := range _{{$to.Name}} {
+							var i int
+							i, err = strconv.Atoi(v)
+							if err != nil {
+								err = t.decodeTypeIntErrorCreator(err)
+								return
+							}
+							{{if eq $to.Type "int"}}
+								{{$to.Name}} = append({{$to.Name}}, i)
+							{{else}}
+								{{$to.Name}} = append({{$to.Name}}, {{$to.Type}}(i))
+							{{end}}
+						}
+					{{end}}
 				{{else}}
+					_{{$to.Name}} := form.Value["{{$from}}"]
 					if len(_{{$to.Name}}) != 1 {
 						err = errors.New("failed to read {{$from}} in MultipartForm")
 						return
@@ -224,20 +253,30 @@ var (
 								{{$to.Name}} = {{$to.Type}}(i)
 							{{end}}
 						}
+					{{else if $to.IsBool}}
+						_{{up $to.Name}} := _{{$to.Name}}[0]
+						if _{{up $to.Name}} == "1" {
+							{{$to.Name}} = true
+						}
 					{{end}}
 				{{end}}
 			{{end}}
-			{{range $to, $from := $multipartFileTags}}
-				_{{$to}} := form.File["{{$from}}"]
-				if _{{$to}} == nil {
-					err = errors.New("failed to read {{$from}} in MultipartForm")
-					return
-				}
-				if len(_{{$to}}) != 1 {
-					err = errors.New("failed to read file in MultipartForm: too many files in {{$from}}")
-					return
-				}
-				{{$to}} = _{{$to}}[0]
+			{{range $t, $from := $multipartFileTags}}
+				{{$to := index $bodyPlaceholders $t}}
+				{{if $to.IsSlice}}
+					{{$to.Name}} = form.File["{{$from}}"]
+				{{else}}
+					_{{$to.Name}} := form.File["{{$from}}"]
+					if _{{$to.Name}} == nil {
+						err = errors.New("failed to read {{$from}} in MultipartForm")
+						return
+					}
+					if len(_{{$to.Name}}) != 1 {
+						err = errors.New("failed to read file in MultipartForm: too many files in {{$from}}")
+						return
+					}
+					{{$to.Name}} = _{{$to.Name}}[0]
+				{{end}}
 			{{end}}
 		{{end}}
 		return
@@ -269,13 +308,26 @@ var (
 				r.SetBody({{$name}})
 			{{end}}
 		{{end}}
+		{{if eq $responseContentType "text/html"}}
+			r.Header.Set("Content-Type", "text/html{{if $responseContentEncoding}}; charset={{$responseContentEncoding}}{{end}}")
+			r.SetBody({{$responseBodyField}})
+		{{end}}
+		{{if eq $responseContentType "text/css"}}
+			r.Header.Set("Content-Type", "text/css{{if $responseContentEncoding}}; charset={{$responseContentEncoding}}{{end}}")
+			r.SetBody({{$responseBodyField}})
+		{{end}}
 		{{range $to, $from := $responseHeaderPlaceholders}}
-			r.Header.Set("{{$to}}", "{{$from}}")
+			// variable set to header must be a *string type
+			if {{$from}} != nil {
+				r.Header.Set("{{$to}}", *{{$from}})
+			}
 		{{end}}
 		{{if $responseFile}}r.SetBody({{$responseFile}}){{end}}
-		{{if $responseFileName}}if len(fileName) > 0 {
-		r.Header.Set("Content-Disposition", "attachment; filename=\""+fileName+"\"")
-			}{{end}}
+		{{if $responseFileName}}
+			if len(fileName) > 0 {
+				r.Header.Set("Content-Disposition", "attachment; filename=\""+fileName+"\"")
+			}
+		{{end}}
 		r.Header.SetStatusCode({{$responseStatus}})
 		return
 	}

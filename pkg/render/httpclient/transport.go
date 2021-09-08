@@ -44,6 +44,7 @@ import (
 	{{$multipartFileTags := $ct.MultipartFileTags}}
 	{{$formUrlencodedTags := $ct.FormUrlencodedTags}}
 	{{$responseJSONTags := $ct.ResponseJSONTags}}
+	{{$responseCookiesPlaceholders := $ct.ResponseCookies}}
 	{{$responseHeaderPlaceholders := $ct.ResponseHeaders}}
 	{{$responseStatus := $ct.ResponseStatus}}
 	{{$responseContentType := $ct.ResponseContentType}}
@@ -141,22 +142,29 @@ import (
 
 			{{range $fr, $to := $multipartValueTags}}
 				{{$from := index $bodyPlaceholders $fr}}
-				{{if $from.IsPointer}}
-					if {{$from.Name}}) != nil {
-						{{if $from.IsString}}
-							_{{$from.Name}} := *{{$from.Name}}
-						{{else if $from.IsInt}}
-							_{{$from.Name}} := fmt.Sprintf("%d", *{{$from.Name}})
-						{{end}}
-					}
+				{{if $from.IsSlice}}
+					// todo generate then {{$from}} is slice
 				{{else}}
-					{{if $from.IsString}}
-						_{{$from.Name}} := {{$from.Name}}
-					{{else if $from.IsInt}}
-						_{{$from.Name}} := fmt.Sprintf("%d", {{$from.Name}})
+					{{if $from.IsPointer}}
+						if {{$from.Name}} != nil {
+							{{if $from.IsString}}
+								writer.WriteField("{{$to}}", *{{$from.Name}})
+							{{else if $from.IsInt}}
+								writer.WriteField("{{$to}}", fmt.Sprintf("%d", *{{$from.Name}}))
+							{{else if $from.IsBool}}
+								writer.WriteField("{{$to}}", fmt.Sprintf("%t", *{{$from.Name}}))
+							{{end}}
+						}
+					{{else}}
+						{{if $from.IsString}}
+							writer.WriteField("{{$to}}", {{$from.Name}})
+						{{else if $from.IsInt}}
+							writer.WriteField("{{$to}}", fmt.Sprintf("%d", {{$from.Name}}))
+						{{else if $from.IsBool}}
+							writer.WriteField("{{$to}}", fmt.Sprintf("%t", {{$from.Name}}))
+						{{end}}
 					{{end}}
 				{{end}}
-				writer.WriteField("{{$to}}", _{{$from.Name}})
 			{{end}}
 
 			{{range $fr, $to := $multipartFileTags}}
@@ -205,6 +213,15 @@ import (
 			err = t.errorProcessor.Decode(r)
 			return
 		}
+		{{range $to, $from := $responseCookiesPlaceholders}}
+			cookie := fasthttp.AcquireCookie()
+			cookie.SetKey("{{$from}}")
+			if r.Header.Cookie(cookie) {
+				_{{$to}} := string(cookie.Value())
+				{{$to}} = &_{{$to}}
+			}
+			fasthttp.ReleaseCookie(cookie)
+		{{end}}
 		{{if eq $responseContentType "application/json"}}
 			{{if lenMap $responseBody}}var theResponse {{low .Name}}Response
 				if err = json.Unmarshal(r.Body(), &theResponse); err != nil {

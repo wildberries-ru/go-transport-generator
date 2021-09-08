@@ -14,6 +14,8 @@ import (
 
 var (
 	emptyBytes = []byte("")
+	boolFalse  = false
+	boolTrue   = true
 )
 
 type createMultipartUploadResponse struct {

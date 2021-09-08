@@ -110,7 +110,7 @@ paths:
                 categoryID:
                   type: string
                 contractID:
-                  type: number
+                  type: boolean
                   nullable: true
                 data:
                   type: string
@@ -119,10 +119,13 @@ paths:
                 extension:
                   type: string
                 name:
-                  type: string
+                  type: array
+                  items:
+                    type: string
                 supplierID:
-                  type: number
-                  nullable: true
+                  type: array
+                  items:
+                    type: number
       responses:
         "201":
           description: ""
@@ -144,7 +147,7 @@ paths:
         "200":
           description: ""
           content:
-            "":
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
               schema:
                 type: object
                 properties:
@@ -169,7 +172,8 @@ paths:
                 type: object
                 properties:
                   "":
-                    type: object
+                    type: string
+                    nullable: true
   /api/v1/multipart/{bucket}/{key}:
     post:
       tags:
@@ -422,14 +426,14 @@ paths:
           type: string
           nullable: true
       - in: query
+        name: testID
+        schema:
+          type: string
+      - in: query
         name: blaID
         schema:
           type: string
           nullable: true
-      - in: query
-        name: testID
-        schema:
-          type: string
       requestBody:
         content:
           application/json:

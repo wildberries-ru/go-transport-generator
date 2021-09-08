@@ -8,7 +8,7 @@ import (
 )
 
 // SomeService ...
-// @gtg http-server log metrics(token) mock http-errors swagger
+// @gtg http-server http-client log metrics(token) mock http-errors swagger
 type SomeService interface {
 	// @gtg http-server-method POST
 	// @gtg http-server-uri-path /api/v1/document
@@ -23,7 +23,7 @@ type SomeService interface {
 	// @gtg http-server-file-tag data document
 	// @gtg http-server-response-content-type application/json
 	// @gtg http-server-response-status 201
-	UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader) (err error)
+	UploadDocument(ctx context.Context, token *string, name []string, extension string, categoryID string, supplierID []int64, contractID *bool, data *multipart.FileHeader) (err error)
 	// @gtg http-server-method GET
 	// @gtg http-server-uri-path /api/v1/getWarehouses
 	// @gtg http-server-header Authorization {token}
@@ -31,8 +31,9 @@ type SomeService interface {
 	// @gtg log-ignore pets
 	// @gtg http-server-response-status http.StatusOK
 	// @gtg http-server-response-content-type application/json
+	// @gtg http-server-response-cookie someCookie some_cookie
 	// @gtg http-server-response-body pets
-	GetWarehouses(ctx context.Context, token *string) (pets map[string]v1.Detail, err error)
+	GetWarehouses(ctx context.Context, token *string) (pets map[string]v1.Detail, someCookie *string, err error)
 	// @gtg http-server-method GET
 	// @gtg http-server-uri-path /api/v1/namespaces/{namespace}/details/{detail}
 	// @gtg http-server-query file={fileID}&some={someID}
@@ -83,7 +84,7 @@ type SomeService interface {
 	// @gtg http-server-method GET
 	// @gtg http-server-uri-path /api/v1/file
 	// @gtg http-server-header Authorization {token}
-	// @gtg http-server-response-header Content-Type application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+	// @gtg http-server-response-content-type application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 	// @gtg http-server-response-status http.StatusOK
 	// @gtg http-server-response-file data fileName
 	GetFile(ctx context.Context, token *string) (data []byte, fileName string, err error)

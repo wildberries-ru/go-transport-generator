@@ -119,7 +119,7 @@ func TestNew(t *testing.T) {
 	tests := []struct {
 		name       string
 		args       args
-		wantClient Service
+		wantClient {{ .Iface.Name }}
 		wantErr    bool
 	}{
 		{"test new builder", args{serverURL, maxConns, &testErrorProcessor{}, opts}, &cl, false},

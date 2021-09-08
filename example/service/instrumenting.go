@@ -23,7 +23,7 @@ type instrumentingMiddleware struct {
 }
 
 // UploadDocument ...
-func (s *instrumentingMiddleware) UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader) (err error) {
+func (s *instrumentingMiddleware) UploadDocument(ctx context.Context, token *string, name []string, extension string, categoryID string, supplierID []int64, contractID *bool, data *multipart.FileHeader) (err error) {
 	defer func(startTime time.Time) {
 
 		var _token string
@@ -48,7 +48,7 @@ func (s *instrumentingMiddleware) UploadDocument(ctx context.Context, token *str
 }
 
 // GetWarehouses ...
-func (s *instrumentingMiddleware) GetWarehouses(ctx context.Context, token *string) (pets map[string]v1.Detail, err error) {
+func (s *instrumentingMiddleware) GetWarehouses(ctx context.Context, token *string) (pets map[string]v1.Detail, someCookie *string, err error) {
 	defer func(startTime time.Time) {
 
 		var _token string
