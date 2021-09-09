@@ -31,7 +31,7 @@ type SomeService interface {
 	// @gtg log-ignore pets
 	// @gtg http-server-response-status http.StatusOK
 	// @gtg http-server-response-content-type application/json
-	// @gtg http-server-response-cookie someCookie some_cookie
+	// @gtg http-server-response-cookie some_cookie {someCookie}
 	// @gtg http-server-response-body pets
 	GetWarehouses(ctx context.Context, token *string) (pets map[string]v1.Detail, someCookie *string, err error)
 	// @gtg http-server-method GET

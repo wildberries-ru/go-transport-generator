@@ -58,9 +58,9 @@ func (t *uploadDocumentTransport) EncodeRequest(ctx context.Context, r *fasthttp
 
 	writer.WriteField("extension", extension)
 
-	// todo generate then {false true false false true string name} is slice
+	// todo generate then name is slice
 
-	// todo generate then {false false true false true int64 supplierID} is slice
+	// todo generate then supplierID is slice
 
 	writer.Close()
 	r.Header.Set("Content-Type", writer.FormDataContentType())
@@ -126,11 +126,11 @@ func (t *getWarehousesTransport) DecodeResponse(ctx context.Context, r *fasthttp
 	}
 
 	cookie := fasthttp.AcquireCookie()
-	cookie.SetKey("some_cookie")
-	if r.Header.Cookie(cookie) {
-		_someCookie := string(cookie.Value())
-		someCookie = &_someCookie
-	}
+
+	// cookies must be a *string type
+	_someCookie := string(r.Header.PeekCookie("some_cookie"))
+	someCookie = &_someCookie
+
 	fasthttp.ReleaseCookie(cookie)
 
 	var theResponse getWarehousesResponse

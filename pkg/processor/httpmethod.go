@@ -116,6 +116,9 @@ func (s *httpMethod) Process(httpMethod *api.HTTPMethod, iface *api.Interface, m
 	for _, res = range results {
 		diff[res.Name] = res.Type.String()
 	}
+	for _, from = range httpMethod.ResponseCookies {
+		delete(diff, from)
+	}
 	for _, from = range httpMethod.ResponseHeaders {
 		delete(diff, from)
 	}

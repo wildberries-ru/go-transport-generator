@@ -47,6 +47,7 @@ var (
 	{{$plainObject := $ct.PlainObject}}
 	{{$multipartValueTags := $ct.MultipartValueTags}}
 	{{$multipartFileTags := $ct.MultipartFileTags}}
+	{{$responseCookiesPlaceholders := $ct.ResponseCookies}}
 	{{$responseHeaderPlaceholders := $ct.ResponseHeaders}}
 	{{$responseStatus := $ct.ResponseStatus}}
 	{{$responseContentType := $ct.ResponseContentType}}
@@ -148,11 +149,15 @@ var (
 				{{end}}
 			{{end}}
 		{{end}}
+		{{$clen := lenMap $cookiePlaceholders}}
+		{{if gt $clen 0}}
+			// cookies must be a *string type
+			{{range $from, $to := $cookiePlaceholders}}
+				{{$to}} = ptr(r.Header.Cookie("{{$from}}"))
+			{{end}}
+		{{end}}
 		{{range $from, $to := $headerPlaceholders}}
 			{{$to}} = ptr(r.Header.Peek("{{$from}}"))
-		{{end}}
-		{{range $from, $to := $cookiePlaceholders}}
-			{{$to}} = ptr(r.Header.Cookie("{{$from}}"))
 		{{end}}
 		{{if eq $contentType "application/json"}}
 			{{$requestName := low .Name}}
@@ -315,6 +320,19 @@ var (
 		{{if eq $responseContentType "text/css"}}
 			r.Header.Set("Content-Type", "text/css{{if $responseContentEncoding}}; charset={{$responseContentEncoding}}{{end}}")
 			r.SetBody({{$responseBodyField}})
+		{{end}}
+		{{$clen := lenMap $responseCookiesPlaceholders}}
+		{{if gt $clen 0}}
+			cookie := fasthttp.AcquireCookie()
+			{{range $to, $from := $responseCookiesPlaceholders}}
+				// cookies must be a *string type
+				if {{$from}} != nil {
+					cookie.SetKey("{{$to}}")
+					cookie.SetValue(*{{$from}})
+					r.Header.SetCookie(cookie)
+				}
+			{{end}}
+			fasthttp.ReleaseCookie(cookie)
 		{{end}}
 		{{range $to, $from := $responseHeaderPlaceholders}}
 			// variable set to header must be a *string type

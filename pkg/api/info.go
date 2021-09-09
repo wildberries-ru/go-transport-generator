@@ -41,8 +41,8 @@ type HTTPMethod struct {
 	URIPathPlaceholders     []string
 	QueryPlaceholders       map[string]*Placeholder
 	IsIntQueryPlaceholders  bool
-	HeaderPlaceholders      map[string]string
 	CookiePlaceholders      map[string]string
+	HeaderPlaceholders      map[string]string
 	ContentType             string
 	JSONTags                map[string]string
 	PlainObject             string

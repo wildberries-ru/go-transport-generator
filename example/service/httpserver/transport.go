@@ -154,6 +154,17 @@ func (t *getWarehousesTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fas
 	}
 	r.SetBody(body)
 
+	cookie := fasthttp.AcquireCookie()
+
+	// cookies must be a *string type
+	if someCookie != nil {
+		cookie.SetKey("some_cookie")
+		cookie.SetValue(*someCookie)
+		r.Header.SetCookie(cookie)
+	}
+
+	fasthttp.ReleaseCookie(cookie)
+
 	r.Header.SetStatusCode(http.StatusOK)
 	return
 }
