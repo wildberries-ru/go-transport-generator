@@ -173,6 +173,8 @@ func (s *httpMethod) castBodyPlaceholder(to string, arg types.Variable, argType 
 			}
 		} else if s.isString(tp) {
 			httpMethod.BodyPlaceholders[to].IsString = true
+		} else if s.isBool(tp) {
+			httpMethod.BodyPlaceholders[to].IsBool = true
 		}
 		httpMethod.BodyPlaceholders[to].Type = tp.String()
 		return
@@ -181,7 +183,9 @@ func (s *httpMethod) castBodyPlaceholder(to string, arg types.Variable, argType 
 		s.castBodyPlaceholder(to, arg, tp.Next, httpMethod)
 		return
 	case types.TArray:
-		httpMethod.BodyPlaceholders[to].Type = tp.String()
+		httpMethod.BodyPlaceholders[to].IsSlice = true
+		s.castBodyPlaceholder(to, arg, tp.Next, httpMethod)
+		return
 	}
 }
 
@@ -196,6 +200,14 @@ func (s *httpMethod) isInt(tp types.Type) bool {
 func (s *httpMethod) isString(tp types.Type) bool {
 	switch tp.String() {
 	case "string":
+		return true
+	}
+	return false
+}
+
+func (s *httpMethod) isBool(tp types.Type) bool {
+	switch tp.String() {
+	case "bool":
 		return true
 	}
 	return false

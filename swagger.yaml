@@ -4,93 +4,6 @@ info:
   description: ""
   version: ""
 paths:
-  /api/v1/branches:
-    get:
-      tags:
-      - C:\Users\spiri\Documents\go-transport-generator\example\s3/Service
-      parameters:
-      - in: header
-        name: authToken
-        schema:
-          type: string
-          nullable: true
-      - in: cookie
-        name: supplierID
-        schema:
-          type: string
-          nullable: true
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  branches:
-                    type: array
-                    items:
-                      type: number
-  /api/v1/doc/{bucket}/{key}:
-    get:
-      tags:
-      - C:\Users\spiri\Documents\go-transport-generator\example\s3/Service
-      parameters:
-      - in: path
-        name: bucket
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: key
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  document:
-                    type: array
-                    items:
-                      type: string
-                      format: byte
-    post:
-      tags:
-      - C:\Users\spiri\Documents\go-transport-generator\example\s3/Service
-      parameters:
-      - in: path
-        name: bucket
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: key
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          "":
-            schema:
-              type: object
-              properties:
-                document:
-                  type: array
-                  items:
-                    type: string
-                    format: byte
-      responses:
-        "201":
-          description: ""
-          content:
-            application/json:
-              schema:
-                type: object
   /api/v1/document:
     post:
       tags:
@@ -110,8 +23,7 @@ paths:
                 categoryID:
                   type: string
                 contractID:
-                  type: number
-                  nullable: true
+                  type: boolean
                 data:
                   type: string
                   format: binary
@@ -119,10 +31,13 @@ paths:
                 extension:
                   type: string
                 name:
-                  type: string
+                  type: array
+                  items:
+                    type: string
                 supplierID:
-                  type: number
-                  nullable: true
+                  type: array
+                  items:
+                    type: number
       responses:
         "201":
           description: ""
@@ -170,111 +85,6 @@ paths:
                 properties:
                   "":
                     type: object
-  /api/v1/multipart/{bucket}/{key}:
-    post:
-      tags:
-      - C:\Users\spiri\Documents\go-transport-generator\example\s3/Service
-      parameters:
-      - in: path
-        name: bucket
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: key
-        required: true
-        schema:
-          type: string
-      responses:
-        "201":
-          description: ""
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  additionalErrors:
-                    type: object
-                    properties:
-                      lastName:
-                        type: string
-                      name:
-                        type: string
-                    nullable: true
-                  data:
-                    type: object
-                    properties:
-                      upload_id:
-                        type: string
-                  error:
-                    type: boolean
-                  errorText:
-                    type: string
-    patch:
-      tags:
-      - C:\Users\spiri\Documents\go-transport-generator\example\s3/Service
-      parameters:
-      - in: path
-        name: bucket
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: key
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          "":
-            schema:
-              type: object
-              properties:
-                document:
-                  type: array
-                  items:
-                    type: string
-                    format: byte
-                partNumber:
-                  type: number
-                uploadID:
-                  type: string
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                type: object
-    put:
-      tags:
-      - C:\Users\spiri\Documents\go-transport-generator\example\s3/Service
-      parameters:
-      - in: path
-        name: bucket
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: key
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          "":
-            schema:
-              type: object
-              properties:
-                uploadID:
-                  type: string
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                type: object
   /api/v1/namespaces/{namespace}/details-embed-array/{detail}:
     get:
       tags:
@@ -422,14 +232,14 @@ paths:
           type: string
           nullable: true
       - in: query
+        name: testID
+        schema:
+          type: string
+      - in: query
         name: blaID
         schema:
           type: string
           nullable: true
-      - in: query
-        name: testID
-        schema:
-          type: string
       requestBody:
         content:
           application/json:
@@ -499,35 +309,3 @@ paths:
                   id:
                     type: string
                     nullable: true
-  /token:
-    post:
-      tags:
-      - C:\Users\spiri\Documents\go-transport-generator\example\s3/Service
-      parameters:
-      - in: header
-        name: authToken
-        schema:
-          type: string
-          nullable: true
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                grantType:
-                  type: string
-                scope:
-                  type: string
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  expiresIn:
-                    type: number
-                  token:
-                    type: string

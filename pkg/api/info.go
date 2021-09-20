@@ -80,6 +80,8 @@ type Placeholder struct {
 	IsPointer bool
 	IsString  bool
 	IsInt     bool
+	IsBool    bool
+	IsSlice   bool
 	Type      string
 	Name      string
 }

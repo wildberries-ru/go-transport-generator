@@ -18,6 +18,7 @@ require (
 	github.com/valyala/fasthttp v1.17.0
 	github.com/vetcher/go-astra v1.2.0
 	go.uber.org/zap v1.13.0
-	golang.org/x/mod v0.3.0
+	golang.org/x/mod v0.4.2
+	golang.org/x/tools v0.1.5 // indirect
 	gopkg.in/yaml.v2 v2.3.0
 )
