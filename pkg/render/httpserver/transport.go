@@ -47,6 +47,7 @@ var (
 	{{$plainObject := $ct.PlainObject}}
 	{{$multipartValueTags := $ct.MultipartValueTags}}
 	{{$multipartFileTags := $ct.MultipartFileTags}}
+	{{$responseCookiesPlaceholders := $ct.ResponseCookies}}
 	{{$responseHeaderPlaceholders := $ct.ResponseHeaders}}
 	{{$responseStatus := $ct.ResponseStatus}}
 	{{$responseContentType := $ct.ResponseContentType}}
@@ -148,11 +149,15 @@ var (
 				{{end}}
 			{{end}}
 		{{end}}
+		{{$clen := lenMap $cookiePlaceholders}}
+		{{if gt $clen 0}}
+			// cookies must be a *string type
+			{{range $from, $to := $cookiePlaceholders}}
+				{{$to}} = ptr(r.Header.Cookie("{{$from}}"))
+			{{end}}
+		{{end}}
 		{{range $from, $to := $headerPlaceholders}}
 			{{$to}} = ptr(r.Header.Peek("{{$from}}"))
-		{{end}}
-		{{range $from, $to := $cookiePlaceholders}}
-			{{$to}} = ptr(r.Header.Cookie("{{$from}}"))
 		{{end}}
 		{{if eq $contentType "application/json"}}
 			{{$requestName := low .Name}}
@@ -261,17 +266,22 @@ var (
 					{{end}}
 				{{end}}
 			{{end}}
-			{{range $to, $from := $multipartFileTags}}
-				_{{$to}} := form.File["{{$from}}"]
-				if _{{$to}} == nil {
-					err = errors.New("failed to read {{$from}} in MultipartForm")
-					return
-				}
-				if len(_{{$to}}) != 1 {
-					err = errors.New("failed to read file in MultipartForm: too many files in {{$from}}")
-					return
-				}
-				{{$to}} = _{{$to}}[0]
+			{{range $t, $from := $multipartFileTags}}
+				{{$to := index $bodyPlaceholders $t}}
+				{{if $to.IsSlice}}
+					{{$to.Name}} = form.File["{{$from}}"]
+				{{else}}
+					_{{$to.Name}} := form.File["{{$from}}"]
+					if _{{$to.Name}} == nil {
+						err = errors.New("failed to read {{$from}} in MultipartForm")
+						return
+					}
+					if len(_{{$to.Name}}) != 1 {
+						err = errors.New("failed to read file in MultipartForm: too many files in {{$from}}")
+						return
+					}
+					{{$to.Name}} = _{{$to.Name}}[0]
+				{{end}}
 			{{end}}
 		{{end}}
 		return
@@ -311,8 +321,29 @@ var (
 			r.Header.Set("Content-Type", "text/css{{if $responseContentEncoding}}; charset={{$responseContentEncoding}}{{end}}")
 			r.SetBody({{$responseBodyField}})
 		{{end}}
+<<<<<<< HEAD
 		{{range $to, $from := $responseHeaderPlaceholders}}
 			r.Header.Set("{{$to}}", {{$from}})
+=======
+		{{$clen := lenMap $responseCookiesPlaceholders}}
+		{{if gt $clen 0}}
+			cookie := fasthttp.AcquireCookie()
+			{{range $to, $from := $responseCookiesPlaceholders}}
+				// cookies must be a *string type
+				if {{$from}} != nil {
+					cookie.SetKey("{{$to}}")
+					cookie.SetValue(*{{$from}})
+					r.Header.SetCookie(cookie)
+				}
+			{{end}}
+			fasthttp.ReleaseCookie(cookie)
+		{{end}}
+		{{range $to, $from := $responseHeaderPlaceholders}}
+			// variable set to header must be a *string type
+			if {{$from}} != nil {
+				r.Header.Set("{{$to}}", *{{$from}})
+			}
+>>>>>>> 062b1b1ca9848d4f461564c6286c1a6079d880cb
 		{{end}}
 		{{if $responseFile}}r.SetBody({{$responseFile}}){{end}}
 		{{if $responseFileName}}

@@ -17,15 +17,19 @@ type MockService struct {
 }
 
 // UploadDocument ...
+<<<<<<< HEAD
 func (s *MockService) UploadDocument(ctx context.Context, token *string, name []string, extension string, categoryID string, supplierID []int64, contractID bool, data *multipart.FileHeader) (err error) {
+=======
+func (s *MockService) UploadDocument(ctx context.Context, token *string, name []string, extension string, categoryID string, supplierID []int64, contractID *bool, data *multipart.FileHeader) (err error) {
+>>>>>>> 062b1b1ca9848d4f461564c6286c1a6079d880cb
 	args := s.Called(context.Background(), token, name, extension, categoryID, supplierID, contractID, data)
 	return args.Error(0)
 }
 
 // GetWarehouses ...
-func (s *MockService) GetWarehouses(ctx context.Context, token *string) (pets map[string]v1.Detail, err error) {
+func (s *MockService) GetWarehouses(ctx context.Context, token *string) (pets map[string]v1.Detail, someCookie *string, err error) {
 	args := s.Called(context.Background(), token)
-	return args.Get(0).(map[string]v1.Detail), args.Error(1)
+	return args.Get(0).(map[string]v1.Detail), args.Get(1).(*string), args.Error(2)
 }
 
 // GetDetails ...

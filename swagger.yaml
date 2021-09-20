@@ -24,6 +24,7 @@ paths:
                   type: string
                 contractID:
                   type: boolean
+                  nullable: true
                 data:
                   type: string
                   format: binary
@@ -59,7 +60,7 @@ paths:
         "200":
           description: ""
           content:
-            "":
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
               schema:
                 type: object
                 properties:
@@ -186,14 +187,14 @@ paths:
           type: string
           nullable: true
       - in: query
-        name: fileID
-        schema:
-          type: number
-      - in: query
         name: someID
         schema:
           type: number
           nullable: true
+      - in: query
+        name: fileID
+        schema:
+          type: number
       responses:
         "200":
           description: ""

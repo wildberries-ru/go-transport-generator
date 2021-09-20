@@ -44,6 +44,7 @@ import (
 	{{$multipartFileTags := $ct.MultipartFileTags}}
 	{{$formUrlencodedTags := $ct.FormUrlencodedTags}}
 	{{$responseJSONTags := $ct.ResponseJSONTags}}
+	{{$responseCookiesPlaceholders := $ct.ResponseCookies}}
 	{{$responseHeaderPlaceholders := $ct.ResponseHeaders}}
 	{{$responseStatus := $ct.ResponseStatus}}
 	{{$responseContentType := $ct.ResponseContentType}}
@@ -109,11 +110,17 @@ import (
 				{{if eq $to.IsPointer true}} } {{end}}
 			{{end}}
 		{{end}}
-		{{range $from, $to := $headerPlaceholders}}
-			r.Header.Set("{{$from}}", *{{$to}})
+		{{$clen := lenMap $cookiePlaceholders}}
+		{{if gt $clen 0}}
+			// cookies must be the *string type
+			{{range $to, $from := $cookiePlaceholders}}
+				if {{$from}} != nil {
+					r.Header.SetCookie("{{$to}}", *{{$from}})
+				}
+			{{end}}
 		{{end}}
-		{{range $from, $to := $cookiePlaceholders}}
-			r.Header.SetCookie("{{$from}}", *{{$to}})
+		{{range $to, $from := $headerPlaceholders}}
+			r.Header.Set("{{$to}}", *{{$from}})
 		{{end}}
 		{{if eq $contentType "application/json"}}r.Header.Set("Content-Type", "application/json")
 		    {{$requestName := low .Name}}
@@ -141,22 +148,29 @@ import (
 
 			{{range $fr, $to := $multipartValueTags}}
 				{{$from := index $bodyPlaceholders $fr}}
-				{{if $from.IsPointer}}
-					if {{$from.Name}}) != nil {
-						{{if $from.IsString}}
-							_{{$from.Name}} := *{{$from.Name}}
-						{{else if $from.IsInt}}
-							_{{$from.Name}} := fmt.Sprintf("%d", *{{$from.Name}})
-						{{end}}
-					}
+				{{if $from.IsSlice}}
+					// todo generate then {{$from.Name}} is slice
 				{{else}}
-					{{if $from.IsString}}
-						_{{$from.Name}} := {{$from.Name}}
-					{{else if $from.IsInt}}
-						_{{$from.Name}} := fmt.Sprintf("%d", {{$from.Name}})
+					{{if $from.IsPointer}}
+						if {{$from.Name}} != nil {
+							{{if $from.IsString}}
+								writer.WriteField("{{$to}}", *{{$from.Name}})
+							{{else if $from.IsInt}}
+								writer.WriteField("{{$to}}", fmt.Sprintf("%d", *{{$from.Name}}))
+							{{else if $from.IsBool}}
+								writer.WriteField("{{$to}}", fmt.Sprintf("%t", *{{$from.Name}}))
+							{{end}}
+						}
+					{{else}}
+						{{if $from.IsString}}
+							writer.WriteField("{{$to}}", {{$from.Name}})
+						{{else if $from.IsInt}}
+							writer.WriteField("{{$to}}", fmt.Sprintf("%d", {{$from.Name}}))
+						{{else if $from.IsBool}}
+							writer.WriteField("{{$to}}", fmt.Sprintf("%t", {{$from.Name}}))
+						{{end}}
 					{{end}}
 				{{end}}
-				writer.WriteField("{{$to}}", _{{$from.Name}})
 			{{end}}
 
 			{{range $fr, $to := $multipartFileTags}}
@@ -205,6 +219,19 @@ import (
 			err = t.errorProcessor.Decode(r)
 			return
 		}
+		{{$clen := lenMap $responseCookiesPlaceholders}}
+		{{if gt $clen 0}}
+			cookie := fasthttp.AcquireCookie()
+			{{range $from, $to := $responseCookiesPlaceholders}}
+				// cookies must be a *string type
+				_{{$to}}:=string(r.Header.PeekCookie("{{$from}}"))
+				{{$to}} = &_{{$to}}
+			{{end}}
+			fasthttp.ReleaseCookie(cookie)
+		{{end}}
+		{{range $from, $to := $responseHeaderPlaceholders}}
+			{{$to}} = ptr(r.Header.Peek("{{$from}}"))
+		{{end}}
 		{{if eq $responseContentType "application/json"}}
 			{{if lenMap $responseBody}}var theResponse {{low .Name}}Response
 				if err = json.Unmarshal(r.Body(), &theResponse); err != nil {
@@ -227,9 +254,6 @@ import (
 					copy({{$name}}, b)
 				{{end}}
 			{{end}}
-		{{end}}
-		{{range $to, $from := $responseHeaderPlaceholders}}
-			{{$from}} = ptr(r.Header.Peek("{{$to}}"))
 		{{end}}
 		{{if $responseFile}}{{$responseFile}} = r.Body(){{end}}
 		return
