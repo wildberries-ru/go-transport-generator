@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/buaazp/fasthttprouter"
@@ -43,6 +44,7 @@ func New(
 	maxConns int, 
 	errorProcessor errorProcessor, 
 	options map[interface{}]Option,
+	defaultTimeOut time.Duration,
 ) (client {{ .Iface.Name }}, err error) {
 	parsedServerURL, err := url.Parse(serverURL)
 	if err != nil {
@@ -64,6 +66,7 @@ func New(
 		},
 		{{range .Iface.Methods}}transport{{.Name}},
 		{{end}}options,
+		defaultTimeOut,
 	)
 	return
 }

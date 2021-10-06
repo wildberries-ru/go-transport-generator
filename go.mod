@@ -15,7 +15,7 @@ require (
 	github.com/rs/zerolog v1.20.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.6.1
-	github.com/valyala/fasthttp v1.17.0
+	github.com/valyala/fasthttp v1.30.0
 	github.com/vetcher/go-astra v1.2.0
 	go.uber.org/zap v1.13.0
 	golang.org/x/mod v0.3.0

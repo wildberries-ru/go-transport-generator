@@ -8,7 +8,7 @@ import (
 )
 
 // SomeService ...
-// @gtg http-server log metrics(token) mock http-errors swagger
+// @gtg http-server log metrics(token) mock http-errors swagger http-client
 type SomeService interface {
 	// @gtg http-server-method POST
 	// @gtg http-server-uri-path /api/v1/document
