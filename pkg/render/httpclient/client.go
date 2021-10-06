@@ -16,6 +16,7 @@ package {{.PkgName}}
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/valyala/fasthttp"
@@ -44,7 +45,7 @@ type client struct {
 	cli *fasthttp.HostClient
 	{{range .Iface.Methods}}transport{{.Name}} {{.Name}}Transport
 	{{end}}options map[interface{}]Option
-	defaultTimeOut time.Duration,
+	defaultTimeOut time.Duration
 }
 
 {{range .Iface.Methods}}// {{.Name}} ...
@@ -66,7 +67,8 @@ func (s *client) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFullVariables
 	if timeOutFromContext != nil {
 		convertedTimeOutFromContext, ok := timeOutFromContext.(time.Duration)
 		if !ok {
-			return errors.New("Bad custom timeout format ")
+			err = errors.New("Bad custom timeout format ")
+			return
 		}
 		timeOut = convertedTimeOutFromContext
 	}
@@ -83,11 +85,13 @@ func NewClient(
 	cli *fasthttp.HostClient,
 	{{range .Iface.Methods}}transport{{.Name}} {{.Name}}Transport,
 	{{end}}options map[interface{}]Option,
+	defaultTimeOut time.Duration,
 ) {{ .Iface.Name }} {
 	return &client{
 		cli: cli,
 		{{range .Iface.Methods}}transport{{.Name}}: transport{{.Name}},
 		{{end}}options: options,
+		defaultTimeOut: defaultTimeOut,
 	}
 }
 `
