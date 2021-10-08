@@ -6,11 +6,9 @@ package httpserver
 import (
 	"bytes"
 	"encoding/json"
-	"mime/multipart"
 	"net/http"
 	"strconv"
 
-	"github.com/pkg/errors"
 	"github.com/valyala/fasthttp"
 	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
 )
@@ -18,128 +16,6 @@ import (
 var (
 	emptyBytes = []byte("")
 )
-
-// UploadDocumentTransport transport interface
-type UploadDocumentTransport interface {
-	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader, err error)
-	EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response) (err error)
-}
-
-type uploadDocumentTransport struct {
-	decodeTypeIntErrorCreator errorCreator
-}
-
-// DecodeRequest method for decoding requests on server side
-func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader, err error) {
-
-	token = ptr(r.Header.Peek("Authorization"))
-
-	var form *multipart.Form
-	if form, err = ctx.MultipartForm(); err != nil {
-		err = errors.Wrap(err, "failed to read MultipartForm")
-		return
-	}
-
-	_categoryID := form.Value["categoryID"]
-
-	if len(_categoryID) != 1 {
-		err = errors.New("failed to read categoryID in MultipartForm")
-		return
-	}
-
-	categoryID = _categoryID[0]
-
-	_contractID := form.Value["contractID"]
-
-	if len(_contractID) == 1 {
-
-		_ContractID := _contractID[0]
-		if _ContractID != "" {
-			var i int
-			i, err = strconv.Atoi(_ContractID)
-			if err != nil {
-				err = t.decodeTypeIntErrorCreator(err)
-				return
-			}
-
-			ii := int64(i)
-			contractID = &ii
-
-		}
-
-	}
-
-	_extension := form.Value["extension"]
-
-	if len(_extension) != 1 {
-		err = errors.New("failed to read extension in MultipartForm")
-		return
-	}
-
-	extension = _extension[0]
-
-	_name := form.Value["name"]
-
-	if len(_name) != 1 {
-		err = errors.New("failed to read name in MultipartForm")
-		return
-	}
-
-	name = _name[0]
-
-	_supplierID := form.Value["supplierID"]
-
-	if len(_supplierID) == 1 {
-
-		_SupplierID := _supplierID[0]
-		if _SupplierID != "" {
-			var i int
-			i, err = strconv.Atoi(_SupplierID)
-			if err != nil {
-				err = t.decodeTypeIntErrorCreator(err)
-				return
-			}
-
-			ii := int64(i)
-			supplierID = &ii
-
-		}
-
-	}
-
-	_data := form.File["document"]
-	if _data == nil {
-		err = errors.New("failed to read document in MultipartForm")
-		return
-	}
-	if len(_data) != 1 {
-		err = errors.New("failed to read file in MultipartForm: too many files in document")
-		return
-	}
-	data = _data[0]
-
-	return
-}
-
-// EncodeResponse method for encoding response on server side
-func (t *uploadDocumentTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response) (err error) {
-
-	r.Header.Set("Content-Type", "application/json")
-
-	r.Header.SetStatusCode(201)
-	return
-}
-
-// NewUploadDocumentTransport the transport creator for http requests
-func NewUploadDocumentTransport(
-
-	decodeTypeIntErrorCreator errorCreator,
-) UploadDocumentTransport {
-	return &uploadDocumentTransport{
-
-		decodeTypeIntErrorCreator: decodeTypeIntErrorCreator,
-	}
-}
 
 type getWarehousesResponse map[string]v1.Detail
 

@@ -5,14 +5,12 @@ package httpserver
 
 import (
 	"context"
-	"mime/multipart"
 
 	"github.com/valyala/fasthttp"
 	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
 )
 
 type service interface {
-	UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader) (err error)
 	GetWarehouses(ctx context.Context, token *string) (pets map[string]v1.Detail, err error)
 	GetDetails(ctx context.Context, namespace string, detail string, fileID uint32, someID *uint64, token *string) (det v1.Detail, ns v1.Namespace, id *string, err error)
 	GetDetailsEmbedStruct(ctx context.Context, namespace string, detail string, token *string) (response v1.GetDetailsEmbedStructResponse, err error)
@@ -20,52 +18,6 @@ type service interface {
 	PutDetails(ctx context.Context, namespace string, detail string, testID string, blaID *string, token *string, pretty v1.Detail, yang v1.Namespace) (cool v1.Detail, nothing v1.Namespace, id *string, err error)
 	GetSomeElseDataUtf8(ctx context.Context, token *string) (cool v1.Detail, nothing v1.Namespace, id *string, err error)
 	GetFile(ctx context.Context, token *string) (data []byte, fileName string, err error)
-}
-
-type uploadDocument struct {
-	transport      UploadDocumentTransport
-	service        service
-	errorProcessor errorProcessor
-}
-
-// ServeHTTP implements http.Handler.
-func (s *uploadDocument) ServeHTTP(ctx *fasthttp.RequestCtx) {
-	var (
-		token      *string
-		name       string
-		extension  string
-		categoryID string
-		supplierID *int64
-		contractID *int64
-		data       *multipart.FileHeader
-		err        error
-	)
-	token, name, extension, categoryID, supplierID, contractID, data, err = s.transport.DecodeRequest(ctx, &ctx.Request)
-	if err != nil {
-		s.errorProcessor.Encode(ctx, &ctx.Response, err)
-		return
-	}
-
-	err = s.service.UploadDocument(ctx, token, name, extension, categoryID, supplierID, contractID, data)
-	if err != nil {
-		s.errorProcessor.Encode(ctx, &ctx.Response, err)
-		return
-	}
-
-	if err = s.transport.EncodeResponse(ctx, &ctx.Response); err != nil {
-		s.errorProcessor.Encode(ctx, &ctx.Response, err)
-		return
-	}
-}
-
-// NewUploadDocument the server creator
-func NewUploadDocument(transport UploadDocumentTransport, service service, errorProcessor errorProcessor) fasthttp.RequestHandler {
-	ls := uploadDocument{
-		transport:      transport,
-		service:        service,
-		errorProcessor: errorProcessor,
-	}
-	return ls.ServeHTTP
 }
 
 type getWarehouses struct {

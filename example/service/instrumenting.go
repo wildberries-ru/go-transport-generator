@@ -5,7 +5,6 @@ package service
 
 import (
 	"context"
-	"mime/multipart"
 	"strconv"
 	"time"
 
@@ -20,31 +19,6 @@ type instrumentingMiddleware struct {
 	reqCount    metrics.Counter
 	reqDuration metrics.Histogram
 	svc         SomeService
-}
-
-// UploadDocument ...
-func (s *instrumentingMiddleware) UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader) (err error) {
-	defer func(startTime time.Time) {
-
-		var _token string
-		if token != nil {
-
-			_token = *token
-
-		} else {
-			_token = "empty"
-		}
-
-		labels := []string{
-			"method", "UploadDocument",
-			"error", strconv.FormatBool(err != nil),
-
-			"token", _token,
-		}
-		s.reqCount.With(labels...).Add(1)
-		s.reqDuration.With(labels...).Observe(time.Since(startTime).Seconds())
-	}(time.Now())
-	return s.svc.UploadDocument(ctx, token, name, extension, categoryID, supplierID, contractID, data)
 }
 
 // GetWarehouses ...

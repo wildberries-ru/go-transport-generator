@@ -13,8 +13,6 @@ import (
 )
 
 const (
-	httpMethodUploadDocument            = "POST"
-	uriPathUploadDocument               = "/api/v1/document"
 	httpMethodGetWarehouses             = "GET"
 	uriPathGetWarehouses                = "/api/v1/getWarehouses"
 	httpMethodGetDetails                = "GET"
@@ -39,12 +37,6 @@ type errorCreator func(err error) error
 
 // New ...
 func New(router *fasthttprouter.Router, svc service, decodeJSONErrorCreator errorCreator, encodeJSONErrorCreator errorCreator, decodeTypeIntErrorCreator errorCreator, errorProcessor errorProcessor) {
-
-	uploadDocumentTransport := NewUploadDocumentTransport(
-
-		decodeTypeIntErrorCreator,
-	)
-	router.Handle(httpMethodUploadDocument, uriPathUploadDocument, NewUploadDocument(uploadDocumentTransport, svc, errorProcessor))
 
 	getWarehousesTransport := NewGetWarehousesTransport(
 

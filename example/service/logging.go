@@ -5,7 +5,6 @@ package service
 
 import (
 	"context"
-	"mime/multipart"
 	"time"
 
 	v1 "github.com/wildberries-ru/go-transport-generator/example/api/v1"
@@ -16,30 +15,6 @@ import (
 type loggingMiddleware struct {
 	logger logger.Logger
 	svc    SomeService
-}
-
-// UploadDocument ...
-func (s *loggingMiddleware) UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader) (err error) {
-	defer func(begin time.Time) {
-		lg := s.logger.WithError(err).WithFields(
-			map[string]interface{}{
-				"token": token,
-
-				"extension":  extension,
-				"categoryID": categoryID,
-				"supplierID": supplierID,
-				"contractID": contractID,
-				"data":       data,
-				"elapsed":    time.Since(begin),
-			},
-		)
-		if err == nil {
-			lg.Debug("UploadDocument")
-		} else {
-			lg.Error("UploadDocument")
-		}
-	}(time.Now())
-	return s.svc.UploadDocument(ctx, token, name, extension, categoryID, supplierID, contractID, data)
 }
 
 // GetWarehouses ...

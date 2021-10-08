@@ -287,6 +287,10 @@ func (s *Transport) Generate(info api.Interface) (err error) {
 		err = errors.Wrap(err, "[httpclient.Transport]t.Execute error")
 		return
 	}
+	err = s.imports.GoImports(info.AbsOutputPath)
+	if err != nil {
+		err = errors.Wrap(err, "[httpclient.Transport]t.Go imports error")
+	}
 	return
 }
 
