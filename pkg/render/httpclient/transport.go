@@ -99,16 +99,21 @@ import (
 				_ = r.URI()
 			{{end}}
 		{{end}}
+		{{$qstr := ""}}
+		{{$qc:="1"}}
 		{{range $from, $to := $queryPlaceholders}}
-			{{if eq $to.IsString true}}
-				{{if eq $to.IsPointer true}}if {{$to.Name}} != nil { {{end}}
-				r.URI().QueryArgs().Set("{{$from}}", {{if eq $to.IsPointer true}}*{{end}}{{$to.Name}})
-				{{if eq $to.IsPointer true}} } {{end}}
-			{{else if eq $to.IsInt true}}
-				{{if eq $to.IsPointer true}}if {{$to.Name}} != nil { {{end}}
-				r.URI().QueryArgs().Set("{{$from}}", strconv.Itoa({{if ne $to.Type "int"}}int({{if eq $to.IsPointer true}}*{{end}}{{$to.Name}}){{else}}{{if eq $to.IsPointer true}}*{{end}}{{$to.Name}}{{end}}))
-				{{if eq $to.IsPointer true}} } {{end}}
+			{{if eq $qc "1"}} 
+				{{$qstr = concat $qstr "\""}}
+			{{else}}
+				{{$qstr = concat $qstr "+\"&"}}
 			{{end}}
+			{{$qstr = concat $qstr $from}}
+			{{$qstr = concat $qstr "=\"+"}}
+			{{$qstr = concat $qstr $to.Name}}
+			{{$qc = concat $qc "1"}}
+		{{end}}
+		{{if ne $qc "1"}}
+			r.URI().SetQueryString({{$qstr}})
 		{{end}}
 		{{$clen := lenMap $cookiePlaceholders}}
 		{{if gt $clen 0}}

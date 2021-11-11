@@ -215,6 +215,10 @@ var (
 								{{$to.Name}} = &boolTrue
 							}
 						{{end}}
+					}  else if len(_{{$to.Name}}) == 2 {
+						{{if $to.IsBool}}
+							{{$to.Name}} = &boolTrue
+						{{end}}
 					}
 				{{else if $to.IsSlice}}
 					{{if $to.IsString}}
@@ -321,10 +325,6 @@ var (
 			r.Header.Set("Content-Type", "text/css{{if $responseContentEncoding}}; charset={{$responseContentEncoding}}{{end}}")
 			r.SetBody({{$responseBodyField}})
 		{{end}}
-<<<<<<< HEAD
-		{{range $to, $from := $responseHeaderPlaceholders}}
-			r.Header.Set("{{$to}}", {{$from}})
-=======
 		{{$clen := lenMap $responseCookiesPlaceholders}}
 		{{if gt $clen 0}}
 			cookie := fasthttp.AcquireCookie()
@@ -343,7 +343,6 @@ var (
 			if {{$from}} != nil {
 				r.Header.Set("{{$to}}", *{{$from}})
 			}
->>>>>>> 062b1b1ca9848d4f461564c6286c1a6079d880cb
 		{{end}}
 		{{if $responseFile}}r.SetBody({{$responseFile}}){{end}}
 		{{if $responseFileName}}
