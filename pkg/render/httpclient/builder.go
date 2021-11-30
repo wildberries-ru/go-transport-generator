@@ -52,8 +52,7 @@ type Config struct {
 
 // New ...
 func New(
-	serverURL string,
-	maxConns int, 
+	config Config,
 	errorProcessor errorProcessor, 
 	options map[interface{}]Option,
 ) (client {{ .Iface.Name }}, err error) {
