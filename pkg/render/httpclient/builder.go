@@ -56,7 +56,7 @@ func New(
 	errorProcessor errorProcessor, 
 	options map[interface{}]Option,
 ) (client {{ .Iface.Name }}, err error) {
-	parsedServerURL, err := url.Parse(config.serverURL)
+	parsedServerURL, err := url.Parse(config.ServerURL)
 	if err != nil {
 		err = errors.Wrap(err, "failed to parse server url")
 		return

@@ -91,7 +91,7 @@ var (
 	goGeneratedAutomaticallyPrefix = []byte("// CODE GENERATED AUTOMATICALLY")
 	yaml                           = true
 
-	version = "v0.1.4-betta-7"
+	version = "v0.1.4-betta-8"
 )
 
 func main() {
