@@ -26,6 +26,6 @@ build:
 	go build -v \
         -o gtg \
         -ldflags "-extldflags "-static" -X main.version=${VERSION}" \
-        ./cmd/gtg
+        ./gtg
 
 .DEFAULT_GOAL := help

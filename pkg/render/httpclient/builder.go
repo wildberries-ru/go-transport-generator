@@ -37,6 +37,19 @@ type errorProcessor interface {
 	Decode(r *fasthttp.Response) error
 }
 
+// Config ...
+type Config struct {
+	ServerURL           string
+	MaxConns            *int
+	MaxConnDuration     *time.Duration
+	MaxIdleConnDuration *time.Duration
+	ReadBufferSize      *int
+	WriteBufferSize     *int
+	ReadTimeout         *time.Duration
+	WriteTimeout        *time.Duration
+	MaxResponseBodySize *int
+}
+
 // New ...
 func New(
 	serverURL string,
@@ -55,13 +68,39 @@ func New(
 		httpMethod{{.Name}},
 	)
 	{{end}}
+
+	cli := fasthttp.HostClient{
+		Addr: parsedServerURL.Host,
+	}
+	if config.MaxConns != nil {
+		cli.MaxConns = *config.MaxConns
+	}
+	if config.MaxConnDuration != nil {
+		cli.MaxConnDuration = *config.MaxConnDuration
+	}
+	if config.MaxIdleConnDuration != nil {
+		cli.MaxIdleConnDuration = *config.MaxIdleConnDuration
+	}
+	if config.ReadBufferSize != nil {
+		cli.ReadBufferSize = *config.ReadBufferSize
+	}
+	if config.WriteBufferSize != nil {
+		cli.WriteBufferSize = *config.WriteBufferSize
+	}
+	if config.ReadTimeout != nil {
+		cli.ReadTimeout = *config.ReadTimeout
+	}
+	if config.WriteTimeout != nil {
+		cli.WriteTimeout = *config.WriteTimeout
+	}
+	if config.MaxResponseBodySize != nil {
+		cli.MaxResponseBodySize = *config.MaxResponseBodySize
+	}
+	{{if .IsTLSClient}}cli.IsTLS = true{{if .IsInsecureTLS}}
+	cli.TLSConfig = &tls.Config{InsecureSkipVerify: true}{{end}}{{end}}
+
 	client = NewClient(
-		&fasthttp.HostClient{
-			Addr:     parsedServerURL.Host,
-			MaxConns: maxConns,
-			{{if .IsTLSClient}}IsTLS:    true,{{if .IsInsecureTLS}}
-			TLSConfig: &tls.Config{InsecureSkipVerify: true},{{end}}{{end}}
-		},
+		&cli,
 		{{range .Iface.Methods}}transport{{.Name}},
 		{{end}}options,
 	)
