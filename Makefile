@@ -24,7 +24,7 @@ help:
 
 build:
 	go build -v \
-        -o gtg \
+        -o ${GOPATH}/bin/gtg \
         -ldflags "-extldflags "-static" -X main.version=${VERSION}" \
         ./gtg
 
