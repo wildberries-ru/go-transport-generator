@@ -19,11 +19,7 @@ type loggingMiddleware struct {
 }
 
 // UploadDocument ...
-<<<<<<< HEAD
 func (s *loggingMiddleware) UploadDocument(ctx context.Context, token *string, name []string, extension string, categoryID string, supplierID []int64, contractID bool, data *multipart.FileHeader) (err error) {
-=======
-func (s *loggingMiddleware) UploadDocument(ctx context.Context, token *string, name []string, extension string, categoryID string, supplierID []int64, contractID *bool, data *multipart.FileHeader) (err error) {
->>>>>>> 062b1b1ca9848d4f461564c6286c1a6079d880cb
 	defer func(begin time.Time) {
 		lg := s.logger.WithError(err).WithFields(
 			map[string]interface{}{
@@ -47,14 +43,13 @@ func (s *loggingMiddleware) UploadDocument(ctx context.Context, token *string, n
 }
 
 // GetWarehouses ...
-func (s *loggingMiddleware) GetWarehouses(ctx context.Context, token *string) (pets map[string]v1.Detail, someCookie *string, err error) {
+func (s *loggingMiddleware) GetWarehouses(ctx context.Context, token *string) (pets map[string]v1.Detail, err error) {
 	defer func(begin time.Time) {
 		lg := s.logger.WithError(err).WithFields(
 			map[string]interface{}{
 				"token": token,
 
-				"someCookie": someCookie,
-				"elapsed":    time.Since(begin),
+				"elapsed": time.Since(begin),
 			},
 		)
 		if err == nil {

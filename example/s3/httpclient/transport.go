@@ -364,9 +364,13 @@ func (t *getBranchesTransport) EncodeRequest(ctx context.Context, r *fasthttp.Re
 	r.Header.SetMethod(t.method)
 	r.SetRequestURI(t.pathTemplate)
 
-	r.Header.Set("Authorization", *authToken)
+	// cookies must be the *string type
 
-	r.Header.SetCookie("x-supplier-id", *supplierID)
+	if supplierID != nil {
+		r.Header.SetCookie("x-supplier-id", *supplierID)
+	}
+
+	r.Header.Set("Authorization", *authToken)
 
 	return
 }

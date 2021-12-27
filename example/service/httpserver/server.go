@@ -12,13 +12,8 @@ import (
 )
 
 type service interface {
-<<<<<<< HEAD
 	UploadDocument(ctx context.Context, token *string, name []string, extension string, categoryID string, supplierID []int64, contractID bool, data *multipart.FileHeader) (err error)
 	GetWarehouses(ctx context.Context, token *string) (pets map[string]v1.Detail, err error)
-=======
-	UploadDocument(ctx context.Context, token *string, name []string, extension string, categoryID string, supplierID []int64, contractID *bool, data *multipart.FileHeader) (err error)
-	GetWarehouses(ctx context.Context, token *string) (pets map[string]v1.Detail, someCookie *string, err error)
->>>>>>> 062b1b1ca9848d4f461564c6286c1a6079d880cb
 	GetDetails(ctx context.Context, namespace string, detail string, fileID uint32, someID *uint64, token *string) (det v1.Detail, ns v1.Namespace, id *string, err error)
 	GetDetailsEmbedStruct(ctx context.Context, namespace string, detail string, token *string) (response v1.GetDetailsEmbedStructResponse, err error)
 	GetDetailsListEmbedStruct(ctx context.Context, namespace string, detail string, token *string) (details []v1.Detail, err error)
@@ -41,11 +36,7 @@ func (s *uploadDocument) ServeHTTP(ctx *fasthttp.RequestCtx) {
 		extension  string
 		categoryID string
 		supplierID []int64
-<<<<<<< HEAD
 		contractID bool
-=======
-		contractID *bool
->>>>>>> 062b1b1ca9848d4f461564c6286c1a6079d880cb
 		data       *multipart.FileHeader
 		err        error
 	)
@@ -86,10 +77,9 @@ type getWarehouses struct {
 // ServeHTTP implements http.Handler.
 func (s *getWarehouses) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	var (
-		token      *string
-		pets       map[string]v1.Detail
-		someCookie *string
-		err        error
+		token *string
+		pets  map[string]v1.Detail
+		err   error
 	)
 	token, err = s.transport.DecodeRequest(ctx, &ctx.Request)
 	if err != nil {
@@ -97,13 +87,13 @@ func (s *getWarehouses) ServeHTTP(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	pets, someCookie, err = s.service.GetWarehouses(ctx, token)
+	pets, err = s.service.GetWarehouses(ctx, token)
 	if err != nil {
 		s.errorProcessor.Encode(ctx, &ctx.Response, err)
 		return
 	}
 
-	if err = s.transport.EncodeResponse(ctx, &ctx.Response, pets, someCookie); err != nil {
+	if err = s.transport.EncodeResponse(ctx, &ctx.Response, pets); err != nil {
 		s.errorProcessor.Encode(ctx, &ctx.Response, err)
 		return
 	}

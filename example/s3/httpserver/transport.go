@@ -313,9 +313,11 @@ type getBranchesTransport struct {
 // DecodeRequest method for decoding requests on server side
 func (t *getBranchesTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (authToken *string, supplierID *string, err error) {
 
-	authToken = ptr(r.Header.Peek("Authorization"))
+	// cookies must be a *string type
 
 	supplierID = ptr(r.Header.Cookie("x-supplier-id"))
+
+	authToken = ptr(r.Header.Peek("Authorization"))
 
 	return
 }

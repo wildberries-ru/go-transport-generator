@@ -23,11 +23,7 @@ var (
 
 // UploadDocumentTransport transport interface
 type UploadDocumentTransport interface {
-<<<<<<< HEAD
 	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, name []string, extension string, categoryID string, supplierID []int64, contractID bool, data *multipart.FileHeader, err error)
-=======
-	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, name []string, extension string, categoryID string, supplierID []int64, contractID *bool, data *multipart.FileHeader, err error)
->>>>>>> 062b1b1ca9848d4f461564c6286c1a6079d880cb
 	EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response) (err error)
 }
 
@@ -36,11 +32,7 @@ type uploadDocumentTransport struct {
 }
 
 // DecodeRequest method for decoding requests on server side
-<<<<<<< HEAD
 func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, name []string, extension string, categoryID string, supplierID []int64, contractID bool, data *multipart.FileHeader, err error) {
-=======
-func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, name []string, extension string, categoryID string, supplierID []int64, contractID *bool, data *multipart.FileHeader, err error) {
->>>>>>> 062b1b1ca9848d4f461564c6286c1a6079d880cb
 
 	token = ptr(r.Header.Peek("Authorization"))
 
@@ -59,7 +51,6 @@ func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fas
 	categoryID = _categoryID[0]
 
 	_contractID := form.Value["contractID"]
-<<<<<<< HEAD
 	if len(_contractID) != 1 {
 		err = errors.New("failed to read contractID in MultipartForm")
 		return
@@ -68,17 +59,6 @@ func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fas
 	_ContractID := _contractID[0]
 	if _ContractID == "1" {
 		contractID = true
-=======
-	if len(_contractID) == 1 {
-
-		_ContractID := _contractID[0]
-		if _ContractID == "0" {
-			contractID = &boolFalse
-		} else if _ContractID == "1" {
-			contractID = &boolTrue
-		}
-
->>>>>>> 062b1b1ca9848d4f461564c6286c1a6079d880cb
 	}
 
 	_extension := form.Value["extension"]
@@ -143,7 +123,7 @@ type getWarehousesResponse map[string]v1.Detail
 // GetWarehousesTransport transport interface
 type GetWarehousesTransport interface {
 	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, err error)
-	EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, pets map[string]v1.Detail, someCookie *string) (err error)
+	EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, pets map[string]v1.Detail) (err error)
 }
 
 type getWarehousesTransport struct {
@@ -159,7 +139,7 @@ func (t *getWarehousesTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fast
 }
 
 // EncodeResponse method for encoding response on server side
-func (t *getWarehousesTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, pets map[string]v1.Detail, someCookie *string) (err error) {
+func (t *getWarehousesTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, pets map[string]v1.Detail) (err error) {
 
 	r.Header.Set("Content-Type", "application/json")
 	var theResponse getWarehousesResponse
@@ -172,17 +152,6 @@ func (t *getWarehousesTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fas
 		return
 	}
 	r.SetBody(body)
-
-	cookie := fasthttp.AcquireCookie()
-
-	// cookies must be a *string type
-	if someCookie != nil {
-		cookie.SetKey("some_cookie")
-		cookie.SetValue(*someCookie)
-		r.Header.SetCookie(cookie)
-	}
-
-	fasthttp.ReleaseCookie(cookie)
 
 	r.Header.SetStatusCode(http.StatusOK)
 	return
@@ -580,6 +549,11 @@ func (t *getFileTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.R
 
 // EncodeResponse method for encoding response on server side
 func (t *getFileTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, data []byte, fileName string) (err error) {
+
+	// variable set to header must be a *string type
+	if application/vnd.openxmlformats-officedocument.spreadsheetml.sheet != nil {
+		r.Header.Set("Content-Type", *application/vnd.openxmlformats-officedocument.spreadsheetml.sheet)
+	}
 
 	r.SetBody(data)
 
