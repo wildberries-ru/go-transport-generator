@@ -16,11 +16,10 @@ type imports interface {
 // Client ...
 type Client struct {
 	*template.Template
-	packageName    string
-	filePath       []string
-	imports        imports
-	clientTpl      string
-	clientTestsTpl string
+	packageName string
+	filePath    []string
+	imports     imports
+	clientTpl   string
 }
 
 // Generate ...
@@ -46,32 +45,16 @@ func (s *Client) Generate(info api.Interface) (err error) {
 	}
 	err = s.imports.GoImports(info.AbsOutputPath)
 
-	absTestPath := strings.Replace(info.AbsOutputPath, ".go", "_test.go", 1)
-
-	serverTestFile, err := os.Create(absTestPath)
-	if err != nil {
-		return
-	}
-	defer func() {
-		_ = serverTestFile.Close()
-	}()
-	t = template.Must(s.Parse(s.clientTestsTpl))
-	if err = t.Execute(serverTestFile, info); err != nil {
-		return
-	}
-	err = s.imports.GoImports(absTestPath)
-
 	return
 }
 
 // NewClient ...
-func NewClient(template *template.Template, packageName string, filePath []string, imports imports, clientTpl string, clientTestsTpl string) *Client {
+func NewClient(template *template.Template, packageName string, filePath []string, imports imports, clientTpl string) *Client {
 	return &Client{
-		Template:       template,
-		packageName:    packageName,
-		filePath:       filePath,
-		imports:        imports,
-		clientTpl:      clientTpl,
-		clientTestsTpl: clientTestsTpl,
+		Template:    template,
+		packageName: packageName,
+		filePath:    filePath,
+		imports:     imports,
+		clientTpl:   clientTpl,
 	}
 }

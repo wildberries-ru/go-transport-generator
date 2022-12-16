@@ -29,15 +29,17 @@ import (
 )
 
 const (
-	httpServer           = "http-server"
-	httpClient           = "http-client"
-	httpsClient          = "https-client"
-	httpsClientInsecure  = "https-client-insecure"
-	httpErrors           = "http-errors"
-	instrumentingService = "metrics"
-	logService           = "log"
-	mockService          = "mock"
-	swagger              = "swagger"
+	httpServer             = "http-server"
+	httpClient             = "http-client"
+	httpClientTests        = "http-client-tests"
+	httpClientBuilderTests = "http-client-builder-tests"
+	httpsClient            = "https-client"
+	httpsClientInsecure    = "https-client-insecure"
+	httpErrors             = "http-errors"
+	instrumentingService   = "metrics"
+	logService             = "log"
+	mockService            = "mock"
+	swagger                = "swagger"
 
 	requestAPIPathSuffix           = "api-path"
 	requestContentTypeSuffix       = "content-type"
@@ -120,8 +122,11 @@ func main() {
 	httpErrorsUIFile := flag.String("http-errors-ui", "./templates/httperrors/ui", "")
 	// http server
 	httpServerBuilderFile := flag.String("http-server-builder", "./templates/httpserver/builder", "")
+	httpServerBuilderOn := flag.Bool("http-server-builder-on", true, "")
 	httpServerServerFile := flag.String("http-server-server", "./templates/httpserver/server", "")
+	httpServerServerOn := flag.Bool("http-server-server-on", true, "")
 	httpServerTransportFile := flag.String("http-server-transport", "./templates/httpserver/transport", "")
+	httpServerTransportOn := flag.Bool("http-server-transport-on", true, "")
 	// service
 	serviceInstrumentingFile := flag.String("service-instrumenting", "./templates/service/instrumenting", "")
 	serviceLoggingFile := flag.String("service-logging", "./templates/service/logging", "")
@@ -424,12 +429,25 @@ func main() {
 
 	imp := imports.NewImports()
 
-	httpServerRender := httpserver.NewServer(t, httpServerPkgName, httpServerFilePath, imp, string(httpServerServer))
-	httpServerTransportRender := httpserver.NewTransport(t, httpServerPkgName, httpServerTransportFilePath, imp, string(httpServerTransport))
-	httpServerBuilderRender := httpserver.NewBuilder(t, httpServerPkgName, httpServerBuilderFilePath, imp, string(httpServerBuilder))
-	httpClientRender := httpclient.NewClient(t, httpClientPkgName, httpClientFilePath, imp, string(httpClientClient), string(httpClientClientTest))
+	var (
+		httpServerRender          *httpserver.Server
+		httpServerTransportRender *httpserver.Transport
+		httpServerBuilderRender   *httpserver.Builder
+	)
+	if httpServerServerOn != nil && *httpServerServerOn {
+		httpServerRender = httpserver.NewServer(t, httpServerPkgName, httpServerFilePath, imp, string(httpServerServer))
+	}
+	if httpServerTransportOn != nil && *httpServerTransportOn {
+		httpServerTransportRender = httpserver.NewTransport(t, httpServerPkgName, httpServerTransportFilePath, imp, string(httpServerTransport))
+	}
+	if httpServerBuilderOn != nil && *httpServerBuilderOn {
+		httpServerBuilderRender = httpserver.NewBuilder(t, httpServerPkgName, httpServerBuilderFilePath, imp, string(httpServerBuilder))
+	}
+	httpClientRender := httpclient.NewClient(t, httpClientPkgName, httpClientFilePath, imp, string(httpClientClient))
+	httpClientTestsRender := httpclient.NewClientTests(t, httpClientPkgName, httpClientFilePath, imp, string(httpClientClientTest))
 	httpClientTransportRender := httpclient.NewTransport(t, httpClientPkgName, httpClientTransportFilePath, imp, string(httpClientTransport))
-	httpClientBuilderRender := httpclient.NewBuilder(t, httpClientPkgName, httpClientBuilderFilePath, imp, string(httpClientBuilder), string(httpClientBuilderTest))
+	httpClientBuilderRender := httpclient.NewBuilder(t, httpClientPkgName, httpClientBuilderFilePath, imp, string(httpClientBuilder))
+	httpClientBuilderTestsRender := httpclient.NewBuilderTests(t, httpClientPkgName, httpClientBuilderFilePath, imp, string(httpClientBuilderTest))
 	httpUIErrorsRender := httperrors.NewUI(t, httpErrorsPkgName, httpUIErrorsFilePath, imp, string(httpErrorsUI))
 	httpClientErrorsRender := httperrors.NewClient(t, httpErrorsPkgName, httpClientErrorsFilePath, imp, string(httpErrorsClient))
 	instrumentingRender := service.NewInstrumenting(t, serviceInstrumentingFilePath, imp, string(serviceInstrumenting))
@@ -450,6 +468,12 @@ func main() {
 			httpClientRender,
 			httpClientTransportRender,
 			httpClientBuilderRender,
+		),
+		httpClientTests: processor.NewHTTPClientTests(
+			httpClientTestsRender,
+		),
+		httpClientBuilderTests: processor.NewHTTPClientBuilderTests(
+			httpClientBuilderTestsRender,
 		),
 		httpsClient: processor.NewHTTPClient(
 			true,
