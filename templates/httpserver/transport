@@ -11,6 +11,10 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/valyala/fasthttp"
+
+	{{range $i, $k := .Imports}}
+    {{$k}}
+	{{end}}
 )
 
 var (

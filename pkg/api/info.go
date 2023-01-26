@@ -23,6 +23,7 @@ type Interface struct {
 	AbsOutputPath string
 	RelOutputPath string
 	Iface         types.Interface
+	Imports       []*types.Import
 	IsTLSClient   bool
 	IsInsecureTLS bool
 	HTTPMethods   map[string]HTTPMethod

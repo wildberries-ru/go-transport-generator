@@ -7,6 +7,10 @@ import (
 	"context"
 
 	"github.com/valyala/fasthttp"
+
+	{{range $i, $k := .Imports}}
+    {{$k}}
+	{{end}}
 )
 
 type service interface {

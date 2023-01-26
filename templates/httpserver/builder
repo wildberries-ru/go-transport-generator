@@ -13,6 +13,10 @@ import (
 
 	"github.com/buaazp/fasthttprouter"
 	"github.com/valyala/fasthttp"
+
+	{{range $i, $k := .Imports}}
+    {{$k}}
+	{{end}}
 )
 
 const (

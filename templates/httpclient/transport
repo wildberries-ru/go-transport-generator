@@ -12,6 +12,10 @@ import (
 	"encoding/json"
 
 	"github.com/valyala/fasthttp"
+
+	{{range $i, $k := .Imports}}
+    {{$k}}
+	{{end}}
 )
 
 {{range .Iface.Methods}}
