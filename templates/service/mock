@@ -1,0 +1,25 @@
+// Package {{.PkgName}} ...
+// CODE GENERATED AUTOMATICALLY
+// DO NOT EDIT
+package {{.PkgName}}
+
+import (
+	"context"
+
+	"github.com/stretchr/testify/mock"
+)
+
+// MockService ...
+type MockService struct {
+	mock.Mock
+}
+
+{{range .Iface.Methods -}}
+// {{.Name}} ...
+func (s *MockService) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFullVariables .Results ","}}) {
+	{{$args := popFirst .Args -}}
+	{{$res := popLast .Results -}}
+	args := s.Called(context.Background(), {{joinVariableNames $args ","}})
+	return {{range $i, $a := $res}}args.Get({{$i}}).({{$a.Type}}), {{end}}args.Error({{lenVariables $res}})
+}
+{{end}}

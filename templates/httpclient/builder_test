@@ -1,0 +1,72 @@
+// Package {{.PkgName}} ...
+// CODE GENERATED AUTOMATICALLY
+// DO NOT EDIT
+package {{.PkgName}}
+
+import (
+    "fmt"
+    "github.com/valyala/fasthttp"
+    "math/rand"
+    "net/url"
+    "reflect"
+    "testing"
+    "time"
+)
+
+type testErrorProcessor struct{}
+
+func TestNew(t *testing.T) {
+	serverURL := fmt.Sprintf("https://%v.com", time.Now().UnixNano())
+	parsedServerURL, _ := url.Parse(serverURL)
+	maxConns := rand.Int()
+	opts := map[interface{}]Option{}
+
+	{{range .Iface.Methods}}transport{{.Name}} := New{{.Name}}Transport(
+		&testErrorProcessor{},
+		parsedServerURL.Scheme+"://"+parsedServerURL.Host+parsedServerURL.Path+uriPathClient{{.Name}},
+		httpMethod{{.Name}},
+	)
+	{{end}}
+
+	cl := client{
+		&fasthttp.HostClient{
+			Addr:     parsedServerURL.Host,
+			MaxConns: maxConns,
+			{{if .IsTLSClient}}IsTLS:    true,{{if .IsInsecureTLS}}
+			TLSConfig: &tls.Config{InsecureSkipVerify: true},{{end}}{{end}}
+		},
+		{{range .Iface.Methods}}transport{{.Name}},
+	{{end}}opts,
+	}
+
+	type args struct {
+		config         Config
+		errorProcessor errorProcessor
+		options        map[interface{}]Option
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantClient {{ .Iface.Name }}
+		wantErr    bool
+	}{
+		{"test new builder", args{Config{ServerURL: serverURL, MaxConns: &maxConns}, &testErrorProcessor{}, opts}, &cl, false},
+		{"test new builder incorrect URL", args{Config{ServerURL: " http:example%20.com", MaxConns: &maxConns}, &testErrorProcessor{}, opts}, nil, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotClient, err := New(tt.args.config, tt.args.errorProcessor, tt.args.options)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotClient, tt.wantClient) {
+				t.Errorf("New() = %v, want %v", gotClient, tt.wantClient)
+			}
+		})
+	}
+}
+
+func (ep *testErrorProcessor) Decode(r *fasthttp.Response) error {
+	return nil
+}

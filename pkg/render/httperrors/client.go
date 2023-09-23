@@ -9,60 +9,13 @@ import (
 	"github.com/wildberries-ru/go-transport-generator/pkg/api"
 )
 
-const clientTpl = `// Package {{.PkgName}} ...
-// CODE GENERATED AUTOMATICALLY
-// DO NOT EDIT
-package {{.PkgName}}
-
-// ClientErrorProcessor ...
-type ClientErrorProcessor struct {
-	defaultCode    int
-	defaultMessage string
-}
-
-// Encode writes a svc error to the given http.ResponseWriter.
-func (e *ClientErrorProcessor) Encode(ctx context.Context, r *fasthttp.Response, err error) {
-	code := e.defaultCode
-	message := e.defaultMessage
-	if err, ok := err.(errorCode); ok {
-		if err.StatusCode() != e.defaultCode {
-			code = err.StatusCode()
-			message = err.Error()
-		}
-	}
-	r.SetStatusCode(code)
-	r.SetBodyString(message)
-	return
-}
-
-// Decode reads a Service error from the given *http.Response.
-func (e *ClientErrorProcessor) Decode(r *fasthttp.Response) error {
-	msgBytes := r.Body()
-	msg := strings.TrimSpace(string(msgBytes))
-	if msg == "" {
-		msg = http.StatusText(r.StatusCode())
-	}
-	return &httpError{
-		Code:    r.StatusCode(),
-		Message: msg,
-	}
-}
-
-// NewClientErrorProcessor ...
-func NewClientErrorProcessor(defaultCode int, defaultMessage string) *ClientErrorProcessor {
-	return &ClientErrorProcessor{
-		defaultCode:    defaultCode,
-		defaultMessage: defaultMessage,
-	}
-}
-`
-
 // Client ...
 type Client struct {
 	*template.Template
 	packageName string
 	filePath    []string
 	imports     imports
+	clientTpl   string
 }
 
 // Generate ...
@@ -81,7 +34,7 @@ func (s *Client) Generate(info api.Interface) (err error) {
 	defer func() {
 		_ = serverFile.Close()
 	}()
-	t := template.Must(s.Parse(clientTpl))
+	t := template.Must(s.Parse(s.clientTpl))
 	if err = t.Execute(serverFile, info); err != nil {
 		return
 	}
@@ -90,11 +43,12 @@ func (s *Client) Generate(info api.Interface) (err error) {
 }
 
 // NewClient ...
-func NewClient(template *template.Template, packageName string, filePath []string, imports imports) *Client {
+func NewClient(template *template.Template, packageName string, filePath []string, imports imports, clientTpl string) *Client {
 	return &Client{
 		Template:    template,
 		packageName: packageName,
 		filePath:    filePath,
 		imports:     imports,
+		clientTpl:   clientTpl,
 	}
 }

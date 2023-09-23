@@ -1,8 +1,10 @@
 package kitadapter
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"reflect"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -70,8 +72,19 @@ func (a *adapter) convertFields(msg string) []interface{} {
 
 	fields = append(fields, "msg", msg)
 
-	for k, v := range a.fields {
-		fields = append(fields, k, v)
+	for k, value := range a.fields {
+		rvalue := reflect.ValueOf(value)
+		switch rvalue.Kind() {
+		case reflect.Array, reflect.Map, reflect.Slice, reflect.Struct:
+			d, err := json.Marshal(value)
+			if err != nil {
+				fields = append(fields, k, value)
+				continue
+			}
+			fields = append(fields, k, string(d))
+		default:
+			fields = append(fields, k, value)
+		}
 	}
 
 	if a.err != nil {

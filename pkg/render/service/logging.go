@@ -10,66 +10,12 @@ import (
 	"github.com/wildberries-ru/go-transport-generator/pkg/api"
 )
 
-const loggingTpl = `// Package {{.PkgName}} ...
-// CODE GENERATED AUTOMATICALLY
-// DO NOT EDIT
-package {{.PkgName}}
-
-import (
-	"context"
-	"time"
-
-	"github.com/wildberries-ru/go-transport-generator/log/logger"
-)
-
-// loggingMiddleware wraps Service and logs request information to the provided logger
-type loggingMiddleware struct {
-	logger logger.Logger
-	svc    {{ .Iface.Name }}
-}
-{{$methods := .HTTPMethods}}
-{{range .Iface.Methods -}}
-	{{$method := index $methods .Name}}
-	// {{.Name}} ...
-	func (s *loggingMiddleware) {{.Name}}({{joinFullVariables .Args ","}}) ({{joinFullVariables .Results ","}}) {
-		defer func(begin time.Time) {
-			lg := s.logger.WithError(err).WithFields(
-				map[string]interface{} {
-					{{$args := popFirst .Args -}}
-					{{range $arg := $args -}}
-						{{if notin $method.LogIgnores $arg.Name}}"{{$arg.Name}}": {{$arg.Name}},{{end}} 
-					{{end -}}
-					{{$args := popLast .Results -}}
-					{{range $arg := $args -}}
-						{{if notin $method.LogIgnores $arg.Name}}"{{$arg.Name}}": {{$arg.Name}},{{end}}
-					{{end -}}
-					"elapsed": time.Since(begin),
-				},
-			)
-			if err == nil {
-				lg.Debug("{{.Name}}")
-			} else {
-				lg.Error("{{.Name}}")
-			}
-		}(time.Now())
-		return s.svc.{{.Name}}({{joinVariableNamesWithEllipsis .Args ","}})
-	}
-{{end}}
-
-// NewLoggingMiddleware ...
-func NewLoggingMiddleware(logger logger.Logger, svc {{ .Iface.Name }}) {{ .Iface.Name }} {
-	return &loggingMiddleware{
-		logger: logger,
-		svc:    svc,
-	}
-}
-`
-
 // Logging ...
 type Logging struct {
 	*template.Template
-	filePath []string
-	imports  imports
+	filePath   []string
+	imports    imports
+	loggingTpl string
 }
 
 // Generate ...
@@ -88,7 +34,7 @@ func (s *Logging) Generate(info api.Interface) (err error) {
 	defer func() {
 		_ = file.Close()
 	}()
-	t := template.Must(s.Parse(loggingTpl))
+	t := template.Must(s.Parse(s.loggingTpl))
 	if err = t.Execute(file, info); err != nil {
 		return
 	}
@@ -97,10 +43,11 @@ func (s *Logging) Generate(info api.Interface) (err error) {
 }
 
 // NewLogging ...
-func NewLogging(template *template.Template, filePath []string, imports imports) *Logging {
+func NewLogging(template *template.Template, filePath []string, imports imports, loggingTpl string) *Logging {
 	return &Logging{
-		Template: template,
-		filePath: filePath,
-		imports:  imports,
+		Template:   template,
+		filePath:   filePath,
+		imports:    imports,
+		loggingTpl: loggingTpl,
 	}
 }

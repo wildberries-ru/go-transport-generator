@@ -17,11 +17,13 @@ import (
 
 var (
 	emptyBytes = []byte("")
+	boolFalse  = false
+	boolTrue   = true
 )
 
 // UploadDocumentTransport transport interface
 type UploadDocumentTransport interface {
-	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader, err error)
+	DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, name []string, extension string, categoryID string, supplierID []int64, contractID bool, data *multipart.FileHeader, err error)
 	EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response) (err error)
 }
 
@@ -30,7 +32,7 @@ type uploadDocumentTransport struct {
 }
 
 // DecodeRequest method for decoding requests on server side
-func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader, err error) {
+func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.Request) (token *string, name []string, extension string, categoryID string, supplierID []int64, contractID bool, data *multipart.FileHeader, err error) {
 
 	token = ptr(r.Header.Peek("Authorization"))
 
@@ -41,7 +43,6 @@ func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fas
 	}
 
 	_categoryID := form.Value["categoryID"]
-
 	if len(_categoryID) != 1 {
 		err = errors.New("failed to read categoryID in MultipartForm")
 		return
@@ -50,27 +51,17 @@ func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fas
 	categoryID = _categoryID[0]
 
 	_contractID := form.Value["contractID"]
+	if len(_contractID) != 1 {
+		err = errors.New("failed to read contractID in MultipartForm")
+		return
+	}
 
-	if len(_contractID) == 1 {
-
-		_ContractID := _contractID[0]
-		if _ContractID != "" {
-			var i int
-			i, err = strconv.Atoi(_ContractID)
-			if err != nil {
-				err = t.decodeTypeIntErrorCreator(err)
-				return
-			}
-
-			ii := int64(i)
-			contractID = &ii
-
-		}
-
+	_ContractID := _contractID[0]
+	if _ContractID == "1" {
+		contractID = true
 	}
 
 	_extension := form.Value["extension"]
-
 	if len(_extension) != 1 {
 		err = errors.New("failed to read extension in MultipartForm")
 		return
@@ -78,32 +69,18 @@ func (t *uploadDocumentTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fas
 
 	extension = _extension[0]
 
-	_name := form.Value["name"]
-
-	if len(_name) != 1 {
-		err = errors.New("failed to read name in MultipartForm")
-		return
-	}
-
-	name = _name[0]
+	name = form.Value["name"]
 
 	_supplierID := form.Value["supplierID"]
-
-	if len(_supplierID) == 1 {
-
-		_SupplierID := _supplierID[0]
-		if _SupplierID != "" {
-			var i int
-			i, err = strconv.Atoi(_SupplierID)
-			if err != nil {
-				err = t.decodeTypeIntErrorCreator(err)
-				return
-			}
-
-			ii := int64(i)
-			supplierID = &ii
-
+	for _, v := range _supplierID {
+		var i int
+		i, err = strconv.Atoi(v)
+		if err != nil {
+			err = t.decodeTypeIntErrorCreator(err)
+			return
 		}
+
+		supplierID = append(supplierID, int64(i))
 
 	}
 
@@ -265,7 +242,10 @@ func (t *getDetailsTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fastht
 	}
 	r.SetBody(body)
 
-	r.Header.Set("X-Auth-ID", "id")
+	// variable set to header must be a *string type
+	if id != nil {
+		r.Header.Set("X-Auth-ID", *id)
+	}
 
 	r.Header.SetStatusCode(http.StatusOK)
 	return
@@ -464,7 +444,10 @@ func (t *putDetailsTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fastht
 	}
 	r.SetBody(body)
 
-	r.Header.Set("X-Auth-ID", "id")
+	// variable set to header must be a *string type
+	if id != nil {
+		r.Header.Set("X-Auth-ID", *id)
+	}
 
 	r.Header.SetStatusCode(http.StatusOK)
 	return
@@ -567,12 +550,17 @@ func (t *getFileTransport) DecodeRequest(ctx *fasthttp.RequestCtx, r *fasthttp.R
 // EncodeResponse method for encoding response on server side
 func (t *getFileTransport) EncodeResponse(ctx *fasthttp.RequestCtx, r *fasthttp.Response, data []byte, fileName string) (err error) {
 
-	r.Header.Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	// variable set to header must be a *string type
+	if application/vnd.openxmlformats-officedocument.spreadsheetml.sheet != nil {
+		r.Header.Set("Content-Type", *application/vnd.openxmlformats-officedocument.spreadsheetml.sheet)
+	}
 
 	r.SetBody(data)
+
 	if len(fileName) > 0 {
 		r.Header.Set("Content-Disposition", "attachment; filename=\""+fileName+"\"")
 	}
+
 	r.Header.SetStatusCode(http.StatusOK)
 	return
 }
