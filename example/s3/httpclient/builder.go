@@ -5,6 +5,7 @@ package httpclient
 
 import (
 	"net/url"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/valyala/fasthttp"
@@ -31,14 +32,26 @@ type errorProcessor interface {
 	Decode(r *fasthttp.Response) error
 }
 
+// Config ...
+type Config struct {
+	ServerURL           string
+	MaxConns            *int
+	MaxConnDuration     *time.Duration
+	MaxIdleConnDuration *time.Duration
+	ReadBufferSize      *int
+	WriteBufferSize     *int
+	ReadTimeout         *time.Duration
+	WriteTimeout        *time.Duration
+	MaxResponseBodySize *int
+}
+
 // New ...
 func New(
-	serverURL string,
-	maxConns int,
+	config Config,
 	errorProcessor errorProcessor,
 	options map[interface{}]Option,
 ) (client Service, err error) {
-	parsedServerURL, err := url.Parse(serverURL)
+	parsedServerURL, err := url.Parse(config.ServerURL)
 	if err != nil {
 		err = errors.Wrap(err, "failed to parse server url")
 		return
@@ -79,11 +92,36 @@ func New(
 		httpMethodGetBranches,
 	)
 
+	cli := fasthttp.HostClient{
+		Addr: parsedServerURL.Host,
+	}
+	if config.MaxConns != nil {
+		cli.MaxConns = *config.MaxConns
+	}
+	if config.MaxConnDuration != nil {
+		cli.MaxConnDuration = *config.MaxConnDuration
+	}
+	if config.MaxIdleConnDuration != nil {
+		cli.MaxIdleConnDuration = *config.MaxIdleConnDuration
+	}
+	if config.ReadBufferSize != nil {
+		cli.ReadBufferSize = *config.ReadBufferSize
+	}
+	if config.WriteBufferSize != nil {
+		cli.WriteBufferSize = *config.WriteBufferSize
+	}
+	if config.ReadTimeout != nil {
+		cli.ReadTimeout = *config.ReadTimeout
+	}
+	if config.WriteTimeout != nil {
+		cli.WriteTimeout = *config.WriteTimeout
+	}
+	if config.MaxResponseBodySize != nil {
+		cli.MaxResponseBodySize = *config.MaxResponseBodySize
+	}
+
 	client = NewClient(
-		&fasthttp.HostClient{
-			Addr:     parsedServerURL.Host,
-			MaxConns: maxConns,
-		},
+		&cli,
 		transportCreateMultipartUpload,
 		transportUploadPartDocument,
 		transportCompleteUpload,

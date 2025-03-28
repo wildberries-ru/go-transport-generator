@@ -74,8 +74,7 @@ func TestNew(t *testing.T) {
 	}
 
 	type args struct {
-		serverURL      string
-		maxConns       int
+		config         Config
 		errorProcessor errorProcessor
 		options        map[interface{}]Option
 	}
@@ -85,12 +84,12 @@ func TestNew(t *testing.T) {
 		wantClient Service
 		wantErr    bool
 	}{
-		{"test new builder", args{serverURL, maxConns, &testErrorProcessor{}, opts}, &cl, false},
-		{"test new builder incorrect URL", args{" http:example%20.com", maxConns, &testErrorProcessor{}, opts}, nil, true},
+		{"test new builder", args{Config{ServerURL: serverURL, MaxConns: &maxConns}, &testErrorProcessor{}, opts}, &cl, false},
+		{"test new builder incorrect URL", args{Config{ServerURL: " http:example%20.com", MaxConns: &maxConns}, &testErrorProcessor{}, opts}, nil, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotClient, err := New(tt.args.serverURL, tt.args.maxConns, tt.args.errorProcessor, tt.args.options)
+			gotClient, err := New(tt.args.config, tt.args.errorProcessor, tt.args.options)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 				return

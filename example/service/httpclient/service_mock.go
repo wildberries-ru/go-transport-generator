@@ -17,7 +17,7 @@ type MockService struct {
 }
 
 // UploadDocument ...
-func (s *MockService) UploadDocument(ctx context.Context, token *string, name string, extension string, categoryID string, supplierID *int64, contractID *int64, data *multipart.FileHeader) (err error) {
+func (s *MockService) UploadDocument(ctx context.Context, token *string, name []string, extension string, categoryID string, supplierID []int64, contractID bool, data *multipart.FileHeader) (err error) {
 	args := s.Called(context.Background(), token, name, extension, categoryID, supplierID, contractID, data)
 	return args.Error(0)
 }

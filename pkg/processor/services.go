@@ -45,7 +45,8 @@ func (s *Services) Process(info *api.GenerationInfo, astra *types.File, outPath 
 				doc = str.String()
 
 				iface := api.Interface{
-					Iface: i,
+					Iface:   i,
+					Imports: astra.Imports,
 				}
 				iface.RelOutputPath = outPath
 				if iface.AbsOutputPath, err = filepath.Abs(outPath); err != nil {
